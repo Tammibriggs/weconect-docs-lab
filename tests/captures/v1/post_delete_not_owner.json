@@ -1,0 +1,22 @@
+{
+  "name": "post_delete_not_owner",
+  "group": "Delete a post",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/posts/6ada229b61da6152a72a479e",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "you can delete only your post"
+    }
+  },
+  "durationMs": 6
+}

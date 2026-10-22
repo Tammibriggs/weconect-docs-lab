@@ -1,0 +1,36 @@
+{
+  "name": "followers",
+  "group": "Followers",
+  "note": "carol and bob follow alice; alice follows bob back",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/followers",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "id": "6ada228f61da6152a72a4770",
+          "username": "carol",
+          "image": {},
+          "following": false
+        },
+        {
+          "id": "6ada228e61da6152a72a476e",
+          "username": "bob",
+          "image": {},
+          "following": true
+        }
+      ]
+    }
+  },
+  "durationMs": 28
+}

@@ -1,0 +1,28 @@
+{
+  "name": "post_delete_invalid_id",
+  "group": "Delete a post",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/posts/abc",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "stringValue": "\"abc\"",
+      "valueType": "string",
+      "kind": "ObjectId",
+      "value": "abc",
+      "path": "_id",
+      "reason": {},
+      "name": "CastError",
+      "message": "Cast to ObjectId failed for value \"abc\" (type string) at path \"_id\" for model \"Post\""
+    }
+  },
+  "durationMs": 7
+}

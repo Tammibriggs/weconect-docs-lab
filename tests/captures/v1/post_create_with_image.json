@@ -1,0 +1,44 @@
+{
+  "name": "post_create_with_image",
+  "group": "Create a post",
+  "request": {
+    "method": "POST",
+    "path": "/api/posts",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6ada228e61da6152a72a476c",
+      "desc": "A photo",
+      "img": {
+        "url": "https://example.com/photo.jpg",
+        "filename": "photo.jpg"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "likes": [],
+        "comments": [],
+        "_id": "6ada229c61da6152a72a47a0",
+        "userId": "6ada228e61da6152a72a476c",
+        "desc": "A photo",
+        "img": {
+          "url": "https://example.com/photo.jpg",
+          "filename": "photo.jpg"
+        },
+        "createdAt": "2026-10-22T14:50:04.025Z",
+        "updatedAt": "2026-10-22T14:50:04.025Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 17
+}

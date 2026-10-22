@@ -1,0 +1,39 @@
+{
+  "name": "login_dave",
+  "group": "Log in",
+  "note": "Checks whether isAdmin from register_extra_fields was stored",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "dave",
+      "password": "<redacted encrypted password>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {},
+        "coverPicture": {},
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6ada229161da6152a72a4774",
+        "username": "dave",
+        "createdAt": "2026-10-22T14:49:53.592Z",
+        "updatedAt": "2026-10-22T14:49:53.592Z",
+        "__v": 0,
+        "accessToken": "<redacted JWT>"
+      }
+    }
+  },
+  "durationMs": 9
+}

@@ -1,0 +1,26 @@
+{
+  "name": "register_bob",
+  "group": "Register",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "bob",
+      "password": "<redacted encrypted password>",
+      "password1": "secret2"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok"
+    }
+  },
+  "durationMs": 22
+}

@@ -1,0 +1,26 @@
+{
+  "name": "follow_carol_to_alice",
+  "group": "Follow",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/follow",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6ada228e61da6152a72a476c"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "message": "user has been followed"
+    }
+  },
+  "durationMs": 34
+}

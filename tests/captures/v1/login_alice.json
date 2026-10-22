@@ -1,0 +1,38 @@
+{
+  "name": "login_alice",
+  "group": "Log in",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "alice",
+      "password": "<redacted encrypted password>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {},
+        "coverPicture": {},
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6ada228e61da6152a72a476c",
+        "username": "alice",
+        "createdAt": "2026-10-22T14:49:50.432Z",
+        "updatedAt": "2026-10-22T14:49:50.432Z",
+        "__v": 0,
+        "accessToken": "<redacted JWT>"
+      }
+    }
+  },
+  "durationMs": 35
+}

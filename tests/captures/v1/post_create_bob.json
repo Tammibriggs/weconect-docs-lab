@@ -1,0 +1,36 @@
+{
+  "name": "post_create_bob",
+  "group": "Create a post",
+  "request": {
+    "method": "POST",
+    "path": "/api/posts",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6ada228e61da6152a72a476e",
+      "desc": "Hello from Bob"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "likes": [],
+        "comments": [],
+        "_id": "6ada229c61da6152a72a47a2",
+        "userId": "6ada228e61da6152a72a476e",
+        "desc": "Hello from Bob",
+        "createdAt": "2026-10-22T14:50:04.339Z",
+        "updatedAt": "2026-10-22T14:50:04.339Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 14
+}

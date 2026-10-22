@@ -1,0 +1,22 @@
+{
+  "name": "user_get_unknown",
+  "group": "Get a user",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/000000000000000000000000/user",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "User not found"
+    }
+  },
+  "durationMs": 10
+}

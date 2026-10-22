@@ -1,0 +1,27 @@
+{
+  "name": "follow_self",
+  "group": "Follow",
+  "note": "Nothing stops a user from following themselves",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/follow",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6ada228f61da6152a72a4770"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "message": "user has been followed"
+    }
+  },
+  "durationMs": 25
+}

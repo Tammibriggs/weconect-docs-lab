@@ -1,0 +1,1246 @@
+openapi: 3.1.0
+info:
+  title: weConect API
+  version: 1.0.0
+  summary: Accounts, follows, posts, and timelines for the weConect social app.
+  description: |
+    The weConect API is the backend of weConect, a small social app. Use it to
+    create an account, find and follow other users, publish posts, and read a
+    timeline of posts from the people you follow.
+
+    This document describes version 1 as it behaves today, including
+    behaviour that will change in version 2. Every status code and example
+    comes from a captured response. `TESTING.md` in the repository lists the
+    test cases and every known issue.
+
+    ## Authentication
+
+    Every endpoint except **Register** and **Log in** needs an access token.
+    Get one from **Log in** and send it in the `Authorization` header:
+
+    ```http
+    Authorization: Bearer ACCESS_TOKEN
+    ```
+
+    Tokens expire two days after login. The API reads the second word of the
+    header as the token and doesn't check the first, so `Bearer` is a
+    convention rather than a requirement.
+
+    | Problem with the token | Status |
+    |---|---|
+    | No `Authorization` header | `401` with `"You are not authenticated!"` |
+    | Signed with the wrong secret | `403` with `"Token is invalid"` |
+    | Expired | `403` with `"expired": true` and `"Your session has expired"` |
+    | Not a JWT, or no scheme word before it | `500` with an HTML error page |
+
+    ## Errors
+
+    Most errors return JSON with `"status": "error"` and a `message`. Version 1
+    also has three other error shapes, documented on each operation:
+
+    - Some `500` responses return the raw database error in an `error` field,
+      or as the whole body.
+    - **Unfollow** returns its messages as plain JSON strings.
+    - A body that isn't valid JSON, or a malformed token, returns Express's
+      HTML error page. So does a path that doesn't exist, with `404`.
+
+    ## Browser requests
+
+    Browsers can call the API only from the origin set in the server's
+    `ALLOWED_HOST` variable. A preflight request from any other origin gets
+    `204` with no CORS headers, so the browser blocks the call. Requests from
+    servers and command-line tools aren't affected.
+servers:
+  - url: http://localhost:8800
+    description: Local development server. The API isn't deployed yet.
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Auth
+    description: Create an account and log in to get an access token.
+  - name: Users
+    description: Read your own profile, look up other users, and search by username.
+  - name: Follows
+    description: Follow and unfollow users, and list who follows you and whom you follow.
+  - name: Posts
+    description: Publish, read, like, and delete posts, and read your timeline.
+
+paths:
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      summary: Register
+      operationId: registerUser
+      security: []
+      description: |
+        Creates an account. The response doesn't include the new user or a
+        token, so call **Log in** next.
+
+        Only `username` and `password` are stored. Other fields in the body,
+        such as `isAdmin`, are ignored.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              username: alice
+              password: secret1
+              password1: secret1
+      responses:
+        '200':
+          description: The account was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+              example:
+                status: ok
+        '400':
+          $ref: '#/components/responses/InvalidJson'
+        '401':
+          description: |
+            `username` is missing or isn't a string, `password` is missing or
+            shorter than 5 characters, or `password1` doesn't match `password`.
+            Version 1 uses `401` for these validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidUsername:
+                  summary: username is missing or isn't a string
+                  value:
+                    status: error
+                    message: Invalid username
+                passwordMismatch:
+                  summary: password1 doesn't match, or is missing
+                  value:
+                    status: error
+                    message: Password does not match
+                passwordTooShort:
+                  summary: password is shorter than 5 characters
+                  value:
+                    status: error
+                    message: Password too short. Should be at least 5 characters
+        '409':
+          description: The username is already taken. The body includes the raw database error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                message: Username already exists
+                error:
+                  driver: true
+                  name: MongoError
+                  index: 0
+                  code: 11000
+                  keyPattern:
+                    username: 1
+                  keyValue:
+                    username: alice
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in
+      operationId: logIn
+      security: []
+      description: |
+        Checks a username and password and returns the user's profile with an
+        access token. The token expires after two days.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              username: alice
+              password: secret1
+      responses:
+        '200':
+          description: The credentials are correct.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  data:
+                    $ref: '#/components/schemas/LoginData'
+              example:
+                status: ok
+                data:
+                  profilePicture: {}
+                  coverPicture: {}
+                  followers: []
+                  followings: []
+                  isAdmin: false
+                  _id: 6ada228e61da6152a72a476c
+                  username: alice
+                  createdAt: '2026-10-22T14:49:50.432Z'
+                  updatedAt: '2026-10-22T14:49:50.432Z'
+                  __v: 0
+                  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.PAYLOAD.SIGNATURE
+        '400':
+          description: The password is wrong.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: Invalid Username/Password
+        '404':
+          description: |
+            No user has this username, or `username` is missing. The message is
+            the same as for a wrong password, but the status code differs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: Invalid Username/Password
+
+  /api/users:
+    get:
+      tags: [Users]
+      summary: Get the current user
+      operationId: getCurrentUser
+      description: Returns the profile of the user who owns the access token.
+      responses:
+        '200':
+          description: The current user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              example:
+                status: ok
+                data:
+                  profilePicture: {}
+                  coverPicture: {}
+                  followers: []
+                  followings: []
+                  isAdmin: false
+                  _id: 6ada228e61da6152a72a476c
+                  username: alice
+                  createdAt: '2026-10-22T14:49:50.432Z'
+                  __v: 0
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+        '500':
+          $ref: '#/components/responses/MalformedToken'
+
+  /api/users/{userId}/user:
+    get:
+      tags: [Users]
+      summary: Get a user
+      operationId: getUser
+      description: Returns another user's profile.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: The user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              example:
+                status: ok
+                data:
+                  profilePicture: {}
+                  coverPicture: {}
+                  followers: []
+                  followings: []
+                  isAdmin: false
+                  _id: 6ada228e61da6152a72a476e
+                  username: bob
+                  createdAt: '2026-10-22T14:49:50.759Z'
+                  __v: 0
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+        '404':
+          description: No user has this ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: User not found
+        '500':
+          description: |
+            `userId` isn't a valid ObjectId (the body includes the raw database
+            error), or the access token is malformed (an HTML error page).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                error:
+                  stringValue: '"abc"'
+                  valueType: string
+                  kind: ObjectId
+                  value: abc
+                  path: _id
+                  reason: {}
+                  name: CastError
+                  message: Cast to ObjectId failed for value "abc" (type string) at path "_id" for model "User"
+            text/html:
+              schema:
+                $ref: '#/components/schemas/HtmlErrorPage'
+
+  /api/users/search:
+    get:
+      tags: [Users]
+      summary: Search users
+      operationId: searchUsers
+      description: |
+        Returns users whose username contains the search term, ignoring case.
+        Without a term, returns every user. Results aren't paginated.
+
+        **Known issue:** each user in the results includes their encrypted
+        password. The results also leave out `profilePicture` and
+        `coverPicture` when they're empty, unlike the other user endpoints.
+      parameters:
+        - name: search
+          in: query
+          required: false
+          description: Text to look for anywhere in the username. Matching ignores case.
+          schema:
+            type: string
+          example: ali
+      responses:
+        '200':
+          description: The matching users, possibly none.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserWithPassword'
+              example:
+                status: ok
+                data:
+                  - followers: []
+                    followings: []
+                    isAdmin: false
+                    _id: 6ada228e61da6152a72a476c
+                    username: alice
+                    password: ENCRYPTED_PASSWORD
+                    createdAt: '2026-10-22T14:49:50.432Z'
+                    updatedAt: '2026-10-22T14:49:50.432Z'
+                    __v: 0
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+        '500':
+          $ref: '#/components/responses/MalformedToken'
+
+  /api/users/follow:
+    put:
+      tags: [Follows]
+      summary: Follow a user
+      operationId: followUser
+      description: |
+        Makes the current user follow another user. Nothing stops users from
+        following themselves.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIdRequest'
+            example:
+              userId: 6ada228e61da6152a72a476e
+      responses:
+        '200':
+          description: The current user now follows the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkWithMessage'
+              example:
+                status: ok
+                message: user has been followed
+        '400':
+          description: '`userId` is missing.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: Missing payload property
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          description: |
+            The current user already follows this user, or the access token is
+            invalid or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                alreadyFollowing:
+                  summary: Already following
+                  value:
+                    status: error
+                    message: you already follow this user
+                invalidToken:
+                  summary: Invalid token
+                  value:
+                    status: error
+                    message: Token is invalid
+        '500':
+          description: |
+            No user has this ID (the error is `{}`), or `userId` isn't a valid
+            ObjectId (the error is the raw database error).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                error: {}
+
+  /api/users/unfollow:
+    put:
+      tags: [Follows]
+      summary: Unfollow a user
+      operationId: unfollowUser
+      description: |
+        Makes the current user stop following another user. Unlike the other
+        endpoints, the success and "not following" responses are plain JSON
+        strings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIdRequest'
+            example:
+              userId: 6ada228e61da6152a72a476e
+      responses:
+        '200':
+          description: The current user no longer follows the user.
+          content:
+            application/json:
+              schema:
+                type: string
+              example: user has been unfollowed
+        '400':
+          description: '`userId` is missing.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: Missing payload property
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          description: |
+            The current user doesn't follow this user (a plain JSON string), or
+            the access token is invalid or expired (an error object).
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: string
+                  - $ref: '#/components/schemas/Error'
+              examples:
+                notFollowing:
+                  summary: Not following
+                  value: you don't follow this user
+                invalidToken:
+                  summary: Invalid token
+                  value:
+                    status: error
+                    message: Token is invalid
+
+  /api/users/followers:
+    get:
+      tags: [Follows]
+      summary: List followers
+      operationId: listFollowers
+      description: |
+        Returns the users who follow the current user, in the order they
+        followed. `following` shows whether the current user follows them back.
+      responses:
+        '200':
+          description: The current user's followers, possibly none.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Follower'
+              example:
+                status: ok
+                data:
+                  - id: 6ada228f61da6152a72a4770
+                    username: carol
+                    image: {}
+                    following: false
+                  - id: 6ada228e61da6152a72a476e
+                    username: bob
+                    image: {}
+                    following: true
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+
+  /api/users/following:
+    get:
+      tags: [Follows]
+      summary: List followed users
+      operationId: listFollowing
+      description: Returns the users the current user follows, in the order they were followed.
+      responses:
+        '200':
+          description: The users the current user follows, possibly none.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FollowedUser'
+              example:
+                status: ok
+                data:
+                  - id: 6ada228e61da6152a72a476e
+                    username: bob
+                    image: {}
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+
+  /api/posts:
+    post:
+      tags: [Posts]
+      summary: Create a post
+      operationId: createPost
+      description: |
+        Publishes a post as the current user. `userId` must be the current
+        user's ID.
+
+        The body is stored as it is, so a client can also set fields such as
+        `likes`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+            examples:
+              text:
+                summary: Text only
+                value:
+                  userId: 6ada228e61da6152a72a476c
+                  desc: Hello from Alice
+              withImage:
+                summary: With an image
+                value:
+                  userId: 6ada228e61da6152a72a476c
+                  desc: A photo
+                  img:
+                    url: https://example.com/photo.jpg
+                    filename: photo.jpg
+      responses:
+        '200':
+          description: The post was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              example:
+                status: ok
+                data:
+                  likes: []
+                  comments: []
+                  _id: 6ada229c61da6152a72a47a0
+                  userId: 6ada228e61da6152a72a476c
+                  desc: A photo
+                  img:
+                    url: https://example.com/photo.jpg
+                    filename: photo.jpg
+                  createdAt: '2026-10-22T14:50:04.025Z'
+                  updatedAt: '2026-10-22T14:50:04.025Z'
+                  __v: 0
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          description: |
+            `userId` is missing or isn't the current user's ID, `img` is missing
+            `url` or `filename`, or the access token is invalid or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingUserId:
+                  summary: userId is missing
+                  value:
+                    status: error
+                    message: user id is required
+                otherUser:
+                  summary: userId isn't the current user's ID
+                  value:
+                    status: error
+                    message: you can only post to your account
+                incompleteImage:
+                  summary: img is missing url or filename
+                  value:
+                    status: error
+                    message: 'img propery most be an object type: {url: <string>, filename: <string>}'
+
+  /api/posts/{postId}/single:
+    get:
+      tags: [Posts]
+      summary: Get a post
+      operationId: getPost
+      description: |
+        Returns one post. If no post has this ID, the response is `200` with
+        `data` set to `null`.
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      responses:
+        '200':
+          description: The post, or `null` if no post has this ID.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/Post'
+                      - type: 'null'
+              examples:
+                found:
+                  summary: The post exists
+                  value:
+                    status: ok
+                    data:
+                      likes: []
+                      comments: []
+                      _id: 6ada229b61da6152a72a479e
+                      userId: 6ada228e61da6152a72a476c
+                      desc: Hello from Alice
+                      createdAt: '2026-10-22T14:50:03.706Z'
+                      updatedAt: '2026-10-22T14:50:03.706Z'
+                      __v: 0
+                notFound:
+                  summary: No post has this ID
+                  value:
+                    status: ok
+                    data: null
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+        '500':
+          description: '`postId` isn''t a valid ObjectId. The body includes the raw database error.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                error:
+                  stringValue: '"abc"'
+                  valueType: string
+                  kind: ObjectId
+                  value: abc
+                  path: _id
+                  reason: {}
+                  name: CastError
+                  message: Cast to ObjectId failed for value "abc" (type string) at path "_id" for model "Post"
+
+  /api/posts/{id}:
+    get:
+      tags: [Posts]
+      summary: List a user's posts
+      operationId: listUserPosts
+      description: |
+        Returns every post by one user, newest first. Results aren't paginated.
+
+        On this path, `id` is a user ID. On **Delete a post**, the same path
+        takes a post ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
+          schema:
+            type: string
+          example: 6ada228e61da6152a72a476e
+      responses:
+        '200':
+          description: The user's posts, possibly none.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostListResponse'
+              example:
+                status: ok
+                data:
+                  - likes: []
+                    comments: []
+                    _id: 6ada229c61da6152a72a47a2
+                    userId: 6ada228e61da6152a72a476e
+                    desc: Hello from Bob
+                    createdAt: '2026-10-22T14:50:04.339Z'
+                    updatedAt: '2026-10-22T14:50:04.339Z'
+                    __v: 0
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+    delete:
+      tags: [Posts]
+      summary: Delete a post
+      operationId: deletePost
+      description: |
+        Deletes one of the current user's posts.
+
+        On this path, `id` is a post ID. On **List a user's posts**, the same
+        path takes a user ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The post's ID.
+          schema:
+            $ref: '#/components/schemas/ObjectId'
+          example: 6ada229c61da6152a72a47a0
+      responses:
+        '200':
+          description: The post was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+              example:
+                status: ok
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          description: The post belongs to another user, or the access token is invalid or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: you can delete only your post
+        '500':
+          description: |
+            No post has this ID (the body is `{}`), or `id` isn't a valid
+            ObjectId (the body is the raw database error, with no `status`
+            field).
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                notFound:
+                  summary: No post has this ID
+                  value: {}
+                invalidId:
+                  summary: id isn't a valid ObjectId
+                  value:
+                    stringValue: '"abc"'
+                    valueType: string
+                    kind: ObjectId
+                    value: abc
+                    path: _id
+                    reason: {}
+                    name: CastError
+                    message: Cast to ObjectId failed for value "abc" (type string) at path "_id" for model "Post"
+
+  /api/posts/timeline/all:
+    get:
+      tags: [Posts]
+      summary: Get the timeline
+      operationId: getTimeline
+      description: |
+        Returns the current user's posts, newest first, followed by the posts of
+        each user they follow, grouped by user. Posts aren't merged into one
+        date order, and results aren't paginated.
+      responses:
+        '200':
+          description: The timeline, possibly empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostListResponse'
+              example:
+                status: ok
+                data:
+                  - likes: []
+                    comments: []
+                    _id: 6ada229b61da6152a72a479e
+                    userId: 6ada228e61da6152a72a476c
+                    desc: Hello from Alice
+                    createdAt: '2026-10-22T14:50:03.706Z'
+                    updatedAt: '2026-10-22T14:50:03.706Z'
+                    __v: 0
+                  - likes: []
+                    comments: []
+                    _id: 6ada229c61da6152a72a47a2
+                    userId: 6ada228e61da6152a72a476e
+                    desc: Hello from Bob
+                    createdAt: '2026-10-22T14:50:04.339Z'
+                    updatedAt: '2026-10-22T14:50:04.339Z'
+                    __v: 0
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+
+  /api/posts/{postId}/like:
+    put:
+      tags: [Posts]
+      summary: Like or unlike a post
+      operationId: likePost
+      description: |
+        Adds `userId` to the post's likes, or removes it if it's already there.
+
+        The API uses `userId` from the body, not the access token, so a client
+        can like a post on behalf of any user ID. Without `userId`, a `null`
+        entry is added to `likes`.
+
+        **Known issue:** removing a like returns `200`, then the server crashes
+        and stops answering until it restarts. The like is removed.
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIdRequest'
+            example:
+              userId: 6ada228e61da6152a72a476e
+      responses:
+        '200':
+          description: The like was added or removed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+              example:
+                status: ok
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/InvalidToken'
+        '500':
+          description: No post has this ID. The body includes the raw error, which is `{}`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                error: {}
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: The `accessToken` from **Log in**. It expires two days after login.
+
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      description: The user's ID, as returned in `_id`.
+      schema:
+        $ref: '#/components/schemas/ObjectId'
+      example: 6ada228e61da6152a72a476e
+    PostId:
+      name: postId
+      in: path
+      required: true
+      description: The post's ID, as returned in `_id`.
+      schema:
+        $ref: '#/components/schemas/ObjectId'
+      example: 6ada229b61da6152a72a479e
+
+  responses:
+    InvalidJson:
+      description: The body isn't valid JSON. Express returns its HTML error page.
+      content:
+        text/html:
+          schema:
+            $ref: '#/components/schemas/HtmlErrorPage'
+          example: |
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+            <meta charset="utf-8">
+            <title>Error</title>
+            </head>
+            <body>
+            <pre>SyntaxError: Expected double-quoted property name in JSON at position 20 (line 1 column 21)<br> &nbsp; &nbsp;at JSON.parse (&lt;anonymous&gt;)<br> ...</pre>
+            </body>
+            </html>
+    NotAuthenticated:
+      description: The `Authorization` header is missing.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: error
+            message: You are not authenticated!
+    InvalidToken:
+      description: The access token is signed with the wrong secret or has expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            invalid:
+              summary: Signed with the wrong secret
+              value:
+                status: error
+                message: Token is invalid
+            expired:
+              summary: Expired
+              value:
+                status: error
+                expired: true
+                message: Your session has expired
+    MalformedToken:
+      description: |
+        The access token isn't a JWT, or the header has no scheme word before
+        the token. Express returns its HTML error page.
+      content:
+        text/html:
+          schema:
+            $ref: '#/components/schemas/HtmlErrorPage'
+          example: |
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+            <meta charset="utf-8">
+            <title>Error</title>
+            </head>
+            <body>
+            <pre>TypeError: Cannot read properties of null (reading &#39;exp&#39;)<br> &nbsp; &nbsp;at verifyToken (api/routes/verifyToken.js:8:34)<br> ...</pre>
+            </body>
+            </html>
+
+  schemas:
+    ObjectId:
+      type: string
+      description: A MongoDB ObjectId, 24 hexadecimal characters.
+      pattern: '^[0-9a-f]{24}$'
+
+    Ok:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          const: ok
+
+    OkWithMessage:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: string
+          const: ok
+        message:
+          type: string
+
+    Error:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: string
+          const: error
+        message:
+          type: string
+          description: What went wrong.
+        expired:
+          type: boolean
+          description: Present and `true` only when the access token has expired.
+
+    ErrorWithDetail:
+      type: object
+      required: [status, error]
+      properties:
+        status:
+          type: string
+          const: error
+        message:
+          type: string
+        error:
+          type: object
+          description: |
+            The raw error from the database or from Node.js. Its fields depend
+            on the error; an error with no enumerable fields appears as `{}`.
+
+    HtmlErrorPage:
+      type: string
+      description: Express's default HTML error page, with a stack trace unless `NODE_ENV` is `production`.
+
+    Image:
+      type: object
+      description: An image stored elsewhere. Empty (`{}`) when no image is set.
+      properties:
+        url:
+          type: string
+          format: uri
+        filename:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required: [username, password, password1]
+      properties:
+        username:
+          type: string
+          description: Must be unique. Version 1 doesn't check its length.
+        password:
+          type: string
+          minLength: 5
+        password1:
+          type: string
+          description: The password again. Must match `password`.
+
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    UserIdRequest:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          $ref: '#/components/schemas/ObjectId'
+
+    User:
+      type: object
+      required: [_id, username, followers, followings, isAdmin, createdAt]
+      properties:
+        _id:
+          $ref: '#/components/schemas/ObjectId'
+        username:
+          type: string
+        profilePicture:
+          $ref: '#/components/schemas/Image'
+        coverPicture:
+          $ref: '#/components/schemas/Image'
+        bio:
+          type: string
+        followers:
+          type: array
+          description: IDs of the users who follow this user, in the order they followed.
+          items:
+            type: string
+        followings:
+          type: array
+          description: IDs of the users this user follows, in the order they were followed.
+          items:
+            type: string
+        isAdmin:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          description: Returned by **Log in** and **Search users** only.
+        __v:
+          type: integer
+          description: MongoDB's internal document version.
+
+    UserResponse:
+      type: object
+      required: [status, data]
+      properties:
+        status:
+          type: string
+          const: ok
+        data:
+          $ref: '#/components/schemas/User'
+
+    LoginData:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          required: [accessToken]
+          properties:
+            accessToken:
+              type: string
+              description: A JWT to send in the `Authorization` header. It expires two days after login.
+
+    UserWithPassword:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          required: [password]
+          properties:
+            password:
+              type: string
+              description: The user's password, encrypted. Returned by mistake in version 1.
+
+    Follower:
+      type: object
+      required: [id, username, image, following]
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectId'
+        username:
+          type: string
+        image:
+          $ref: '#/components/schemas/Image'
+        following:
+          type: boolean
+          description: Whether the current user follows this user back.
+
+    FollowedUser:
+      type: object
+      required: [id, username, image]
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectId'
+        username:
+          type: string
+        image:
+          $ref: '#/components/schemas/Image'
+
+    CreatePostRequest:
+      type: object
+      required: [userId]
+      properties:
+        userId:
+          $ref: '#/components/schemas/ObjectId'
+        desc:
+          type: string
+          description: The post's text. Version 1 doesn't limit its length.
+        img:
+          type: object
+          description: An image for the post. If you send `img`, include both fields.
+          required: [url, filename]
+          properties:
+            url:
+              type: string
+              format: uri
+            filename:
+              type: string
+
+    Post:
+      type: object
+      required: [_id, userId, likes, comments, createdAt, updatedAt]
+      properties:
+        _id:
+          $ref: '#/components/schemas/ObjectId'
+        userId:
+          $ref: '#/components/schemas/ObjectId'
+        desc:
+          type: string
+        img:
+          $ref: '#/components/schemas/Image'
+        likes:
+          type: array
+          description: IDs of the users who like the post. Can contain `null`; see **Like or unlike a post**.
+          items:
+            type: [string, 'null']
+        comments:
+          type: array
+          description: No endpoint adds comments in version 1.
+          items: {}
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        __v:
+          type: integer
+
+    PostResponse:
+      type: object
+      required: [status, data]
+      properties:
+        status:
+          type: string
+          const: ok
+        data:
+          $ref: '#/components/schemas/Post'
+
+    PostListResponse:
+      type: object
+      required: [status, data]
+      properties:
+        status:
+          type: string
+          const: ok
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'

@@ -1,0 +1,17 @@
+{
+  "name": "we-conect",
+  "private": true,
+  "description": "weConect: a small social app (api/, web/) used to practise API documentation end to end",
+  "scripts": {
+    "test:capture": "node tests/capture.mjs",
+    "test:validate": "node tests/validate.mjs",
+    "lint:spec": "redocly lint openapi/weconect-v1.yaml"
+  },
+  "devDependencies": {
+    "@redocly/cli": "2.69.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "mongodb-memory-server": "11.3.0",
+    "yaml": "2.9.1"
+  }
+}

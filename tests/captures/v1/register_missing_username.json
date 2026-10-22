@@ -1,0 +1,26 @@
+{
+  "name": "register_missing_username",
+  "group": "Register",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "password": "<redacted encrypted password>",
+      "password1": "secret1"
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "Invalid username"
+    }
+  },
+  "durationMs": 13
+}

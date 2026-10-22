@@ -1,0 +1,68 @@
+{
+  "name": "search_all",
+  "group": "Search users",
+  "note": "No search term returns every user",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/search",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "followers": [],
+          "followings": [],
+          "isAdmin": false,
+          "_id": "6ada228e61da6152a72a476c",
+          "username": "alice",
+          "password": "<redacted encrypted password>",
+          "createdAt": "2026-10-22T14:49:50.432Z",
+          "updatedAt": "2026-10-22T14:49:50.432Z",
+          "__v": 0
+        },
+        {
+          "followers": [],
+          "followings": [],
+          "isAdmin": false,
+          "_id": "6ada228e61da6152a72a476e",
+          "username": "bob",
+          "password": "<redacted encrypted password>",
+          "createdAt": "2026-10-22T14:49:50.759Z",
+          "updatedAt": "2026-10-22T14:49:50.759Z",
+          "__v": 0
+        },
+        {
+          "followers": [],
+          "followings": [],
+          "isAdmin": false,
+          "_id": "6ada228f61da6152a72a4770",
+          "username": "carol",
+          "password": "<redacted encrypted password>",
+          "createdAt": "2026-10-22T14:49:51.087Z",
+          "updatedAt": "2026-10-22T14:49:51.087Z",
+          "__v": 0
+        },
+        {
+          "followers": [],
+          "followings": [],
+          "isAdmin": false,
+          "_id": "6ada229161da6152a72a4774",
+          "username": "dave",
+          "password": "<redacted encrypted password>",
+          "createdAt": "2026-10-22T14:49:53.592Z",
+          "updatedAt": "2026-10-22T14:49:53.592Z",
+          "__v": 0
+        }
+      ]
+    }
+  },
+  "durationMs": 35
+}

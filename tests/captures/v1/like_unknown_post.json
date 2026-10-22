@@ -1,0 +1,26 @@
+{
+  "name": "like_unknown_post",
+  "group": "Like a post",
+  "request": {
+    "method": "PUT",
+    "path": "/api/posts/000000000000000000000000/like",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6ada228e61da6152a72a476e"
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "error": {}
+    }
+  },
+  "durationMs": 11
+}

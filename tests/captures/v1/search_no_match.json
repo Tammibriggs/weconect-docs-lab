@@ -1,0 +1,22 @@
+{
+  "name": "search_no_match",
+  "group": "Search users",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/search?search=zzz",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": []
+    }
+  },
+  "durationMs": 14
+}

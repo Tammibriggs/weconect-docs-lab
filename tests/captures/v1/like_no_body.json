@@ -1,0 +1,23 @@
+{
+  "name": "like_no_body",
+  "group": "Like a post",
+  "request": {
+    "method": "PUT",
+    "path": "/api/posts/6ada229c61da6152a72a47a2/like",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok"
+    }
+  },
+  "durationMs": 19
+}

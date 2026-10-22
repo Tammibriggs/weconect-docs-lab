@@ -1,0 +1,28 @@
+{
+  "name": "following",
+  "group": "Following",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/following",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "id": "6ada228e61da6152a72a476e",
+          "username": "bob",
+          "image": {}
+        }
+      ]
+    }
+  },
+  "durationMs": 25
+}

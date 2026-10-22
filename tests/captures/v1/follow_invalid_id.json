@@ -1,0 +1,35 @@
+{
+  "name": "follow_invalid_id",
+  "group": "Follow",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/follow",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "abc"
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "error": {
+        "stringValue": "\"abc\"",
+        "valueType": "string",
+        "kind": "ObjectId",
+        "value": "abc",
+        "path": "_id",
+        "reason": {},
+        "name": "CastError",
+        "message": "Cast to ObjectId failed for value \"abc\" (type string) at path \"_id\" for model \"User\""
+      }
+    }
+  },
+  "durationMs": 10
+}

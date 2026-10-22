@@ -1,0 +1,31 @@
+{
+  "name": "post_get_invalid_id",
+  "group": "Get a post",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/abc/single",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "error": {
+        "stringValue": "\"abc\"",
+        "valueType": "string",
+        "kind": "ObjectId",
+        "value": "abc",
+        "path": "_id",
+        "reason": {},
+        "name": "CastError",
+        "message": "Cast to ObjectId failed for value \"abc\" (type string) at path \"_id\" for model \"Post\""
+      }
+    }
+  },
+  "durationMs": 10
+}

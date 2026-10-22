@@ -1,0 +1,31 @@
+{
+  "name": "post_get",
+  "group": "Get a post",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/6ada229b61da6152a72a479e/single",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "likes": [],
+        "comments": [],
+        "_id": "6ada229b61da6152a72a479e",
+        "userId": "6ada228e61da6152a72a476c",
+        "desc": "Hello from Alice",
+        "createdAt": "2026-10-22T14:50:03.706Z",
+        "updatedAt": "2026-10-22T14:50:03.706Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 6
+}

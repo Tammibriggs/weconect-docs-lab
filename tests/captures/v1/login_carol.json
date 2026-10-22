@@ -1,0 +1,38 @@
+{
+  "name": "login_carol",
+  "group": "Log in",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "carol",
+      "password": "<redacted encrypted password>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {},
+        "coverPicture": {},
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6ada228f61da6152a72a4770",
+        "username": "carol",
+        "createdAt": "2026-10-22T14:49:51.087Z",
+        "updatedAt": "2026-10-22T14:49:51.087Z",
+        "__v": 0,
+        "accessToken": "<redacted JWT>"
+      }
+    }
+  },
+  "durationMs": 9
+}

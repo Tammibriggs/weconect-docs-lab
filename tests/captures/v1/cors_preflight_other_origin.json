@@ -1,0 +1,21 @@
+{
+  "name": "cors_preflight_other_origin",
+  "group": "General",
+  "note": "A browser preflight from an origin other than ALLOWED_HOST",
+  "request": {
+    "method": "OPTIONS",
+    "path": "/api/auth/login",
+    "headers": {
+      "Origin": "https://example.com",
+      "Access-Control-Request-Method": "POST"
+    }
+  },
+  "response": {
+    "status": 204,
+    "headers": {
+      "access-control-allow-methods": "GET,HEAD,PUT,PATCH,POST,DELETE"
+    },
+    "body": ""
+  },
+  "durationMs": 6
+}

@@ -1,0 +1,19 @@
+{
+  "name": "post_delete_again",
+  "group": "Delete a post",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/posts/6ada229c61da6152a72a47a0",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {}
+  },
+  "durationMs": 7
+}

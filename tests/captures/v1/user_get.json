@@ -1,0 +1,32 @@
+{
+  "name": "user_get",
+  "group": "Get a user",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/6ada228e61da6152a72a476e/user",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {},
+        "coverPicture": {},
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6ada228e61da6152a72a476e",
+        "username": "bob",
+        "createdAt": "2026-10-22T14:49:50.759Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 7
+}

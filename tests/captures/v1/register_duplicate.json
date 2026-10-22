@@ -1,0 +1,39 @@
+{
+  "name": "register_duplicate",
+  "group": "Register",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "alice",
+      "password": "<redacted encrypted password>",
+      "password1": "secret1"
+    }
+  },
+  "response": {
+    "status": 409,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "Username already exists",
+      "error": {
+        "driver": true,
+        "name": "MongoError",
+        "index": 0,
+        "code": 11000,
+        "keyPattern": {
+          "username": 1
+        },
+        "keyValue": {
+          "username": "alice"
+        }
+      }
+    }
+  },
+  "durationMs": 23
+}

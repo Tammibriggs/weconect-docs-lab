@@ -1,0 +1,42 @@
+{
+  "name": "post_create_preset_likes",
+  "group": "Create a post",
+  "note": "Can the client set fields it shouldn't, such as likes?",
+  "request": {
+    "method": "POST",
+    "path": "/api/posts",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6ada228e61da6152a72a476c",
+      "desc": "Already liked",
+      "likes": [
+        "6ada228f61da6152a72a4770"
+      ]
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "likes": [
+          "6ada228f61da6152a72a4770"
+        ],
+        "comments": [],
+        "_id": "6ada229d61da6152a72a47a6",
+        "userId": "6ada228e61da6152a72a476c",
+        "desc": "Already liked",
+        "createdAt": "2026-10-22T14:50:05.880Z",
+        "updatedAt": "2026-10-22T14:50:05.880Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 6
+}

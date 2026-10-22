@@ -1,0 +1,23 @@
+{
+  "name": "auth_bad_signature",
+  "group": "Authentication",
+  "note": "A JWT signed with a different secret",
+  "request": {
+    "method": "GET",
+    "path": "/api/users",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "Token is invalid"
+    }
+  },
+  "durationMs": 4
+}

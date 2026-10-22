@@ -1,0 +1,28 @@
+{
+  "name": "register_extra_fields",
+  "group": "Register",
+  "note": "isAdmin in the body should be ignored",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "dave",
+      "password": "<redacted encrypted password>",
+      "password1": "secret4",
+      "isAdmin": true
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok"
+    }
+  },
+  "durationMs": 10
+}

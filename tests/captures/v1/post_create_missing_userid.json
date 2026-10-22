@@ -1,0 +1,26 @@
+{
+  "name": "post_create_missing_userid",
+  "group": "Create a post",
+  "request": {
+    "method": "POST",
+    "path": "/api/posts",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "desc": "No user ID"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "user id is required"
+    }
+  },
+  "durationMs": 8
+}

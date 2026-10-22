@@ -1,0 +1,21 @@
+{
+  "name": "after_unlike",
+  "group": "Like a post",
+  "note": "Unlike sends 200, then the server crashes (ERR_HTTP_HEADERS_SENT), so this request is refused",
+  "request": {
+    "method": "GET",
+    "path": "/api/users",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "error": "ECONNREFUSED"
+  },
+  "durationMs": 9,
+  "serverExited": {
+    "code": 1,
+    "signal": null
+  },
+  "serverLog": "\nError [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client\n    at ServerResponse.setHeader (node:_http_outgoing:684:11)\n    at ServerResponse.header (<repo>/api/node_modules/express/lib/response.js:794:10)\n    at ServerResponse.send (<repo>/api/node_modules/express/lib/response.js:174:12)\n    at ServerResponse.json (<repo>/api/node_modules/express/lib/response.js:278:15)\n    at <repo>/api/routes/posts.js:70:21\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  code: 'ERR_HTTP_HEADERS_SENT'\n}\n\nNode.js v24.20.0"
+}

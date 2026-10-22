@@ -1,0 +1,24 @@
+{
+  "name": "follow_missing_userid",
+  "group": "Follow",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/follow",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {}
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "Missing payload property"
+    }
+  },
+  "durationMs": 11
+}
