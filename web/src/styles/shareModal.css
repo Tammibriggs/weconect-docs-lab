@@ -1,0 +1,14 @@
+.mantine-Paper-root {
+  padding: 1rem .5rem;
+  border-radius: 1rem;
+  flex: 1;
+  max-width: 600px;
+}
+
+.mantine-Paper-root .share {
+  padding: 0;
+}
+
+.mantine-Modal-header {
+  margin: 0;
+}

@@ -1,0 +1,74 @@
+.followCard__cont {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.followCard {
+  width: 100%;
+  border-radius: 0.7rem;
+  background-color: white;
+  padding: 10px;
+  border-radius: 1rem;
+}
+
+.followCard__list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.followCard__follow > span {
+  font-size: 12px;
+  width: 50px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--p-color3);
+}
+
+.followCard__head {
+  display: flex;
+  background: var(--p-color8);
+  border-radius: 0.5rem;
+  padding: 0.35rem;
+  gap: 0.35rem;
+  /* border-bottom: 1px solid var(--p-color8); */
+}
+
+.followCard__head > span {
+  text-align: center;
+  padding: .5rem;
+  cursor: pointer;
+  flex: 50%;
+  border-radius: 0.35rem;
+  border: 1px solid transparent;
+}
+
+.followCard__head .tag {
+  margin: 0 0.25rem;
+  font-weight: 600;
+  background: var(--p-color10);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.followCard__follow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.followCard__follow > div span {
+  font-weight: 550;
+  font-size: 14px;
+}
+
+.followImage {
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+  border-radius: 100%;
+  margin-right: 5px;
+  object-fit: cover;
+}

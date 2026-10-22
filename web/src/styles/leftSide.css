@@ -1,0 +1,20 @@
+.leftSide{
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  max-width: 350px;
+}
+
+@media(min-width: 1024px) {
+  .leftSide {
+    display: flex;
+    flex: 30%;
+  }
+}
+
+.leftSide__wrapper {
+  position: sticky;
+  top: 0;
+  width: 100%;
+}

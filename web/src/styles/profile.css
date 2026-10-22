@@ -1,0 +1,52 @@
+.profile {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.profile .profileCard__cont {
+  padding: 0.5rem;
+}
+
+.profile .share__cont {
+  padding: 0 0.5rem ;
+}
+
+.profile__left {
+  position: sticky;
+  top: 10px;
+  flex: 30%;
+  height: fit-content;
+  display: none;
+  max-width: 350px;
+}
+
+.profile .followCard {
+  margin-top: 0;
+}
+
+.profile__left + div {
+  width: 100%;
+  max-width: 600px;
+}
+
+@media(min-width: 500px) {
+
+  .profile__left + div {
+    /* margin-right: 10px; */
+  }
+}
+
+@media(min-width: 850px) {
+  .profile {
+    max-width: unset;
+  }
+}
+
+@media(min-width: 1024px) {
+  .profile__left {
+    display: block;
+  }
+}

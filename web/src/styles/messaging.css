@@ -1,0 +1,45 @@
+.messaging {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.messaging .message__cont {
+  background-color: white;
+  height: 100%;
+  padding: 0;
+  width: 100%;
+  max-width: 600px;
+  max-height: 100vh;
+}
+
+.messaging .message {
+  height: 100%;
+}
+
+.messaging .message__searchPal {
+  margin-bottom: 15px;
+}
+ 
+.messaging .message__searchPalImage {
+  width: 8vw;
+  height: 8vw;
+  min-width: 50px;
+  min-height: 50px;
+}
+
+.messaging .chat__head img {
+  width: 8vw;
+  height: 8vw;
+  min-width: 50px;
+  min-height: 50px;
+}
+
+@media(min-width: 500px) {
+  .messaging .message {
+    min-height: 100vh;
+    padding-bottom: 20px;
+  }
+}

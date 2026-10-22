@@ -1,0 +1,116 @@
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat__head {
+  display: flex;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--p-color8);
+}
+
+.chat__head img{
+  width: 40px;
+  height: 40px;
+  margin-right: 5px;
+  border-radius: 100%;
+}
+
+.chat__head span:nth-child(1) svg {
+  font-size: 32px;
+}
+
+.chat__head span {
+  font-weight: 550;
+}
+
+.chat__chats {
+  flex: 1;
+  overflow-y: scroll;
+}
+
+.chat__chats::-webkit-scrollbar {
+  display: none;
+}
+
+.chat__chats {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.chat__chats > span {
+  height: fit-content;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat__myMessage {
+  align-items: end;
+}
+
+.chat .chat__myMessage > span:nth-child(2) {
+  background-color: var(--p-color1);
+  color: white;
+}
+
+.chat__chats > span span:nth-child(1) {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--p-color4);
+}
+
+.chat__chats > span span:nth-child(2) {
+  padding: 10px;
+  background-color: var(--p-color8);
+  width: fit-content;
+  font-size: 14px;
+  border-radius: 10px;
+  display: block;
+}
+
+.chat form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  margin-top: 10px;
+}
+
+.chat form button {
+  background-color: var(--p-color1);
+  padding:5px 10px;
+  border-radius: 10px;
+  border: none;
+  margin-left: 5px;
+  align-self: end;
+}
+
+.chat form button svg {
+  color: white;
+  font-size: 20px;
+}
+
+.textarea {
+  display: block;
+  overflow: hidden;
+  resize: both;
+  border-radius: 5px;
+  min-height: 40px;
+  line-height: 20px;
+  font-family: inherit;
+  align-self: flex-end;
+  border: 10px;
+  background-color: var(--inputColor);
+  padding: 10px;
+  border: none;
+  outline: none;
+  flex: 1;
+}
+
+.textarea[contenteditable]:empty::before {
+  content: "Enter message";
+  color: gray;
+}
