@@ -25,7 +25,7 @@ Entries are in date order, newest last. Every number names the file or command i
 | 132 test cases; 131 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
 | 117 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
 | 26 findings, 3 of them fixed in 1.1 | `TESTING.md` |
-| 11 commits of history kept from 2 repos | `git log` |
+| Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
 | 5 more API problems found by reading the code while redesigning | `TESTING.md`, "Found by reading the code" |
@@ -43,7 +43,7 @@ Entries are in date order, newest last. Every number names the file or command i
 |---|---|---|
 | Use weConect, my own app, instead of Maritime | Maritime is closed source: no code to read, no way to make breaking changes, and live tests cost credit on a real account. Maritime stays as the "documenting someone else's API" project. | A new toy API (too clean to produce realistic findings) |
 | One repo: `api/`, `web/`, `openapi/`, `tests/` (and `docs/` later) | One pull request can change code, spec, and docs together; a PR agent sees both; one CI pipeline; one version tag | Separate repos, common when a docs team owns the docs, but docs drift from the code |
-| Import with `git subtree` | Keeps the history of both repos (11 commits) | Copying the files, which loses history |
+| Import with `git subtree` | Keeps the history of both repos (11 commits) *(changed 2026-10-26: the frontend's history is now squashed into one commit; see that day's entry)* | Copying the files, which loses history |
 | Document 15 of the 23 endpoints first | Covers the core story (accounts, follows, posts, timeline) at a manageable size | All 23; messaging and its Socket.io events wait for AsyncAPI |
 | Spec approach: v1 as it behaves, v2 spec-first, later code-first with an OpenAPI Overlay *(changed 2026-10-25: see that day's change of plan)* | Matches the three situations writers meet at work | Code-first only |
 | Docs platform: Docusaurus, plus a day on Mintlify | Docusaurus makes me build the pipeline, which is the learning; Mintlify shows what a hosted tool automates | Mintlify only |
@@ -420,10 +420,27 @@ Entries are in date order, newest last. Every number names the file or command i
 
 At my request, Claude Code committed everything that was uncommitted, in two commits on `main`. The entries above that say "nothing is committed" describe the state at the time.
 
-- `e315668`: the API, the spec and public spec, the tests and captures, the scripts, and the docs: everything from 2026-10-23 to 2026-10-26 outside `web/`.
-- `f0f21f0`: `web/`: the redesign and the API keys page. They're one commit because the page edits files the redesign created.
+- `4349184` (first committed as `e315668`): the API, the spec and public spec, the tests and captures, the scripts, and the docs: everything from 2026-10-23 to 2026-10-26 outside `web/`.
+- `ec0e4f1` (first committed as `f0f21f0`): `web/`: the redesign and the API keys page. They're one commit because the page edits files the redesign created.
 
 The repo has no remote yet, so nothing is pushed.
+
+### 2026-10-26: Squashing the frontend's history
+
+**Decision (mine):** remove Miracle Onyenma from the repo's GitHub contributors list by squashing the frontend's imported history into one commit, crediting their work in the commit message and the README. I chose this over leaving the history as it was, and over re-crediting their commits to me, which would have claimed their work.
+
+**Why it's fair:** Miracle helped with the original UI (pull request #1, March 2023), but none of that code is left. `git blame -w -C -C -C` over every file in `web/src` and `web/public`, which also follows code moved or copied between files, credits 0 lines to their commits. The only lines still credited to them were 1,228 generated lines in `web/package-lock.json`.
+
+**How it was done** (the repo hadn't been pushed, so rewriting it was safe):
+- A backup branch, `backup/before-squash`, keeps the old history.
+- `git commit-tree` made one commit with the frontend import's exact files, and `git rebase --onto` replayed the 5 later commits on top. Every commit after the import has a new ID.
+- `git diff backup/before-squash main` is empty: the files are byte-for-byte identical.
+
+**A surprise:** the backend's first commit is by Safak Kocaoglu, dated 25 March 2021, with the message "commit". I don't remember him contributing. The package name `rest-api`, port 8800, and the "Backend server is running!" message suggest the backend started as a clone of a tutorial repo, which keeps its history. 228 lines of his code are still in `api/`, across the models, routes, `index.js`, and `package.json` (`git blame -w`, lockfiles excluded), so his commit stays, and the README credits him.
+
+**Who did what**
+- **Me:** chose to remove Miracle from the list, and chose this option.
+- **Claude Code:** checked the authorship, rewrote the history, verified it, and updated the README and this log.
 
 ## Post and portfolio ideas
 

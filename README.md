@@ -58,4 +58,7 @@ This starts the API (port 8800) and the frontend (port 3000) together, using you
 
 ## History
 
-`api/` and `web/` were separate repos (the `weconect-rest-api` and `main` branches of `Tammibriggs/we-conect`). Both were imported with `git subtree`, so their full history is kept.
+`api/` and `web/` were separate repos (the `weconect-rest-api` and `main` branches of `Tammibriggs/we-conect`).
+
+- **`api/`** was imported with `git subtree`, so its history is kept. Its first commit, from March 2021, is by Safak Kocaoglu, and part of that code is still in `api/`.
+- **`web/`** was imported as one commit. Its 9 earlier commits, including UI styling work by Miracle Onyenma (pull request #1), are in the original repo. The 2026 redesign replaced the files from that work.
