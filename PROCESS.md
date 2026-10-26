@@ -15,7 +15,7 @@ Entries are in date order, newest last. Every number names the file or command i
 | 4. AI readers | `llms.txt`, Markdown versions of pages, a docs MCP server | Not started |
 | 5. AI automation | AutoDoc flags docs affected by each pull request | Not started |
 | 6. Developer experience | SDK and code samples, search, analytics, feedback; AsyncAPI for messaging | Not started |
-| Side project: frontend redesign | Design system, app shell, every page rebuilt; sessions, accessibility and performance fixes in `web/` | Done 2026-10-25, not yet reviewed or committed |
+| Side project: frontend redesign | Design system, app shell, every page rebuilt; sessions, accessibility and performance fixes in `web/` | Done 2026-10-25, committed 2026-10-26; not yet reviewed by me |
 
 ## Key numbers
 
@@ -415,6 +415,15 @@ Entries are in date order, newest last. Every number names the file or command i
 - **Tests:** 3 new cases: a read-only key can't delete, bob's key can't delete alice's post, and alice's key deletes her own. 132 cases, 131 as predicted plus the unlike crash; 117 captured responses validate; the public spec has exactly 10 operations.
 - **How:** built and tested in the repo copy on port 8810, because `start:real` was running again; one file in `api/` was copied back, so my running API restarted once. **Problem:** the check for files changed during the work failed (this system's `find` rejected a relative date) and the copy went ahead anyway. A corrected check afterwards found that nothing else had changed.
 - **Left out of the spec now (3):** list followers, list followed users, get a post.
+
+### 2026-10-26: Committed
+
+At my request, Claude Code committed everything that was uncommitted, in two commits on `main`. The entries above that say "nothing is committed" describe the state at the time.
+
+- `e315668`: the API, the spec and public spec, the tests and captures, the scripts, and the docs: everything from 2026-10-23 to 2026-10-26 outside `web/`.
+- `f0f21f0`: `web/`: the redesign and the API keys page. They're one commit because the page edits files the redesign created.
+
+The repo has no remote yet, so nothing is pushed.
 
 ## Post and portfolio ideas
 
