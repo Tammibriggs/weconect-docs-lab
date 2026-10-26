@@ -1,0 +1,983 @@
+openapi: 3.1.0
+info:
+  title: weConect API
+  version: 1.1.0
+  summary: Profiles, follows, posts, and timelines for the weConect social app.
+  description: |
+    The weConect API lets your code use weConect as you: read profiles and
+    timelines, find people, follow them, publish posts, and like posts.
+
+    This document describes the API as it behaves today, including known
+    issues. Every status code and example comes from a captured response.
+    `TESTING.md` in the repository lists the test cases and every known issue,
+    and `CHANGELOG.md` lists the changes in each version.
+
+    ## Authentication
+
+    Authenticate with an API key, sent in the `Authorization` header:
+
+    ```http
+    Authorization: Bearer wck_YOUR_API_KEY
+    ```
+
+    To create a key, open your profile in the weConect app and select
+    **API keys**. The app shows the key only once, so copy it then. A key acts
+    as you, so keep it secret. If a key leaks, delete it on the same page; it
+    stops working at once.
+
+    ### Scopes
+
+    Each key has one or both of these scopes:
+
+    | Scope | What the key can do |
+    |---|---|
+    | `read` | Get the current user, get a user, search users, list a user's posts, and get the timeline |
+    | `write` | Follow and unfollow users, create and delete your posts, and like or unlike posts |
+
+    Each endpoint lists the scope it needs.
+
+    ### Authentication errors
+
+    | Problem | Status |
+    |---|---|
+    | No `Authorization` header | `401` with `"You are not authenticated!"` |
+    | The key is wrong, or was deleted | `401` with `"Invalid API key"` |
+    | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'write' scope"` |
+    | The header holds something other than an API key, such as a malformed token | `500` with an HTML error page |
+
+    ## Errors
+
+    Most errors return JSON with `"status": "error"` and a `message`. The API
+    also has three other error shapes, documented on each operation:
+
+    - Some `500` responses return the raw database error in an `error` field.
+    - **Unfollow a user** returns its messages as plain JSON strings.
+    - A body that isn't valid JSON, or a malformed token, returns Express's
+      HTML error page. So does a path or method that doesn't exist, with
+      `404`.
+
+    ## Request bodies
+
+    Send request bodies as JSON, with `Content-Type: application/json`. The
+    API doesn't parse other formats, such as form-encoded bodies, so it
+    treats their fields as missing.
+
+    ## Browser requests
+
+    Browsers can call the API only from the weConect app's own origin, set in
+    the server's `ALLOWED_HOST` variable. A preflight request from any other
+    origin gets `204` with no CORS headers, so the browser blocks the call.
+    Call the API from your server or scripts instead; requests that don't come
+    from a browser aren't affected.
+servers:
+  - url: http://localhost:8800
+    description: Local development server. The API isn't deployed yet.
+tags:
+  - name: Users
+    description: Read your own profile, look up other users, and search by username.
+  - name: Follows
+    description: Follow and unfollow users.
+  - name: Posts
+    description: Publish, delete, and like posts, and read a user's posts and your timeline.
+paths:
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: Get the current user
+      operationId: getCurrentUser
+      security:
+        - ApiKeyAuth:
+            - read
+      description: |
+        Returns the profile of the user who owns the API key.
+
+        **Scope:** `read`
+      responses:
+        '200':
+          description: The current user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              example:
+                status: ok
+                data:
+                  profilePicture: {}
+                  coverPicture: {}
+                  followers: []
+                  followings: []
+                  isAdmin: false
+                  _id: 6adf12d208ef70e347ff2489
+                  username: alice
+                  createdAt: '2026-10-26T08:44:02.569Z'
+                  __v: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/MalformedToken'
+  /api/users/{userId}/user:
+    get:
+      tags:
+        - Users
+      summary: Get a user
+      operationId: getUser
+      security:
+        - ApiKeyAuth:
+            - read
+      description: |
+        Returns another user's profile.
+
+        **Scope:** `read`
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: The user's profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              example:
+                status: ok
+                data:
+                  profilePicture: {}
+                  coverPicture: {}
+                  followers: []
+                  followings: []
+                  isAdmin: false
+                  _id: 6adf12d208ef70e347ff248b
+                  username: bob
+                  createdAt: '2026-10-26T08:44:02.890Z'
+                  __v: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: No user has this ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: User not found
+        '500':
+          description: |
+            `userId` isn't a valid ObjectId (the body includes the raw database
+            error), or the `Authorization` header holds a malformed token (an
+            HTML error page).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                error:
+                  stringValue: '"abc"'
+                  valueType: string
+                  kind: ObjectId
+                  value: abc
+                  path: _id
+                  reason: {}
+                  name: CastError
+                  message: Cast to ObjectId failed for value "abc" (type string) at path "_id" for model "User"
+            text/html:
+              schema:
+                $ref: '#/components/schemas/HtmlErrorPage'
+  /api/users/search:
+    get:
+      tags:
+        - Users
+      summary: Search users
+      operationId: searchUsers
+      security:
+        - ApiKeyAuth:
+            - read
+      description: |
+        Returns users whose username contains the search term, ignoring case.
+        Without a term, returns every user. Results aren't paginated.
+
+        Unlike the other user endpoints, the results leave out
+        `profilePicture` and `coverPicture` when they're empty, and include
+        `updatedAt`.
+
+        **Scope:** `read`
+      parameters:
+        - name: search
+          in: query
+          required: false
+          description: |
+            Text to look for anywhere in the username. Matching ignores case,
+            and special characters such as `.` and `(` match only themselves.
+          schema:
+            type: string
+          example: ali
+      responses:
+        '200':
+          description: The matching users, possibly none.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - data
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+              example:
+                status: ok
+                data:
+                  - followers: []
+                    followings: []
+                    isAdmin: false
+                    _id: 6adf12d208ef70e347ff2489
+                    username: alice
+                    createdAt: '2026-10-26T08:44:02.569Z'
+                    updatedAt: '2026-10-26T08:44:02.569Z'
+                    __v: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/MalformedToken'
+  /api/users/follow:
+    put:
+      tags:
+        - Follows
+      summary: Follow a user
+      operationId: followUser
+      security:
+        - ApiKeyAuth:
+            - write
+      description: |
+        Makes the current user follow another user. Nothing stops users from
+        following themselves.
+
+        **Scope:** `write`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIdRequest'
+            example:
+              userId: 6adf12d208ef70e347ff248b
+      responses:
+        '200':
+          description: The current user now follows the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkWithMessage'
+              example:
+                status: ok
+                message: user has been followed
+        '400':
+          description: '`userId` is missing.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: Missing payload property
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: |
+            The current user already follows this user, or the API key doesn't
+            have the `write` scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                alreadyFollowing:
+                  summary: Already following
+                  value:
+                    status: error
+                    message: you already follow this user
+                missingScope:
+                  summary: The key doesn't have the write scope
+                  value:
+                    status: error
+                    message: This API key doesn't have the 'write' scope
+        '500':
+          description: |
+            No user has this ID (the error is `{}`), or `userId` isn't a valid
+            ObjectId (the error is the raw database error).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                error: {}
+  /api/users/unfollow:
+    put:
+      tags:
+        - Follows
+      summary: Unfollow a user
+      operationId: unfollowUser
+      security:
+        - ApiKeyAuth:
+            - write
+      description: |
+        Makes the current user stop following another user. Unlike the other
+        endpoints, the success and "not following" responses are plain JSON
+        strings.
+
+        **Scope:** `write`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIdRequest'
+            example:
+              userId: 6adf12d208ef70e347ff248b
+      responses:
+        '200':
+          description: The current user no longer follows the user.
+          content:
+            application/json:
+              schema:
+                type: string
+              example: user has been unfollowed
+        '400':
+          description: '`userId` is missing.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: Missing payload property
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: |
+            The current user doesn't follow this user (a plain JSON string), or
+            the API key doesn't have the `write` scope (an error object).
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: string
+                  - $ref: '#/components/schemas/Error'
+              examples:
+                notFollowing:
+                  summary: Not following
+                  value: you don't follow this user
+                missingScope:
+                  summary: The key doesn't have the write scope
+                  value:
+                    status: error
+                    message: This API key doesn't have the 'write' scope
+  /api/posts:
+    post:
+      tags:
+        - Posts
+      summary: Create a post
+      operationId: createPost
+      security:
+        - ApiKeyAuth:
+            - write
+      description: |
+        Publishes a post as the current user. `userId` must be the current
+        user's ID.
+
+        The body is stored as it is, so a client can also set fields such as
+        `likes`.
+
+        **Scope:** `write`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostRequest'
+            examples:
+              text:
+                summary: Text only
+                value:
+                  userId: 6adf12d208ef70e347ff2489
+                  desc: Hello from Alice
+              withImage:
+                summary: With an image
+                value:
+                  userId: 6adf12d208ef70e347ff2489
+                  desc: A photo
+                  img:
+                    url: https://example.com/photo.jpg
+                    filename: photo.jpg
+      responses:
+        '200':
+          description: The post was created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+              example:
+                status: ok
+                data:
+                  likes: []
+                  comments: []
+                  _id: 6adf12e008ef70e347ff24bd
+                  userId: 6adf12d208ef70e347ff2489
+                  desc: A photo
+                  img:
+                    url: https://example.com/photo.jpg
+                    filename: photo.jpg
+                  createdAt: '2026-10-26T08:44:16.194Z'
+                  updatedAt: '2026-10-26T08:44:16.194Z'
+                  __v: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: |
+            `userId` is missing or isn't the current user's ID, `img` is missing
+            `url` or `filename`, or the API key doesn't have the `write` scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingUserId:
+                  summary: userId is missing
+                  value:
+                    status: error
+                    message: user id is required
+                otherUser:
+                  summary: userId isn't the current user's ID
+                  value:
+                    status: error
+                    message: you can only post to your account
+                incompleteImage:
+                  summary: img is missing url or filename
+                  value:
+                    status: error
+                    message: 'img propery most be an object type: {url: <string>, filename: <string>}'
+                missingScope:
+                  summary: The key doesn't have the write scope
+                  value:
+                    status: error
+                    message: This API key doesn't have the 'write' scope
+  /api/posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: List a user's posts
+      operationId: listUserPosts
+      security:
+        - ApiKeyAuth:
+            - read
+      description: |
+        Returns every post by one user, newest first. Results aren't paginated.
+
+        On this path, `id` is a user ID. On **Delete a post**, the same path
+        takes a post ID.
+
+        **Scope:** `read`
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
+          schema:
+            type: string
+          example: 6adf12d208ef70e347ff248b
+      responses:
+        '200':
+          description: The user's posts, possibly none.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostListResponse'
+              example:
+                status: ok
+                data:
+                  - likes: []
+                    comments: []
+                    _id: 6adf12e008ef70e347ff24bf
+                    userId: 6adf12d208ef70e347ff248b
+                    desc: Hello from Bob
+                    createdAt: '2026-10-26T08:44:16.511Z'
+                    updatedAt: '2026-10-26T08:44:16.511Z'
+                    __v: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags:
+        - Posts
+      summary: Delete a post
+      operationId: deletePost
+      security:
+        - ApiKeyAuth:
+            - write
+      description: |
+        Deletes one of the current user's posts.
+
+        On this path, `id` is a post ID. On **List a user's posts**, the same
+        path takes a user ID.
+
+        **Scope:** `write`
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The post's ID.
+          schema:
+            $ref: '#/components/schemas/ObjectId'
+          example: 6adf12e008ef70e347ff24bd
+      responses:
+        '200':
+          description: The post was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+              example:
+                status: ok
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: The post belongs to another user, or the API key doesn't have the `write` scope.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                notYours:
+                  summary: The post belongs to another user
+                  value:
+                    status: error
+                    message: you can delete only your post
+                missingScope:
+                  summary: The key doesn't have the write scope
+                  value:
+                    status: error
+                    message: This API key doesn't have the 'write' scope
+        '500':
+          description: |
+            No post has this ID (the body is `{}`), or `id` isn't a valid
+            ObjectId (the body is the raw database error, with no `status`
+            field).
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                notFound:
+                  summary: No post has this ID
+                  value: {}
+                invalidId:
+                  summary: id isn't a valid ObjectId
+                  value:
+                    stringValue: '"abc"'
+                    valueType: string
+                    kind: ObjectId
+                    value: abc
+                    path: _id
+                    reason: {}
+                    name: CastError
+                    message: Cast to ObjectId failed for value "abc" (type string) at path "_id" for model "Post"
+  /api/posts/timeline/all:
+    get:
+      tags:
+        - Posts
+      summary: Get the timeline
+      operationId: getTimeline
+      security:
+        - ApiKeyAuth:
+            - read
+      description: |
+        Returns the current user's posts, newest first, followed by the posts of
+        each user they follow, grouped by user. Posts aren't merged into one
+        date order, and results aren't paginated.
+
+        **Scope:** `read`
+      responses:
+        '200':
+          description: The timeline, possibly empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostListResponse'
+              example:
+                status: ok
+                data:
+                  - likes: []
+                    comments: []
+                    _id: 6adf12df08ef70e347ff24bb
+                    userId: 6adf12d208ef70e347ff2489
+                    desc: Hello from Alice
+                    createdAt: '2026-10-26T08:44:15.875Z'
+                    updatedAt: '2026-10-26T08:44:15.875Z'
+                    __v: 0
+                  - likes: []
+                    comments: []
+                    _id: 6adf12e008ef70e347ff24bf
+                    userId: 6adf12d208ef70e347ff248b
+                    desc: Hello from Bob
+                    createdAt: '2026-10-26T08:44:16.511Z'
+                    updatedAt: '2026-10-26T08:44:16.511Z'
+                    __v: 0
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/posts/{postId}/like:
+    put:
+      tags:
+        - Posts
+      summary: Like or unlike a post
+      operationId: likePost
+      security:
+        - ApiKeyAuth:
+            - write
+      description: |
+        Adds the current user's like to the post, or removes it if it's already
+        there.
+
+        **Known issue:** removing a like returns `200`, then the server crashes
+        and stops answering until it restarts. The like is removed.
+
+        **Scope:** `write`
+      parameters:
+        - $ref: '#/components/parameters/PostId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikeRequest'
+            example: {}
+      responses:
+        '200':
+          description: The like was added or removed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+              example:
+                status: ok
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          description: No post has this ID. The body includes the raw error, which is `{}`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                error: {}
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key
+      description: |
+        An API key from the weConect app's **API keys** page, starting with
+        `wck_`. Each endpoint lists the scope the key needs: `read` or `write`.
+  parameters:
+    UserId:
+      name: userId
+      in: path
+      required: true
+      description: The user's ID, as returned in `_id`.
+      schema:
+        $ref: '#/components/schemas/ObjectId'
+      example: 6adf12d208ef70e347ff248b
+    PostId:
+      name: postId
+      in: path
+      required: true
+      description: The post's ID, as returned in `_id`.
+      schema:
+        $ref: '#/components/schemas/ObjectId'
+      example: 6adf12df08ef70e347ff24bb
+  responses:
+    Unauthorized:
+      description: The `Authorization` header is missing, or the API key is wrong or was deleted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missingHeader:
+              summary: No Authorization header
+              value:
+                status: error
+                message: You are not authenticated!
+            invalidKey:
+              summary: The key is wrong or was deleted
+              value:
+                status: error
+                message: Invalid API key
+    Forbidden:
+      description: The API key doesn't have the scope this endpoint needs.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missingScope:
+              summary: The key doesn't have the scope
+              value:
+                status: error
+                message: This API key doesn't have the 'write' scope
+    MalformedToken:
+      description: |
+        The `Authorization` header holds something other than an API key or a
+        valid token, or has no scheme word before it. Express returns its HTML
+        error page.
+      content:
+        text/html:
+          schema:
+            $ref: '#/components/schemas/HtmlErrorPage'
+          example: |
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+            <meta charset="utf-8">
+            <title>Error</title>
+            </head>
+            <body>
+            <pre>TypeError: Cannot read properties of null (reading &#39;exp&#39;)<br> &nbsp; &nbsp;at verifyToken (api/routes/verifyToken.js:24:34)<br> ...</pre>
+            </body>
+            </html>
+  schemas:
+    ObjectId:
+      type: string
+      description: A MongoDB ObjectId, 24 hexadecimal characters.
+      pattern: ^[0-9a-f]{24}$
+    Ok:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          const: ok
+    OkWithMessage:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          const: ok
+        message:
+          type: string
+    Error:
+      type: object
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          const: error
+        message:
+          type: string
+          description: What went wrong.
+        expired:
+          type: boolean
+          description: Present and `true` only when a session token from the weConect app has expired.
+    ErrorWithDetail:
+      type: object
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: string
+          const: error
+        message:
+          type: string
+        error:
+          type: object
+          description: |
+            The raw error from the database or from Node.js. Its fields depend
+            on the error; an error with no enumerable fields appears as `{}`.
+    HtmlErrorPage:
+      type: string
+      description: Express's default HTML error page, with a stack trace unless `NODE_ENV` is `production`.
+    Image:
+      type: object
+      description: An image stored elsewhere. Empty (`{}`) when no image is set.
+      properties:
+        url:
+          type: string
+          format: uri
+        filename:
+          type: string
+    UserIdRequest:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          $ref: '#/components/schemas/ObjectId'
+    LikeRequest:
+      type: object
+      properties:
+        userId:
+          $ref: '#/components/schemas/ObjectId'
+          deprecated: true
+          description: |
+            Ignored since version 1.1, which always uses the current user.
+            Version 1.0 used this field as the user who liked the post.
+    User:
+      type: object
+      required:
+        - _id
+        - username
+        - followers
+        - followings
+        - isAdmin
+        - createdAt
+      properties:
+        _id:
+          $ref: '#/components/schemas/ObjectId'
+        username:
+          type: string
+        profilePicture:
+          $ref: '#/components/schemas/Image'
+        coverPicture:
+          $ref: '#/components/schemas/Image'
+        bio:
+          type: string
+        followers:
+          type: array
+          description: IDs of the users who follow this user, in the order they followed.
+          items:
+            type: string
+        followings:
+          type: array
+          description: IDs of the users this user follows, in the order they were followed.
+          items:
+            type: string
+        isAdmin:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          description: Among the public endpoints, only **Search users** returns it.
+        __v:
+          type: integer
+          description: MongoDB's internal document version.
+    UserResponse:
+      type: object
+      required:
+        - status
+        - data
+      properties:
+        status:
+          type: string
+          const: ok
+        data:
+          $ref: '#/components/schemas/User'
+    CreatePostRequest:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          $ref: '#/components/schemas/ObjectId'
+        desc:
+          type: string
+          description: The post's text. Its length isn't limited, and an empty string is accepted.
+        img:
+          type: object
+          description: An image for the post. If you send `img`, include both fields.
+          required:
+            - url
+            - filename
+          properties:
+            url:
+              type: string
+              format: uri
+            filename:
+              type: string
+    Post:
+      type: object
+      required:
+        - _id
+        - userId
+        - likes
+        - comments
+        - createdAt
+        - updatedAt
+      properties:
+        _id:
+          $ref: '#/components/schemas/ObjectId'
+        userId:
+          $ref: '#/components/schemas/ObjectId'
+        desc:
+          type: string
+        img:
+          $ref: '#/components/schemas/Image'
+        likes:
+          type: array
+          description: IDs of the users who like the post.
+          items:
+            type: string
+        comments:
+          type: array
+          description: No endpoint adds comments.
+          items: {}
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        __v:
+          type: integer
+    PostResponse:
+      type: object
+      required:
+        - status
+        - data
+      properties:
+        status:
+          type: string
+          const: ok
+        data:
+          $ref: '#/components/schemas/Post'
+    PostListResponse:
+      type: object
+      required:
+        - status
+        - data
+      properties:
+        status:
+          type: string
+          const: ok
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'

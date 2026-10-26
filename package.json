@@ -3,9 +3,12 @@
   "private": true,
   "description": "weConect: a small social app (api/, web/) used to practise API documentation end to end",
   "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "start:real": "node scripts/start.mjs",
     "test:capture": "node tests/capture.mjs",
     "test:validate": "node tests/validate.mjs",
-    "lint:spec": "redocly lint openapi/weconect-v1.yaml"
+    "lint:spec": "redocly lint full && npm run --silent build:spec && redocly lint openapi/weconect-public.yaml",
+    "build:spec": "redocly bundle public -o openapi/weconect-public.yaml"
   },
   "devDependencies": {
     "@redocly/cli": "2.69.0",

@@ -1,0 +1,23 @@
+{
+  "name": "keys_delete_other_user",
+  "group": "Delete an API key",
+  "note": "bob can't delete alice's key",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/keys/6adf12e808ef70e347ff24e5",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "API key not found"
+    }
+  },
+  "durationMs": 15
+}

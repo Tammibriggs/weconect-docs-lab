@@ -1,0 +1,21 @@
+{
+  "name": "keys_delete",
+  "group": "Delete an API key",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/keys/6adf12e808ef70e347ff24e5",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok"
+    }
+  },
+  "durationMs": 8
+}

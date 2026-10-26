@@ -1,0 +1,30 @@
+{
+  "name": "keys_create_long_name",
+  "group": "Create an API key",
+  "note": "Names can be up to 50 characters",
+  "request": {
+    "method": "POST",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+      "scopes": [
+        "read"
+      ]
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "name must be a string of 1 to 50 characters"
+    }
+  },
+  "durationMs": 7
+}

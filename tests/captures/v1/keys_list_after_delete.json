@@ -1,0 +1,45 @@
+{
+  "name": "keys_list_after_delete",
+  "group": "List API keys",
+  "note": "One key left; lastUsedAt is set because the key was used above",
+  "request": {
+    "method": "GET",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "id": "6adf12e908ef70e347ff24e9",
+          "name": "Poster",
+          "lastFour": "CkKE",
+          "scopes": [
+            "write"
+          ],
+          "createdAt": "2026-10-26T08:44:25.606Z",
+          "lastUsedAt": null
+        },
+        {
+          "id": "6adf12e808ef70e347ff24e3",
+          "name": "My bot",
+          "lastFour": "muPG",
+          "scopes": [
+            "read",
+            "write"
+          ],
+          "createdAt": "2026-10-26T08:44:24.654Z",
+          "lastUsedAt": "2026-10-26T08:44:33.447Z"
+        }
+      ]
+    }
+  },
+  "durationMs": 9
+}

@@ -1,0 +1,35 @@
+{
+  "name": "keys_list_bob",
+  "group": "List API keys",
+  "note": "Each user sees only their own keys",
+  "request": {
+    "method": "GET",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "id": "6adf12e908ef70e347ff24e7",
+          "name": "Bob's script",
+          "lastFour": "Nri0",
+          "scopes": [
+            "read",
+            "write"
+          ],
+          "createdAt": "2026-10-26T08:44:25.289Z",
+          "lastUsedAt": "2026-10-26T08:44:32.189Z"
+        }
+      ]
+    }
+  },
+  "durationMs": 5
+}

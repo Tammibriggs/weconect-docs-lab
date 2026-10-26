@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const router = require("express").Router();
-const {verifyToken} = require('./verifyToken')
+const {verifyToken, verifyTokenOrApiKey} = require('./verifyToken')
 
 const validateUpdateUser = (req, res, next) => {
 
@@ -50,11 +50,11 @@ router.put("/", verifyToken, validateUpdateUser, async (req, res) => {
 )
 
 // search for users
-router.get("/search", verifyToken, async (req, res) => {
+router.get("/search", verifyTokenOrApiKey("read"), async (req, res) => {
   if(req.query.search) {
     const regex = new RegExp(escapeRegex(req.query.search), 'gi')
     try {
-      const users = await User.find({username: regex});
+      const users = await User.find({username: regex}).select('-password');
       res.status(200).json({status: 'ok', data: users});
     } catch (err) {
       res.status(500).json({status: 'error', error: err});
@@ -62,7 +62,7 @@ router.get("/search", verifyToken, async (req, res) => {
   }
   else {
     try {
-      const users = await User.find({});
+      const users = await User.find({}).select('-password');
       res.status(200).json({status: 'ok', data: users});
     } catch (err) {
       res.status(500).json({status: 'error', error: err});
@@ -82,7 +82,7 @@ router.delete("/", verifyToken, async (req, res) => {
 }) 
 
 //get a user using the id in the user token
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", verifyTokenOrApiKey("read"), async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     const { password, updatedAt, ...other } = user._doc;
@@ -94,7 +94,7 @@ router.get("/", verifyToken, async (req, res) => {
 
 
 // get a user by id in paramerter
-router.get("/:id/user", verifyToken, async (req, res) => {
+router.get("/:id/user", verifyTokenOrApiKey("read"), async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if(!user) return res.status(404).json({status: 'error' , message: 'User not found'})
@@ -144,7 +144,7 @@ router.get('/following', verifyToken, async (req, res) => {
 })
 
 //follow a user
-router.put("/follow", verifyToken, async (req, res) => {
+router.put("/follow", verifyTokenOrApiKey("write"), async (req, res) => {
   if(!req.body.userId) return res.status(400).json({status: 'error', message: 'Missing payload property'})
   try {
     const user = await User.findById(req.body.userId);
@@ -162,7 +162,7 @@ router.put("/follow", verifyToken, async (req, res) => {
 })
 
 //unfollow a user
-router.put("/unfollow", verifyToken, async (req, res) => {
+router.put("/unfollow", verifyTokenOrApiKey("write"), async (req, res) => {
   if(!req.body.userId) return res.status(400).json({status: 'error', message: 'Missing payload property'})
   try {
     const user = await User.findById(req.body.userId);

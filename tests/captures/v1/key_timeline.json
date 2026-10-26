@@ -1,0 +1,58 @@
+{
+  "name": "key_timeline",
+  "group": "Timeline",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/timeline/all",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "likes": [
+            "6adf12d308ef70e347ff248d"
+          ],
+          "comments": [],
+          "_id": "6adf12e208ef70e347ff24c3",
+          "userId": "6adf12d208ef70e347ff2489",
+          "desc": "Already liked",
+          "createdAt": "2026-10-26T08:44:18.073Z",
+          "updatedAt": "2026-10-26T08:44:18.073Z",
+          "__v": 0
+        },
+        {
+          "likes": [],
+          "comments": [],
+          "_id": "6adf12e108ef70e347ff24c1",
+          "userId": "6adf12d208ef70e347ff2489",
+          "desc": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "createdAt": "2026-10-26T08:44:17.755Z",
+          "updatedAt": "2026-10-26T08:44:17.755Z",
+          "__v": 0
+        },
+        {
+          "likes": [
+            "6adf12d208ef70e347ff248b",
+            "6adf12d208ef70e347ff2489"
+          ],
+          "comments": [],
+          "_id": "6adf12df08ef70e347ff24bb",
+          "userId": "6adf12d208ef70e347ff2489",
+          "desc": "Hello from Alice",
+          "createdAt": "2026-10-26T08:44:15.875Z",
+          "updatedAt": "2026-10-26T08:44:20.886Z",
+          "__v": 0
+        }
+      ]
+    }
+  },
+  "durationMs": 32
+}

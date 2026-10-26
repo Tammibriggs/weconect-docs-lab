@@ -1,10 +1,10 @@
 const router = require("express").Router();
 const Post = require("../models/Post");
 const User = require("../models/User");
-const {verifyToken } = require("./verifyToken");
+const {verifyToken, verifyTokenOrApiKey } = require("./verifyToken");
 
 //create a post
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", verifyTokenOrApiKey("write"), async (req, res) => {
   if(!req.body.userId) return res.status(403).json({
     status: 'error', message: 'user id is required'
   })
@@ -41,7 +41,7 @@ router.put("/", verifyToken, async (req, res) => {
 }); 
 
 //delete a post
-router.delete("/:postId", verifyToken, async (req, res) => {
+router.delete("/:postId", verifyTokenOrApiKey("write"), async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
     if (post.userId === req.user.id) {
@@ -56,14 +56,16 @@ router.delete("/:postId", verifyToken, async (req, res) => {
 });
 
 //like / dislike a post
-router.put("/:postId/like", verifyToken, async (req, res) => {
+router.put("/:postId/like", verifyTokenOrApiKey("write"), async (req, res) => {
   try {
     const post = await Post.findById(req.params.postId);
-    if (!post.likes.includes(req.body.userId)) {
-      await post.updateOne({ $push: { likes: req.body.userId } });
+    // The like is always the caller's own; userId in the body is ignored
+    const userId = req.user.id;
+    if (!post.likes.includes(userId)) {
+      await post.updateOne({ $push: { likes: userId } });
       res.status(200).json({status: 'ok'});
     } else {
-      await post.updateOne({ $pull: { likes: req.body.userId } });
+      await post.updateOne({ $pull: { likes: userId } });
       res.status(200).json({status: 'ok'});url
     }
   } catch (err) {
@@ -82,7 +84,7 @@ router.get("/:postId/single", verifyToken, async (req, res) => {
 });
 
 // get posts
-router.get("/:userId", verifyToken, async (req, res) => {
+router.get("/:userId", verifyTokenOrApiKey("read"), async (req, res) => {
   try {
     const userPosts = await Post.find({ userId: req.params.userId }).sort({createdAt: 'desc'});
     res.status(200).json({status: 'ok', data: userPosts})
@@ -92,7 +94,7 @@ router.get("/:userId", verifyToken, async (req, res) => {
 });
 
 //get timeline posts
-router.get("/timeline/all", verifyToken, async(req, res) => {
+router.get("/timeline/all", verifyTokenOrApiKey("read"), async(req, res) => {
   try {
     const currentUser = await User.findById(req.user.id);
     const userPosts = await Post.find({ userId: currentUser._id }).sort({createdAt: 'desc'});

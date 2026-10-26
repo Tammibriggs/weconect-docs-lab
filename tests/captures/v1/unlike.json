@@ -4,13 +4,13 @@
   "note": "Liking a second time removes the like",
   "request": {
     "method": "PUT",
-    "path": "/api/posts/6ada229b61da6152a72a479e/like",
+    "path": "/api/posts/6adf12df08ef70e347ff24bb/like",
     "headers": {
       "Authorization": "Bearer <redacted JWT>",
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ada228e61da6152a72a476e"
+      "userId": "6adf12d208ef70e347ff248b"
     }
   },
   "response": {
@@ -22,10 +22,10 @@
       "status": "ok"
     }
   },
-  "durationMs": 16,
+  "durationMs": 8,
   "serverExited": {
     "code": 1,
     "signal": null
   },
-  "serverLog": "\nError [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client\n    at ServerResponse.setHeader (node:_http_outgoing:684:11)\n    at ServerResponse.header (<repo>/api/node_modules/express/lib/response.js:794:10)\n    at ServerResponse.send (<repo>/api/node_modules/express/lib/response.js:174:12)\n    at ServerResponse.json (<repo>/api/node_modules/express/lib/response.js:278:15)\n    at <repo>/api/routes/posts.js:70:21\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  code: 'ERR_HTTP_HEADERS_SENT'\n}\n\nNode.js v24.20.0"
+  "serverLog": "\nError [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client\n    at ServerResponse.setHeader (node:_http_outgoing:684:11)\n    at ServerResponse.header (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:794:10)\n    at ServerResponse.send (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:174:12)\n    at ServerResponse.json (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:278:15)\n    at <repo>/api/routes/posts.js:72:21\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  code: 'ERR_HTTP_HEADERS_SENT'\n}\n\nNode.js v24.20.0"
 }

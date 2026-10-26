@@ -1,0 +1,26 @@
+{
+  "name": "login_username_case",
+  "group": "Log in",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "ALICE",
+      "password": "<redacted encrypted password>"
+    }
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "Invalid Username/Password"
+    }
+  },
+  "durationMs": 8
+}

@@ -1,0 +1,35 @@
+{
+  "name": "key_user_posts",
+  "group": "List a user's posts",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/6adf12d208ef70e347ff248b",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "likes": [
+            "6adf12d208ef70e347ff2489"
+          ],
+          "comments": [],
+          "_id": "6adf12e008ef70e347ff24bf",
+          "userId": "6adf12d208ef70e347ff248b",
+          "desc": "Hello from Bob",
+          "createdAt": "2026-10-26T08:44:16.511Z",
+          "updatedAt": "2026-10-26T08:44:21.202Z",
+          "__v": 0
+        }
+      ]
+    }
+  },
+  "durationMs": 20
+}

@@ -1,0 +1,28 @@
+{
+  "name": "key_create_post_as_other_user",
+  "group": "Create a post",
+  "note": "A key acts as its owner, bob",
+  "request": {
+    "method": "POST",
+    "path": "/api/posts",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6adf12d208ef70e347ff2489",
+      "desc": "Posting as alice"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "you can only post to your account"
+    }
+  },
+  "durationMs": 11
+}

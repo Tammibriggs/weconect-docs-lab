@@ -1,0 +1,27 @@
+{
+  "name": "register_username_long",
+  "group": "Register",
+  "note": "The model says max 20; Mongoose's max applies only to numbers",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+      "password": "<redacted encrypted password>",
+      "password1": "secret6"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok"
+    }
+  },
+  "durationMs": 14
+}

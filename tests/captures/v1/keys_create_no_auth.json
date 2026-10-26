@@ -1,0 +1,28 @@
+{
+  "name": "keys_create_no_auth",
+  "group": "Create an API key",
+  "request": {
+    "method": "POST",
+    "path": "/api/keys",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "Anonymous",
+      "scopes": [
+        "read"
+      ]
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "You are not authenticated!"
+    }
+  },
+  "durationMs": 3
+}

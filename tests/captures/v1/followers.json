@@ -18,13 +18,13 @@
       "status": "ok",
       "data": [
         {
-          "id": "6ada228f61da6152a72a4770",
+          "id": "6adf12d308ef70e347ff248d",
           "username": "carol",
           "image": {},
           "following": false
         },
         {
-          "id": "6ada228e61da6152a72a476e",
+          "id": "6adf12d208ef70e347ff248b",
           "username": "bob",
           "image": {},
           "following": true
@@ -32,5 +32,5 @@
       ]
     }
   },
-  "durationMs": 28
+  "durationMs": 19
 }

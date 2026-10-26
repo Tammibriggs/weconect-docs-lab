@@ -1,0 +1,38 @@
+{
+  "name": "login_erin",
+  "group": "Log in",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "erin",
+      "password": "<redacted encrypted password>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {},
+        "coverPicture": {},
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6adf12f608ef70e347ff252f",
+        "username": "erin",
+        "createdAt": "2026-10-26T08:44:38.122Z",
+        "updatedAt": "2026-10-26T08:44:38.122Z",
+        "__v": 0,
+        "accessToken": "<redacted JWT>"
+      }
+    }
+  },
+  "durationMs": 13
+}

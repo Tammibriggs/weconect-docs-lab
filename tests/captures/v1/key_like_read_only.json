@@ -1,0 +1,24 @@
+{
+  "name": "key_like_read_only",
+  "group": "Like a post",
+  "request": {
+    "method": "PUT",
+    "path": "/api/posts/6adf12ed08ef70e347ff2500/like",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {}
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "This API key doesn't have the 'write' scope"
+    }
+  },
+  "durationMs": 11
+}

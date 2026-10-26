@@ -1,0 +1,15 @@
+# Two versions of one spec:
+#   full    everything, including the internal endpoints the app uses (x-internal: true)
+#   public  what third-party developers see: internal endpoints, tags, and examples removed
+# Build the public version with: npm run build:spec
+extends:
+  - recommended
+
+apis:
+  full:
+    root: openapi/weconect-v1.yaml
+  public:
+    root: openapi/weconect-v1.yaml
+    decorators:
+      remove-x-internal: on
+      remove-unused-components: on

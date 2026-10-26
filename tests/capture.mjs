@@ -8,26 +8,18 @@
 // run never touches a real database. The first run downloads MongoDB (~70 MB)
 // to ~/.cache/mongodb-binaries.
 
-import { spawn } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { ApiServer, BASE, ROOT, SECRETS, isPortInUse, startMongo } from "../scripts/api-server.mjs";
 import { cases } from "./cases.mjs";
-
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const API_DIR = path.join(ROOT, "api");
-const BASE = "http://localhost:8800"; // the port is fixed in api/index.js
-const MONGO_VERSION = "6.0.19"; // the oldest release built for Ubuntu 22.04; api/ uses MongoDB driver 3.7
 
 const outArg = process.argv.indexOf("--out");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
 const OUT = path.resolve(ROOT, outArg > -1 ? process.argv[outArg + 1] : path.join("tests", "runs", stamp));
 
-const JWT_SECT = crypto.randomBytes(32).toString("hex");
-const PASS_ENC_SECT = crypto.randomBytes(32).toString("hex");
 const JWT_PATTERN = /eyJ[\w-]+\.[\w-]+\.[\w-]+/g;
+const API_KEY_PATTERN = /wck_[\w-]{8,}/g; // the 4-character lastFour field isn't a secret
 
 function signJwt(payload, secret) {
   const enc = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
@@ -40,6 +32,7 @@ function redact(value) {
   if (typeof value === "string") {
     return value
       .replace(JWT_PATTERN, "<redacted JWT>")
+      .replace(API_KEY_PATTERN, "<redacted API key>")
       .split(ROOT).join("<repo>")
       .split(process.env.HOME || "/nonexistent").join("<home>");
   }
@@ -66,49 +59,20 @@ function pick(obj, dotted) {
   return dotted.split(".").reduce((o, key) => (o == null ? undefined : o[key]), obj);
 }
 
-// ─── The API process ────────────────────────────────────────────
-let api = null;
-let apiExit = null;
+// Everything the API prints, saved as server.log
 const log = [];
 
-async function startApi(mongoUri) {
-  apiExit = null;
-  api = spawn(process.execPath, ["index.js"], {
-    cwd: API_DIR,
-    env: { ...process.env, MONGO_URL: `${mongoUri}weconect`, JWT_SECT, PASS_ENC_SECT, ALLOWED_HOST: "http://localhost:3000" },
-  });
-  let connected = false;
-  const onData = (d) => {
-    const text = d.toString();
-    log.push(text);
-    if (text.includes("Connected to MongoDB")) connected = true;
-  };
-  api.stdout.on("data", onData);
-  api.stderr.on("data", onData);
-  api.on("exit", (code, signal) => { apiExit = { code, signal }; });
-  for (let i = 0; i < 100; i++) {
-    if (apiExit) throw new Error(`The API exited on start (${JSON.stringify(apiExit)}):\n${log.slice(-5).join("")}`);
-    if (connected) {
-      try { await fetch(`${BASE}/api/nope`); return; } catch { /* not listening yet */ }
-    }
-    await new Promise((r) => setTimeout(r, 200));
-  }
-  throw new Error("The API didn't start within 20 seconds");
-}
-
 // ─── One case ───────────────────────────────────────────────────
-async function run(c, vars) {
+async function run(c, vars, server) {
   const headers = { ...(c.headers || {}) };
   if (c.auth) {
-    const token = {
-      alice: vars.aliceToken, bob: vars.bobToken, carol: vars.carolToken,
-      expired: vars.expiredToken, badsig: vars.badSigToken,
-    }[c.auth];
+    // "alice" uses {aliceToken}, saved by login_alice; the runner makes the other two
+    const token = { expired: vars.expiredToken, badsig: vars.badSigToken }[c.auth] ?? vars[`${c.auth}Token`];
     headers.Authorization = typeof c.auth === "object" ? fill(c.auth.raw, vars) : `Bearer ${token}`;
   }
   let body;
   if (c.body !== undefined) {
-    headers["Content-Type"] = "application/json";
+    headers["Content-Type"] ??= "application/json";
     body = typeof c.body === "string" ? c.body : JSON.stringify(fill(c.body, vars));
   }
   const urlPath = fill(c.path, vars);
@@ -135,33 +99,37 @@ async function run(c, vars) {
   }
   capture.durationMs = Date.now() - started;
   await new Promise((r) => setTimeout(r, 300)); // give a crash time to happen
-  if (apiExit) {
-    capture.serverExited = apiExit;
+  if (server.exited) {
+    capture.serverExited = server.exited;
     capture.serverLog = redact(log.slice(-3).join("").trim().split("\n").slice(-12).join("\n"));
   }
   return capture;
 }
 
 // ─── Main ───────────────────────────────────────────────────────
-try { await fetch(`${BASE}/`); console.error(`Port 8800 is already in use. Stop that server first.`); process.exit(1); } catch { /* free */ }
+if (await isPortInUse()) {
+  console.error(`${BASE} is already in use. Stop that server first, or run on another port: PORT=8810 npm run test:capture`);
+  process.exit(1);
+}
 
 fs.mkdirSync(OUT, { recursive: true });
 for (const f of fs.readdirSync(OUT)) if (f.endsWith(".json")) fs.rmSync(path.join(OUT, f));
 
-const mongo = await MongoMemoryServer.create({ binary: { version: MONGO_VERSION } });
-await startApi(mongo.getUri());
+const mongo = await startMongo();
+const server = new ApiServer({ mongoUri: mongo.getUri(), onOutput: (text) => log.push(text) });
+await server.start();
 
 const vars = {};
 const rows = [];
 let restarts = 0;
 for (const c of cases) {
-  if (apiExit && !c.noRestart) { await startApi(mongo.getUri()); restarts++; }
+  if (server.exited && !c.noRestart) { await server.start(); restarts++; }
   if (vars.aliceId && !vars.expiredToken) {
     const now = Math.floor(Date.now() / 1000);
-    vars.expiredToken = signJwt({ id: vars.aliceId, iat: now - 7200, exp: now - 3600 }, JWT_SECT);
+    vars.expiredToken = signJwt({ id: vars.aliceId, iat: now - 7200, exp: now - 3600 }, SECRETS.JWT_SECT);
     vars.badSigToken = signJwt({ id: vars.aliceId, iat: now, exp: now + 3600 }, "a-different-secret");
   }
-  const capture = await run(c, vars);
+  const capture = await run(c, vars, server);
   fs.writeFileSync(path.join(OUT, `${c.name}.json`), JSON.stringify(capture, null, 2) + "\n");
   const status = capture.response.status ?? capture.response.error;
   const ok = status === c.expect;
@@ -169,7 +137,7 @@ for (const c of cases) {
   console.log(`${ok ? "ok  " : "DIFF"} ${String(status).padEnd(12)} ${c.name}${capture.serverExited ? "   (server exited)" : ""}`);
 }
 
-if (api && !apiExit) api.kill();
+server.stop();
 await mongo.stop();
 fs.writeFileSync(path.join(OUT, "server.log"), redact(log.join("")));
 

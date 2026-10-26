@@ -1,0 +1,26 @@
+{
+  "name": "key_follow_read_only",
+  "group": "Follow",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/follow",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6adf12d308ef70e347ff248d"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "This API key doesn't have the 'write' scope"
+    }
+  },
+  "durationMs": 10
+}

@@ -1,0 +1,22 @@
+{
+  "name": "key_delete_post_read_only",
+  "group": "Delete a post",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/posts/6adf12ed08ef70e347ff2500",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "This API key doesn't have the 'write' scope"
+    }
+  },
+  "durationMs": 9
+}

@@ -1,0 +1,23 @@
+{
+  "name": "key_on_internal_endpoint",
+  "group": "API keys",
+  "note": "Keys work only on the 10 public endpoints",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/followers",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "API keys can't be used with this endpoint. Use an access token from logging in."
+    }
+  },
+  "durationMs": 5
+}

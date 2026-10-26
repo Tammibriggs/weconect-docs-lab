@@ -1,70 +1,91 @@
 openapi: 3.1.0
 info:
   title: weConect API
-  version: 1.0.0
-  summary: Accounts, follows, posts, and timelines for the weConect social app.
+  version: 1.1.0
+  summary: Profiles, follows, posts, and timelines for the weConect social app.
   description: |
-    The weConect API is the backend of weConect, a small social app. Use it to
-    create an account, find and follow other users, publish posts, and read a
-    timeline of posts from the people you follow.
+    The weConect API lets your code use weConect as you: read profiles and
+    timelines, find people, follow them, publish posts, and like posts.
 
-    This document describes version 1 as it behaves today, including
-    behaviour that will change in version 2. Every status code and example
-    comes from a captured response. `TESTING.md` in the repository lists the
-    test cases and every known issue.
+    This document describes the API as it behaves today, including known
+    issues. Every status code and example comes from a captured response.
+    `TESTING.md` in the repository lists the test cases and every known issue,
+    and `CHANGELOG.md` lists the changes in each version.
 
     ## Authentication
 
-    Every endpoint except **Register** and **Log in** needs an access token.
-    Get one from **Log in** and send it in the `Authorization` header:
+    Authenticate with an API key, sent in the `Authorization` header:
 
     ```http
-    Authorization: Bearer ACCESS_TOKEN
+    Authorization: Bearer wck_YOUR_API_KEY
     ```
 
-    Tokens expire two days after login. The API reads the second word of the
-    header as the token and doesn't check the first, so `Bearer` is a
-    convention rather than a requirement.
+    To create a key, open your profile in the weConect app and select
+    **API keys**. The app shows the key only once, so copy it then. A key acts
+    as you, so keep it secret. If a key leaks, delete it on the same page; it
+    stops working at once.
 
-    | Problem with the token | Status |
+    ### Scopes
+
+    Each key has one or both of these scopes:
+
+    | Scope | What the key can do |
+    |---|---|
+    | `read` | Get the current user, get a user, search users, list a user's posts, and get the timeline |
+    | `write` | Follow and unfollow users, create and delete your posts, and like or unlike posts |
+
+    Each endpoint lists the scope it needs.
+
+    ### Authentication errors
+
+    | Problem | Status |
     |---|---|
     | No `Authorization` header | `401` with `"You are not authenticated!"` |
-    | Signed with the wrong secret | `403` with `"Token is invalid"` |
-    | Expired | `403` with `"expired": true` and `"Your session has expired"` |
-    | Not a JWT, or no scheme word before it | `500` with an HTML error page |
+    | The key is wrong, or was deleted | `401` with `"Invalid API key"` |
+    | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'write' scope"` |
+    | The header holds something other than an API key, such as a malformed token | `500` with an HTML error page |
 
     ## Errors
 
-    Most errors return JSON with `"status": "error"` and a `message`. Version 1
+    Most errors return JSON with `"status": "error"` and a `message`. The API
     also has three other error shapes, documented on each operation:
 
-    - Some `500` responses return the raw database error in an `error` field,
-      or as the whole body.
-    - **Unfollow** returns its messages as plain JSON strings.
+    - Some `500` responses return the raw database error in an `error` field.
+    - **Unfollow a user** returns its messages as plain JSON strings.
     - A body that isn't valid JSON, or a malformed token, returns Express's
-      HTML error page. So does a path that doesn't exist, with `404`.
+      HTML error page. So does a path or method that doesn't exist, with
+      `404`.
+
+    ## Request bodies
+
+    Send request bodies as JSON, with `Content-Type: application/json`. The
+    API doesn't parse other formats, such as form-encoded bodies, so it
+    treats their fields as missing.
 
     ## Browser requests
 
-    Browsers can call the API only from the origin set in the server's
-    `ALLOWED_HOST` variable. A preflight request from any other origin gets
-    `204` with no CORS headers, so the browser blocks the call. Requests from
-    servers and command-line tools aren't affected.
+    Browsers can call the API only from the weConect app's own origin, set in
+    the server's `ALLOWED_HOST` variable. A preflight request from any other
+    origin gets `204` with no CORS headers, so the browser blocks the call.
+    Call the API from your server or scripts instead; requests that don't come
+    from a browser aren't affected.
 servers:
   - url: http://localhost:8800
     description: Local development server. The API isn't deployed yet.
-security:
-  - BearerAuth: []
 
 tags:
-  - name: Auth
-    description: Create an account and log in to get an access token.
   - name: Users
     description: Read your own profile, look up other users, and search by username.
   - name: Follows
-    description: Follow and unfollow users, and list who follows you and whom you follow.
+    description: Follow and unfollow users.
   - name: Posts
-    description: Publish, read, like, and delete posts, and read your timeline.
+    description: Publish, delete, and like posts, and read a user's posts and your timeline.
+  - name: Auth
+    description: Used by the weConect app. Create an account and log in to get an access token.
+    x-internal: true
+  - name: API keys
+    description: Used by the weConect app's API keys page. Create, list, and delete API keys.
+    x-internal: true
 
 paths:
   /api/auth/register:
@@ -72,6 +93,7 @@ paths:
       tags: [Auth]
       summary: Register
       operationId: registerUser
+      x-internal: true
       security: []
       description: |
         Creates an account. The response doesn't include the new user or a
@@ -104,7 +126,7 @@ paths:
           description: |
             `username` is missing or isn't a string, `password` is missing or
             shorter than 5 characters, or `password1` doesn't match `password`.
-            Version 1 uses `401` for these validation errors.
+            The API uses `401` for these validation errors.
           content:
             application/json:
               schema:
@@ -149,10 +171,12 @@ paths:
       tags: [Auth]
       summary: Log in
       operationId: logIn
+      x-internal: true
       security: []
       description: |
         Checks a username and password and returns the user's profile with an
-        access token. The token expires after two days.
+        access token for the weConect app. The token expires after two days.
+        It works on every endpoint, including the public ones.
       requestBody:
         required: true
         content:
@@ -184,10 +208,10 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ada228e61da6152a72a476c
+                  _id: 6adf12d208ef70e347ff2489
                   username: alice
-                  createdAt: '2026-10-22T14:49:50.432Z'
-                  updatedAt: '2026-10-22T14:49:50.432Z'
+                  createdAt: '2026-10-26T08:44:02.569Z'
+                  updatedAt: '2026-10-26T08:44:02.569Z'
                   __v: 0
                   accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.PAYLOAD.SIGNATURE
         '400':
@@ -211,12 +235,167 @@ paths:
                 status: error
                 message: Invalid Username/Password
 
+  /api/keys:
+    post:
+      tags: [API keys]
+      summary: Create an API key
+      operationId: createApiKey
+      x-internal: true
+      security:
+        - AccessToken: []
+      description: |
+        Creates an API key for the current user. The response is the only time
+        the key itself is returned; afterwards, only its last four characters
+        are.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyRequest'
+            example:
+              name: My bot
+              scopes: [read, write]
+      responses:
+        '201':
+          description: The key was created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  data:
+                    $ref: '#/components/schemas/NewApiKey'
+              example:
+                status: ok
+                data:
+                  id: 6adf12e808ef70e347ff24e3
+                  name: My bot
+                  lastFour: 9XAa
+                  scopes: [read, write]
+                  createdAt: '2026-10-26T08:44:24.654Z'
+                  lastUsedAt: null
+                  key: wck_REDACTED
+        '400':
+          description: '`name` or `scopes` is missing or invalid.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidName:
+                  summary: name is missing, empty, or longer than 50 characters
+                  value:
+                    status: error
+                    message: name must be a string of 1 to 50 characters
+                invalidScopes:
+                  summary: scopes is missing, empty, or has an unknown or repeated scope
+                  value:
+                    status: error
+                    message: 'scopes must be a list of one or both of: read, write'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/AccessTokenForbidden'
+    get:
+      tags: [API keys]
+      summary: List API keys
+      operationId: listApiKeys
+      x-internal: true
+      security:
+        - AccessToken: []
+      description: Returns the current user's API keys, newest first. The keys themselves aren't returned.
+      responses:
+        '200':
+          description: The current user's keys, possibly none.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, data]
+                properties:
+                  status:
+                    type: string
+                    const: ok
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiKey'
+              example:
+                status: ok
+                data:
+                  - id: 6adf12e908ef70e347ff24e9
+                    name: Poster
+                    lastFour: W1_B
+                    scopes: [write]
+                    createdAt: '2026-10-26T08:44:25.606Z'
+                    lastUsedAt: null
+                  - id: 6adf12e808ef70e347ff24e3
+                    name: My bot
+                    lastFour: 9XAa
+                    scopes: [read, write]
+                    createdAt: '2026-10-26T08:44:24.654Z'
+                    lastUsedAt: '2026-10-26T08:44:33.447Z'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/AccessTokenForbidden'
+
+  /api/keys/{keyId}:
+    delete:
+      tags: [API keys]
+      summary: Delete an API key
+      operationId: deleteApiKey
+      x-internal: true
+      security:
+        - AccessToken: []
+      description: Deletes one of the current user's API keys. The key stops working at once.
+      parameters:
+        - name: keyId
+          in: path
+          required: true
+          description: The key's `id`, as returned by **List API keys**.
+          schema:
+            type: string
+          example: 6adf12e808ef70e347ff24e3
+      responses:
+        '200':
+          description: The key was deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+              example:
+                status: ok
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/AccessTokenForbidden'
+        '404':
+          description: The current user has no key with this ID, including when `keyId` isn't a valid ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                status: error
+                message: API key not found
+
   /api/users:
     get:
       tags: [Users]
       summary: Get the current user
       operationId: getCurrentUser
-      description: Returns the profile of the user who owns the access token.
+      security:
+        - ApiKeyAuth: [read]
+      description: |
+        Returns the profile of the user who owns the API key.
+
+        **Scope:** `read`
       responses:
         '200':
           description: The current user's profile.
@@ -232,14 +411,14 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ada228e61da6152a72a476c
+                  _id: 6adf12d208ef70e347ff2489
                   username: alice
-                  createdAt: '2026-10-22T14:49:50.432Z'
+                  createdAt: '2026-10-26T08:44:02.569Z'
                   __v: 0
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/InvalidToken'
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/MalformedToken'
 
@@ -248,7 +427,12 @@ paths:
       tags: [Users]
       summary: Get a user
       operationId: getUser
-      description: Returns another user's profile.
+      security:
+        - ApiKeyAuth: [read]
+      description: |
+        Returns another user's profile.
+
+        **Scope:** `read`
       parameters:
         - $ref: '#/components/parameters/UserId'
       responses:
@@ -266,14 +450,14 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ada228e61da6152a72a476e
+                  _id: 6adf12d208ef70e347ff248b
                   username: bob
-                  createdAt: '2026-10-22T14:49:50.759Z'
+                  createdAt: '2026-10-26T08:44:02.890Z'
                   __v: 0
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/InvalidToken'
+          $ref: '#/components/responses/Forbidden'
         '404':
           description: No user has this ID.
           content:
@@ -286,7 +470,8 @@ paths:
         '500':
           description: |
             `userId` isn't a valid ObjectId (the body includes the raw database
-            error), or the access token is malformed (an HTML error page).
+            error), or the `Authorization` header holds a malformed token (an
+            HTML error page).
           content:
             application/json:
               schema:
@@ -311,18 +496,24 @@ paths:
       tags: [Users]
       summary: Search users
       operationId: searchUsers
+      security:
+        - ApiKeyAuth: [read]
       description: |
         Returns users whose username contains the search term, ignoring case.
         Without a term, returns every user. Results aren't paginated.
 
-        **Known issue:** each user in the results includes their encrypted
-        password. The results also leave out `profilePicture` and
-        `coverPicture` when they're empty, unlike the other user endpoints.
+        Unlike the other user endpoints, the results leave out
+        `profilePicture` and `coverPicture` when they're empty, and include
+        `updatedAt`.
+
+        **Scope:** `read`
       parameters:
         - name: search
           in: query
           required: false
-          description: Text to look for anywhere in the username. Matching ignores case.
+          description: |
+            Text to look for anywhere in the username. Matching ignores case,
+            and special characters such as `.` and `(` match only themselves.
           schema:
             type: string
           example: ali
@@ -341,23 +532,22 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/UserWithPassword'
+                      $ref: '#/components/schemas/User'
               example:
                 status: ok
                 data:
                   - followers: []
                     followings: []
                     isAdmin: false
-                    _id: 6ada228e61da6152a72a476c
+                    _id: 6adf12d208ef70e347ff2489
                     username: alice
-                    password: ENCRYPTED_PASSWORD
-                    createdAt: '2026-10-22T14:49:50.432Z'
-                    updatedAt: '2026-10-22T14:49:50.432Z'
+                    createdAt: '2026-10-26T08:44:02.569Z'
+                    updatedAt: '2026-10-26T08:44:02.569Z'
                     __v: 0
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/InvalidToken'
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/MalformedToken'
 
@@ -366,9 +556,13 @@ paths:
       tags: [Follows]
       summary: Follow a user
       operationId: followUser
+      security:
+        - ApiKeyAuth: [write]
       description: |
         Makes the current user follow another user. Nothing stops users from
         following themselves.
+
+        **Scope:** `write`
       requestBody:
         required: true
         content:
@@ -376,7 +570,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ada228e61da6152a72a476e
+              userId: 6adf12d208ef70e347ff248b
       responses:
         '200':
           description: The current user now follows the user.
@@ -397,11 +591,11 @@ paths:
                 status: error
                 message: Missing payload property
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
           description: |
-            The current user already follows this user, or the access token is
-            invalid or expired.
+            The current user already follows this user, or the API key doesn't
+            have the `write` scope.
           content:
             application/json:
               schema:
@@ -412,8 +606,14 @@ paths:
                   value:
                     status: error
                     message: you already follow this user
+                missingScope:
+                  summary: The key doesn't have the write scope
+                  value:
+                    status: error
+                    message: This API key doesn't have the 'write' scope
                 invalidToken:
-                  summary: Invalid token
+                  summary: The app's access token is invalid
+                  x-internal: true
                   value:
                     status: error
                     message: Token is invalid
@@ -434,10 +634,14 @@ paths:
       tags: [Follows]
       summary: Unfollow a user
       operationId: unfollowUser
+      security:
+        - ApiKeyAuth: [write]
       description: |
         Makes the current user stop following another user. Unlike the other
         endpoints, the success and "not following" responses are plain JSON
         strings.
+
+        **Scope:** `write`
       requestBody:
         required: true
         content:
@@ -445,7 +649,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ada228e61da6152a72a476e
+              userId: 6adf12d208ef70e347ff248b
       responses:
         '200':
           description: The current user no longer follows the user.
@@ -464,11 +668,11 @@ paths:
                 status: error
                 message: Missing payload property
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
           description: |
             The current user doesn't follow this user (a plain JSON string), or
-            the access token is invalid or expired (an error object).
+            the API key doesn't have the `write` scope (an error object).
           content:
             application/json:
               schema:
@@ -479,96 +683,33 @@ paths:
                 notFollowing:
                   summary: Not following
                   value: you don't follow this user
+                missingScope:
+                  summary: The key doesn't have the write scope
+                  value:
+                    status: error
+                    message: This API key doesn't have the 'write' scope
                 invalidToken:
-                  summary: Invalid token
+                  summary: The app's access token is invalid
+                  x-internal: true
                   value:
                     status: error
                     message: Token is invalid
-
-  /api/users/followers:
-    get:
-      tags: [Follows]
-      summary: List followers
-      operationId: listFollowers
-      description: |
-        Returns the users who follow the current user, in the order they
-        followed. `following` shows whether the current user follows them back.
-      responses:
-        '200':
-          description: The current user's followers, possibly none.
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [status, data]
-                properties:
-                  status:
-                    type: string
-                    const: ok
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Follower'
-              example:
-                status: ok
-                data:
-                  - id: 6ada228f61da6152a72a4770
-                    username: carol
-                    image: {}
-                    following: false
-                  - id: 6ada228e61da6152a72a476e
-                    username: bob
-                    image: {}
-                    following: true
-        '401':
-          $ref: '#/components/responses/NotAuthenticated'
-        '403':
-          $ref: '#/components/responses/InvalidToken'
-
-  /api/users/following:
-    get:
-      tags: [Follows]
-      summary: List followed users
-      operationId: listFollowing
-      description: Returns the users the current user follows, in the order they were followed.
-      responses:
-        '200':
-          description: The users the current user follows, possibly none.
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [status, data]
-                properties:
-                  status:
-                    type: string
-                    const: ok
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/FollowedUser'
-              example:
-                status: ok
-                data:
-                  - id: 6ada228e61da6152a72a476e
-                    username: bob
-                    image: {}
-        '401':
-          $ref: '#/components/responses/NotAuthenticated'
-        '403':
-          $ref: '#/components/responses/InvalidToken'
 
   /api/posts:
     post:
       tags: [Posts]
       summary: Create a post
       operationId: createPost
+      security:
+        - ApiKeyAuth: [write]
       description: |
         Publishes a post as the current user. `userId` must be the current
         user's ID.
 
         The body is stored as it is, so a client can also set fields such as
         `likes`.
+
+        **Scope:** `write`
       requestBody:
         required: true
         content:
@@ -579,12 +720,12 @@ paths:
               text:
                 summary: Text only
                 value:
-                  userId: 6ada228e61da6152a72a476c
+                  userId: 6adf12d208ef70e347ff2489
                   desc: Hello from Alice
               withImage:
                 summary: With an image
                 value:
-                  userId: 6ada228e61da6152a72a476c
+                  userId: 6adf12d208ef70e347ff2489
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
@@ -601,21 +742,21 @@ paths:
                 data:
                   likes: []
                   comments: []
-                  _id: 6ada229c61da6152a72a47a0
-                  userId: 6ada228e61da6152a72a476c
+                  _id: 6adf12e008ef70e347ff24bd
+                  userId: 6adf12d208ef70e347ff2489
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
                     filename: photo.jpg
-                  createdAt: '2026-10-22T14:50:04.025Z'
-                  updatedAt: '2026-10-22T14:50:04.025Z'
+                  createdAt: '2026-10-26T08:44:16.194Z'
+                  updatedAt: '2026-10-26T08:44:16.194Z'
                   __v: 0
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
           description: |
             `userId` is missing or isn't the current user's ID, `img` is missing
-            `url` or `filename`, or the access token is invalid or expired.
+            `url` or `filename`, or the API key doesn't have the `write` scope.
           content:
             application/json:
               schema:
@@ -636,84 +777,26 @@ paths:
                   value:
                     status: error
                     message: 'img propery most be an object type: {url: <string>, filename: <string>}'
-
-  /api/posts/{postId}/single:
-    get:
-      tags: [Posts]
-      summary: Get a post
-      operationId: getPost
-      description: |
-        Returns one post. If no post has this ID, the response is `200` with
-        `data` set to `null`.
-      parameters:
-        - $ref: '#/components/parameters/PostId'
-      responses:
-        '200':
-          description: The post, or `null` if no post has this ID.
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [status, data]
-                properties:
-                  status:
-                    type: string
-                    const: ok
-                  data:
-                    oneOf:
-                      - $ref: '#/components/schemas/Post'
-                      - type: 'null'
-              examples:
-                found:
-                  summary: The post exists
+                missingScope:
+                  summary: The key doesn't have the write scope
                   value:
-                    status: ok
-                    data:
-                      likes: []
-                      comments: []
-                      _id: 6ada229b61da6152a72a479e
-                      userId: 6ada228e61da6152a72a476c
-                      desc: Hello from Alice
-                      createdAt: '2026-10-22T14:50:03.706Z'
-                      updatedAt: '2026-10-22T14:50:03.706Z'
-                      __v: 0
-                notFound:
-                  summary: No post has this ID
-                  value:
-                    status: ok
-                    data: null
-        '401':
-          $ref: '#/components/responses/NotAuthenticated'
-        '403':
-          $ref: '#/components/responses/InvalidToken'
-        '500':
-          description: '`postId` isn''t a valid ObjectId. The body includes the raw database error.'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorWithDetail'
-              example:
-                status: error
-                error:
-                  stringValue: '"abc"'
-                  valueType: string
-                  kind: ObjectId
-                  value: abc
-                  path: _id
-                  reason: {}
-                  name: CastError
-                  message: Cast to ObjectId failed for value "abc" (type string) at path "_id" for model "Post"
+                    status: error
+                    message: This API key doesn't have the 'write' scope
 
   /api/posts/{id}:
     get:
       tags: [Posts]
       summary: List a user's posts
       operationId: listUserPosts
+      security:
+        - ApiKeyAuth: [read]
       description: |
         Returns every post by one user, newest first. Results aren't paginated.
 
         On this path, `id` is a user ID. On **Delete a post**, the same path
         takes a post ID.
+
+        **Scope:** `read`
       parameters:
         - name: id
           in: path
@@ -721,7 +804,7 @@ paths:
           description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
           schema:
             type: string
-          example: 6ada228e61da6152a72a476e
+          example: 6adf12d208ef70e347ff248b
       responses:
         '200':
           description: The user's posts, possibly none.
@@ -734,25 +817,29 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ada229c61da6152a72a47a2
-                    userId: 6ada228e61da6152a72a476e
+                    _id: 6adf12e008ef70e347ff24bf
+                    userId: 6adf12d208ef70e347ff248b
                     desc: Hello from Bob
-                    createdAt: '2026-10-22T14:50:04.339Z'
-                    updatedAt: '2026-10-22T14:50:04.339Z'
+                    createdAt: '2026-10-26T08:44:16.511Z'
+                    updatedAt: '2026-10-26T08:44:16.511Z'
                     __v: 0
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/InvalidToken'
+          $ref: '#/components/responses/Forbidden'
     delete:
       tags: [Posts]
       summary: Delete a post
       operationId: deletePost
+      security:
+        - ApiKeyAuth: [write]
       description: |
         Deletes one of the current user's posts.
 
         On this path, `id` is a post ID. On **List a user's posts**, the same
         path takes a user ID.
+
+        **Scope:** `write`
       parameters:
         - name: id
           in: path
@@ -760,7 +847,7 @@ paths:
           description: The post's ID.
           schema:
             $ref: '#/components/schemas/ObjectId'
-          example: 6ada229c61da6152a72a47a0
+          example: 6adf12e008ef70e347ff24bd
       responses:
         '200':
           description: The post was deleted.
@@ -771,16 +858,30 @@ paths:
               example:
                 status: ok
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          description: The post belongs to another user, or the access token is invalid or expired.
+          description: The post belongs to another user, or the API key doesn't have the `write` scope.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              example:
-                status: error
-                message: you can delete only your post
+              examples:
+                notYours:
+                  summary: The post belongs to another user
+                  value:
+                    status: error
+                    message: you can delete only your post
+                missingScope:
+                  summary: The key doesn't have the write scope
+                  value:
+                    status: error
+                    message: This API key doesn't have the 'write' scope
+                invalidToken:
+                  summary: The app's access token is invalid
+                  x-internal: true
+                  value:
+                    status: error
+                    message: Token is invalid
         '500':
           description: |
             No post has this ID (the body is `{}`), or `id` isn't a valid
@@ -811,10 +912,14 @@ paths:
       tags: [Posts]
       summary: Get the timeline
       operationId: getTimeline
+      security:
+        - ApiKeyAuth: [read]
       description: |
         Returns the current user's posts, newest first, followed by the posts of
         each user they follow, grouped by user. Posts aren't merged into one
         date order, and results aren't paginated.
+
+        **Scope:** `read`
       responses:
         '200':
           description: The timeline, possibly empty.
@@ -827,49 +932,49 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ada229b61da6152a72a479e
-                    userId: 6ada228e61da6152a72a476c
+                    _id: 6adf12df08ef70e347ff24bb
+                    userId: 6adf12d208ef70e347ff2489
                     desc: Hello from Alice
-                    createdAt: '2026-10-22T14:50:03.706Z'
-                    updatedAt: '2026-10-22T14:50:03.706Z'
+                    createdAt: '2026-10-26T08:44:15.875Z'
+                    updatedAt: '2026-10-26T08:44:15.875Z'
                     __v: 0
                   - likes: []
                     comments: []
-                    _id: 6ada229c61da6152a72a47a2
-                    userId: 6ada228e61da6152a72a476e
+                    _id: 6adf12e008ef70e347ff24bf
+                    userId: 6adf12d208ef70e347ff248b
                     desc: Hello from Bob
-                    createdAt: '2026-10-22T14:50:04.339Z'
-                    updatedAt: '2026-10-22T14:50:04.339Z'
+                    createdAt: '2026-10-26T08:44:16.511Z'
+                    updatedAt: '2026-10-26T08:44:16.511Z'
                     __v: 0
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/InvalidToken'
+          $ref: '#/components/responses/Forbidden'
 
   /api/posts/{postId}/like:
     put:
       tags: [Posts]
       summary: Like or unlike a post
       operationId: likePost
+      security:
+        - ApiKeyAuth: [write]
       description: |
-        Adds `userId` to the post's likes, or removes it if it's already there.
-
-        The API uses `userId` from the body, not the access token, so a client
-        can like a post on behalf of any user ID. Without `userId`, a `null`
-        entry is added to `likes`.
+        Adds the current user's like to the post, or removes it if it's already
+        there.
 
         **Known issue:** removing a like returns `200`, then the server crashes
         and stops answering until it restarts. The like is removed.
+
+        **Scope:** `write`
       parameters:
         - $ref: '#/components/parameters/PostId'
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserIdRequest'
-            example:
-              userId: 6ada228e61da6152a72a476e
+              $ref: '#/components/schemas/LikeRequest'
+            example: {}
       responses:
         '200':
           description: The like was added or removed.
@@ -880,9 +985,9 @@ paths:
               example:
                 status: ok
         '401':
-          $ref: '#/components/responses/NotAuthenticated'
+          $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/InvalidToken'
+          $ref: '#/components/responses/Forbidden'
         '500':
           description: No post has this ID. The body includes the raw error, which is `{}`.
           content:
@@ -895,11 +1000,33 @@ paths:
 
 components:
   securitySchemes:
-    BearerAuth:
+    ApiKeyAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key
+      description: |
+        An API key from the weConect app's **API keys** page, starting with
+        `wck_`. Each endpoint lists the scope the key needs: `read` or `write`.
+    AccessToken:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: The `accessToken` from **Log in**. It expires two days after login.
+      description: |
+        The `accessToken` from **Log in**, used by the weConect app. It expires
+        two days after login. It works on every endpoint, including the public
+        ones, which list only `ApiKeyAuth`. The internal endpoints for managing
+        keys accept only this token.
+
+        | Problem with the token | Status |
+        |---|---|
+        | No `Authorization` header | `401` with `"You are not authenticated!"` |
+        | Signed with the wrong secret | `403` with `"Token is invalid"` |
+        | Expired | `403` with `"expired": true` and `"Your session has expired"` |
+        | An API key, on an endpoint that accepts only this token | `403` with `"API keys can't be used with this endpoint..."` |
+        | Not a JWT, or no scheme word before it | `500` with an HTML error page |
+
+        The API reads the second word of the header as the token and doesn't
+        check the first, so `Bearer` is a convention rather than a requirement.
 
   parameters:
     UserId:
@@ -909,7 +1036,7 @@ components:
       description: The user's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ada228e61da6152a72a476e
+      example: 6adf12d208ef70e347ff248b
     PostId:
       name: postId
       in: path
@@ -917,7 +1044,7 @@ components:
       description: The post's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ada229b61da6152a72a479e
+      example: 6adf12df08ef70e347ff24bb
 
   responses:
     InvalidJson:
@@ -937,6 +1064,48 @@ components:
             <pre>SyntaxError: Expected double-quoted property name in JSON at position 20 (line 1 column 21)<br> &nbsp; &nbsp;at JSON.parse (&lt;anonymous&gt;)<br> ...</pre>
             </body>
             </html>
+    Unauthorized:
+      description: The `Authorization` header is missing, or the API key is wrong or was deleted.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missingHeader:
+              summary: No Authorization header
+              value:
+                status: error
+                message: You are not authenticated!
+            invalidKey:
+              summary: The key is wrong or was deleted
+              value:
+                status: error
+                message: Invalid API key
+    Forbidden:
+      description: The API key doesn't have the scope this endpoint needs.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missingScope:
+              summary: The key doesn't have the scope
+              value:
+                status: error
+                message: This API key doesn't have the 'write' scope
+            invalidToken:
+              summary: The app's access token is signed with the wrong secret
+              x-internal: true
+              value:
+                status: error
+                message: Token is invalid
+            expiredToken:
+              summary: The app's access token has expired
+              x-internal: true
+              value:
+                status: error
+                expired: true
+                message: Your session has expired
     NotAuthenticated:
       description: The `Authorization` header is missing.
       content:
@@ -946,13 +1115,20 @@ components:
           example:
             status: error
             message: You are not authenticated!
-    InvalidToken:
-      description: The access token is signed with the wrong secret or has expired.
+    AccessTokenForbidden:
+      description: |
+        The access token is signed with the wrong secret or has expired, or the
+        request used an API key, which this endpoint doesn't accept.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
+            apiKey:
+              summary: An API key instead of an access token
+              value:
+                status: error
+                message: API keys can't be used with this endpoint. Use an access token from logging in.
             invalid:
               summary: Signed with the wrong secret
               value:
@@ -966,8 +1142,9 @@ components:
                 message: Your session has expired
     MalformedToken:
       description: |
-        The access token isn't a JWT, or the header has no scheme word before
-        the token. Express returns its HTML error page.
+        The `Authorization` header holds something other than an API key or a
+        valid token, or has no scheme word before it. Express returns its HTML
+        error page.
       content:
         text/html:
           schema:
@@ -980,7 +1157,7 @@ components:
             <title>Error</title>
             </head>
             <body>
-            <pre>TypeError: Cannot read properties of null (reading &#39;exp&#39;)<br> &nbsp; &nbsp;at verifyToken (api/routes/verifyToken.js:8:34)<br> ...</pre>
+            <pre>TypeError: Cannot read properties of null (reading &#39;exp&#39;)<br> &nbsp; &nbsp;at verifyToken (api/routes/verifyToken.js:24:34)<br> ...</pre>
             </body>
             </html>
 
@@ -1020,7 +1197,7 @@ components:
           description: What went wrong.
         expired:
           type: boolean
-          description: Present and `true` only when the access token has expired.
+          description: Present and `true` only when a session token from the weConect app has expired.
 
     ErrorWithDetail:
       type: object
@@ -1057,7 +1234,9 @@ components:
       properties:
         username:
           type: string
-          description: Must be unique. Version 1 doesn't check its length.
+          description: |
+            Must be unique. Uniqueness is case-sensitive, so `alice` and
+            `Alice` are different users. The length isn't checked.
         password:
           type: string
           minLength: 5
@@ -1071,8 +1250,62 @@ components:
       properties:
         username:
           type: string
+          description: Case-sensitive. `ALICE` doesn't log in as `alice`.
         password:
           type: string
+
+    ApiKeyRequest:
+      type: object
+      required: [name, scopes]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: A name to tell the key apart from others, such as what uses it.
+        scopes:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          description: What the key can do. See **Scopes** in the introduction.
+          items:
+            type: string
+            enum: [read, write]
+
+    ApiKey:
+      type: object
+      required: [id, name, lastFour, scopes, createdAt, lastUsedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/ObjectId'
+        name:
+          type: string
+        lastFour:
+          type: string
+          description: The key's last four characters, to tell keys apart.
+        scopes:
+          type: array
+          description: The key's scopes, always in the order `read`, `write`.
+          items:
+            type: string
+            enum: [read, write]
+        createdAt:
+          type: string
+          format: date-time
+        lastUsedAt:
+          type: [string, 'null']
+          format: date-time
+          description: When the key was last used successfully, or `null` if it never was.
+
+    NewApiKey:
+      allOf:
+        - $ref: '#/components/schemas/ApiKey'
+        - type: object
+          required: [key]
+          properties:
+            key:
+              type: string
+              description: The API key. This is the only response that includes it.
 
     UserIdRequest:
       type: object
@@ -1080,6 +1313,16 @@ components:
       properties:
         userId:
           $ref: '#/components/schemas/ObjectId'
+
+    LikeRequest:
+      type: object
+      properties:
+        userId:
+          $ref: '#/components/schemas/ObjectId'
+          deprecated: true
+          description: |
+            Ignored since version 1.1, which always uses the current user.
+            Version 1.0 used this field as the user who liked the post.
 
     User:
       type: object
@@ -1113,7 +1356,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-          description: Returned by **Log in** and **Search users** only.
+          description: Among the public endpoints, only **Search users** returns it.
         __v:
           type: integer
           description: MongoDB's internal document version.
@@ -1138,41 +1381,6 @@ components:
               type: string
               description: A JWT to send in the `Authorization` header. It expires two days after login.
 
-    UserWithPassword:
-      allOf:
-        - $ref: '#/components/schemas/User'
-        - type: object
-          required: [password]
-          properties:
-            password:
-              type: string
-              description: The user's password, encrypted. Returned by mistake in version 1.
-
-    Follower:
-      type: object
-      required: [id, username, image, following]
-      properties:
-        id:
-          $ref: '#/components/schemas/ObjectId'
-        username:
-          type: string
-        image:
-          $ref: '#/components/schemas/Image'
-        following:
-          type: boolean
-          description: Whether the current user follows this user back.
-
-    FollowedUser:
-      type: object
-      required: [id, username, image]
-      properties:
-        id:
-          $ref: '#/components/schemas/ObjectId'
-        username:
-          type: string
-        image:
-          $ref: '#/components/schemas/Image'
-
     CreatePostRequest:
       type: object
       required: [userId]
@@ -1181,7 +1389,7 @@ components:
           $ref: '#/components/schemas/ObjectId'
         desc:
           type: string
-          description: The post's text. Version 1 doesn't limit its length.
+          description: The post's text. Its length isn't limited, and an empty string is accepted.
         img:
           type: object
           description: An image for the post. If you send `img`, include both fields.
@@ -1207,12 +1415,12 @@ components:
           $ref: '#/components/schemas/Image'
         likes:
           type: array
-          description: IDs of the users who like the post. Can contain `null`; see **Like or unlike a post**.
+          description: IDs of the users who like the post.
           items:
-            type: [string, 'null']
+            type: string
         comments:
           type: array
-          description: No endpoint adds comments in version 1.
+          description: No endpoint adds comments.
           items: {}
         createdAt:
           type: string

@@ -1,0 +1,22 @@
+{
+  "name": "keys_delete_unknown",
+  "group": "Delete an API key",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/keys/000000000000000000000000",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "API key not found"
+    }
+  },
+  "durationMs": 10
+}

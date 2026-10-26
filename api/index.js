@@ -9,6 +9,7 @@ const authRoute = require("./routes/auth");
 const postRoute = require("./routes/posts");
 const conversationRoute = require("./routes/conversations");
 const messageRoute = require("./routes/messages");
+const keyRoute = require("./routes/keys");
 const cors = require("cors");
 const {Server} = require('socket.io')
 
@@ -43,8 +44,9 @@ app.use("/api/users", userRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/messages", messageRoute);
 app.use("/api/conversations", conversationRoute);
+app.use("/api/keys", keyRoute);
 
-const server = app.listen(8800, () => {
+const server = app.listen(process.env.PORT || 8800, () => {
   console.log("Backend server is running!");
 });
 

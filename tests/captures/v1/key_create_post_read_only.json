@@ -1,0 +1,28 @@
+{
+  "name": "key_create_post_read_only",
+  "group": "Create a post",
+  "note": "A read-only key can't call write endpoints",
+  "request": {
+    "method": "POST",
+    "path": "/api/posts",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6adf12d208ef70e347ff2489",
+      "desc": "Not allowed"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "This API key doesn't have the 'write' scope"
+    }
+  },
+  "durationMs": 11
+}

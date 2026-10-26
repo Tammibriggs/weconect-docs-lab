@@ -3,7 +3,7 @@
   "group": "Get a user",
   "request": {
     "method": "GET",
-    "path": "/api/users/6ada228e61da6152a72a476e/user",
+    "path": "/api/users/6adf12d208ef70e347ff248b/user",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -21,12 +21,12 @@
         "followers": [],
         "followings": [],
         "isAdmin": false,
-        "_id": "6ada228e61da6152a72a476e",
+        "_id": "6adf12d208ef70e347ff248b",
         "username": "bob",
-        "createdAt": "2026-10-22T14:49:50.759Z",
+        "createdAt": "2026-10-26T08:44:02.890Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 7
+  "durationMs": 14
 }

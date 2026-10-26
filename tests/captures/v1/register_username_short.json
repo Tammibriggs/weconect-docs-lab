@@ -1,0 +1,27 @@
+{
+  "name": "register_username_short",
+  "group": "Register",
+  "note": "The model says min 3; Mongoose's min applies only to numbers",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "ab",
+      "password": "<redacted encrypted password>",
+      "password1": "secret6"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok"
+    }
+  },
+  "durationMs": 15
+}

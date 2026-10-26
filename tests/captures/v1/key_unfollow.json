@@ -1,0 +1,23 @@
+{
+  "name": "key_unfollow",
+  "group": "Unfollow",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/unfollow",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6adf12d308ef70e347ff248d"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": "user has been unfollowed"
+  },
+  "durationMs": 28
+}

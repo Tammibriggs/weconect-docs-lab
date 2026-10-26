@@ -1,0 +1,55 @@
+{
+  "name": "keys_list",
+  "group": "List API keys",
+  "note": "Newest first; the key itself is never returned again",
+  "request": {
+    "method": "GET",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "id": "6adf12e908ef70e347ff24e9",
+          "name": "Poster",
+          "lastFour": "CkKE",
+          "scopes": [
+            "write"
+          ],
+          "createdAt": "2026-10-26T08:44:25.606Z",
+          "lastUsedAt": null
+        },
+        {
+          "id": "6adf12e808ef70e347ff24e5",
+          "name": "Dashboard",
+          "lastFour": "I-9G",
+          "scopes": [
+            "read"
+          ],
+          "createdAt": "2026-10-26T08:44:24.972Z",
+          "lastUsedAt": null
+        },
+        {
+          "id": "6adf12e808ef70e347ff24e3",
+          "name": "My bot",
+          "lastFour": "muPG",
+          "scopes": [
+            "read",
+            "write"
+          ],
+          "createdAt": "2026-10-26T08:44:24.654Z",
+          "lastUsedAt": null
+        }
+      ]
+    }
+  },
+  "durationMs": 10
+}

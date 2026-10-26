@@ -1,0 +1,38 @@
+{
+  "name": "login_unicode",
+  "group": "Log in",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "zoë",
+      "password": "<redacted encrypted password>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {},
+        "coverPicture": {},
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6adf12f508ef70e347ff252a",
+        "username": "zoë",
+        "createdAt": "2026-10-26T08:44:37.181Z",
+        "updatedAt": "2026-10-26T08:44:37.181Z",
+        "__v": 0,
+        "accessToken": "<redacted JWT>"
+      }
+    }
+  },
+  "durationMs": 14
+}

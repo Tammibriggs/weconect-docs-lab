@@ -1,0 +1,30 @@
+{
+  "name": "keys_create_with_api_key",
+  "group": "Create an API key",
+  "note": "A key can't create keys, so a leaked key can't make more",
+  "request": {
+    "method": "POST",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "Made by a key",
+      "scopes": [
+        "read"
+      ]
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "API keys can't be used with this endpoint. Use an access token from logging in."
+    }
+  },
+  "durationMs": 4
+}

@@ -1,0 +1,42 @@
+{
+  "name": "keys_create_bob",
+  "group": "Create an API key",
+  "note": "Scopes are returned in a fixed order: read, write",
+  "request": {
+    "method": "POST",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "Bob's script",
+      "scopes": [
+        "write",
+        "read"
+      ]
+    }
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "id": "6adf12e908ef70e347ff24e7",
+        "name": "Bob's script",
+        "lastFour": "Nri0",
+        "scopes": [
+          "read",
+          "write"
+        ],
+        "createdAt": "2026-10-26T08:44:25.289Z",
+        "lastUsedAt": null,
+        "key": "<redacted API key>"
+      }
+    }
+  },
+  "durationMs": 15
+}

@@ -1,6 +1,6 @@
-# Capture run 2026-10-22T14-49-48
+# Capture run 2026-10-26T08-44-00
 
-75 cases, 75 as expected, 0 different, 1 server restart(s).
+132 cases, 132 as expected, 0 different, 1 server restart(s).
 
 | Case | Group | Expected | Got | Note |
 |---|---|---|---|---|
@@ -34,7 +34,7 @@
 | user_get | Get a user | 200 | 200 |  |
 | user_get_unknown | Get a user | 404 | 404 |  |
 | user_get_invalid_id | Get a user | 500 | 500 |  |
-| search_all | Search users | 200 | 200 | No search term returns every user |
+| search_all | Search users | 200 | 200 | No search term returns every user. Since 2026-10-26, without passwords (finding 1 fixed) |
 | search_term | Search users | 200 | 200 |  |
 | search_case_insensitive | Search users | 200 | 200 |  |
 | search_no_match | Search users | 200 | 200 |  |
@@ -64,8 +64,8 @@
 | timeline | Timeline | 200 | 200 | alice's posts, then posts from the users she follows (bob) |
 | timeline_self_follow | Timeline | 200 | 200 | carol follows alice and herself |
 | like | Like a post | 200 | 200 |  |
-| like_on_behalf | Like a post | 200 | 200 | alice's token, carol's user ID |
-| like_no_body | Like a post | 200 | 200 |  |
+| like_on_behalf | Like a post | 200 | 200 | alice's token, carol's user ID. Since 2026-10-26 the like is alice's own (finding 2 fixed) |
+| like_no_body | Like a post | 200 | 200 | Since 2026-10-26 this adds alice's ID; before, it added null (finding 17 fixed) |
 | like_unknown_post | Like a post | 500 | 500 |  |
 | post_get_after_likes | Get a post | 200 | 200 |  |
 | post_get_after_empty_like | Get a post | 200 | 200 |  |
@@ -76,6 +76,63 @@
 | post_delete | Delete a post | 200 | 200 |  |
 | post_delete_again | Delete a post | 500 | 500 |  |
 | post_delete_invalid_id | Delete a post | 500 | 500 |  |
+| keys_create | Create an API key | 201 | 201 |  |
+| keys_create_read_only | Create an API key | 201 | 201 |  |
+| keys_create_bob | Create an API key | 201 | 201 | Scopes are returned in a fixed order: read, write |
+| keys_create_write_only | Create an API key | 201 | 201 |  |
+| keys_create_missing_name | Create an API key | 400 | 400 |  |
+| keys_create_long_name | Create an API key | 400 | 400 | Names can be up to 50 characters |
+| keys_create_bad_scope | Create an API key | 400 | 400 |  |
+| keys_create_no_scopes | Create an API key | 400 | 400 |  |
+| keys_create_no_auth | Create an API key | 401 | 401 |  |
+| keys_create_with_api_key | Create an API key | 403 | 403 | A key can't create keys, so a leaked key can't make more |
+| keys_list | List API keys | 200 | 200 | Newest first; the key itself is never returned again |
+| key_me | Current user | 200 | 200 |  |
+| key_read_only_me | Current user | 200 | 200 |  |
+| key_get_user | Get a user | 200 | 200 |  |
+| key_search | Search users | 200 | 200 | No password in the results (finding 1 fixed) |
+| key_user_posts | List a user's posts | 200 | 200 |  |
+| key_timeline | Timeline | 200 | 200 |  |
+| key_create_post | Create a post | 200 | 200 |  |
+| key_create_post_read_only | Create a post | 403 | 403 | A read-only key can't call write endpoints |
+| key_create_post_as_other_user | Create a post | 403 | 403 | A key acts as its owner, bob |
+| key_write_only_read | Search users | 403 | 403 | A write-only key can't call read endpoints |
+| key_like | Like a post | 200 | 200 |  |
+| key_like_read_only | Like a post | 403 | 403 |  |
+| key_delete_post_read_only | Delete a post | 403 | 403 |  |
+| key_delete_other_users_post | Delete a post | 403 | 403 | bob's key can't delete alice's post |
+| key_delete_post | Delete a post | 200 | 200 |  |
+| key_follow | Follow | 200 | 200 |  |
+| key_follow_read_only | Follow | 403 | 403 |  |
+| key_unfollow | Unfollow | 200 | 200 |  |
+| key_on_internal_endpoint | API keys | 403 | 403 | Keys work only on the 10 public endpoints |
+| key_invalid | API keys | 401 | 401 |  |
+| keys_delete_other_user | Delete an API key | 404 | 404 | bob can't delete alice's key |
+| keys_delete_unknown | Delete an API key | 404 | 404 |  |
+| keys_delete_invalid_id | Delete an API key | 404 | 404 |  |
+| keys_delete | Delete an API key | 200 | 200 |  |
+| key_deleted | API keys | 401 | 401 | A deleted key stops working at once |
+| keys_list_after_delete | List API keys | 200 | 200 | One key left; lastUsedAt is set because the key was used above |
+| keys_list_bob | List API keys | 200 | 200 | Each user sees only their own keys |
+| search_special_dot | Search users | 200 | 200 | As a regex, a.i would match alice; escaped, it matches nobody |
+| search_special_paren | Search users | 200 | 200 | An unescaped ( would be an invalid regex and a 500 |
+| register_unicode | Register | 200 | 200 |  |
+| login_unicode | Log in | 200 | 200 |  |
+| post_create_unicode | Create a post | 200 | 200 |  |
+| register_password_min | Register | 200 | 200 | Exactly 5 characters, the shortest allowed |
+| login_erin | Log in | 200 | 200 |  |
+| register_password_empty | Register | 401 | 401 |  |
+| register_username_empty | Register | 401 | 401 |  |
+| register_username_short | Register | 200 | 200 | The model says min 3; Mongoose's min applies only to numbers |
+| register_username_long | Register | 200 | 200 | The model says max 20; Mongoose's max applies only to numbers |
+| post_create_empty_desc | Create a post | 200 | 200 |  |
+| register_username_case | Register | 200 | 200 | alice already exists; the unique index is case-sensitive |
+| login_username_case | Log in | 404 | 404 |  |
+| register_form_encoded | Register | 401 | 401 | Only JSON bodies are parsed, so the API sees no username |
+| wrong_method | General | 404 | 404 | Express answers an unsupported method with its 404 page, not 405 |
+| followers_empty | Followers | 200 | 200 |  |
+| following_empty | Following | 200 | 200 |  |
+| timeline_empty | Timeline | 200 | 200 |  |
 | unlike | Like a post | 200 | 200 (server exited) | Liking a second time removes the like |
 | after_unlike | Like a post | ECONNREFUSED | ECONNREFUSED (server exited) | Unlike sends 200, then the server crashes (ERR_HTTP_HEADERS_SENT), so this request is refused |
 | post_get_after_unlike | Get a post | 200 | 200 | After a restart, if one was needed: was the like removed? |

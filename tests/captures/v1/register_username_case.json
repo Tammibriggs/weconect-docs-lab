@@ -1,0 +1,27 @@
+{
+  "name": "register_username_case",
+  "group": "Register",
+  "note": "alice already exists; the unique index is case-sensitive",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "Alice",
+      "password": "<redacted encrypted password>",
+      "password1": "secret7"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok"
+    }
+  },
+  "durationMs": 7
+}

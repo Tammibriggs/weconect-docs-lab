@@ -1,0 +1,23 @@
+{
+  "name": "search_special_paren",
+  "group": "Search users",
+  "note": "An unescaped ( would be an invalid regex and a 500",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/search?search=(",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": []
+    }
+  },
+  "durationMs": 9
+}

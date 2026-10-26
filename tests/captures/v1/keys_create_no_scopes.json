@@ -1,0 +1,27 @@
+{
+  "name": "keys_create_no_scopes",
+  "group": "Create an API key",
+  "request": {
+    "method": "POST",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "Nothing",
+      "scopes": []
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "scopes must be a list of one or both of: read, write"
+    }
+  },
+  "durationMs": 7
+}

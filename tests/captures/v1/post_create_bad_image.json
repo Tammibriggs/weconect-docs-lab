@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ada228e61da6152a72a476c",
+      "userId": "6adf12d208ef70e347ff2489",
       "img": {
         "url": "https://example.com/photo.jpg"
       }
@@ -25,5 +25,5 @@
       "message": "img propery most be an object type: {url: <string>, filename: <string>}"
     }
   },
-  "durationMs": 3
+  "durationMs": 8
 }

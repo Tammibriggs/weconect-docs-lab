@@ -1,0 +1,18 @@
+{
+  "name": "wrong_method",
+  "group": "General",
+  "note": "Express answers an unsupported method with its 404 page, not 405",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/auth/login",
+    "headers": {}
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "body": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot DELETE /api/auth/login</pre>\n</body>\n</html>\n"
+  },
+  "durationMs": 5
+}

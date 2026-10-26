@@ -1,0 +1,36 @@
+{
+  "name": "key_create_post",
+  "group": "Create a post",
+  "request": {
+    "method": "POST",
+    "path": "/api/posts",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6adf12d208ef70e347ff2489",
+      "desc": "Posted with an API key"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "likes": [],
+        "comments": [],
+        "_id": "6adf12ed08ef70e347ff2500",
+        "userId": "6adf12d208ef70e347ff2489",
+        "desc": "Posted with an API key",
+        "createdAt": "2026-10-26T08:44:29.996Z",
+        "updatedAt": "2026-10-26T08:44:29.996Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 16
+}

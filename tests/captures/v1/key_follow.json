@@ -1,0 +1,26 @@
+{
+  "name": "key_follow",
+  "group": "Follow",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/follow",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6adf12d308ef70e347ff248d"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "message": "user has been followed"
+    }
+  },
+  "durationMs": 11
+}

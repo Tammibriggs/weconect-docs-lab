@@ -1,0 +1,36 @@
+{
+  "name": "post_create_unicode",
+  "group": "Create a post",
+  "request": {
+    "method": "POST",
+    "path": "/api/posts",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6adf12d208ef70e347ff2489",
+      "desc": "Hello 👋 from Alice, café"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "likes": [],
+        "comments": [],
+        "_id": "6adf12f508ef70e347ff252d",
+        "userId": "6adf12d208ef70e347ff2489",
+        "desc": "Hello 👋 from Alice, café",
+        "createdAt": "2026-10-26T08:44:37.808Z",
+        "updatedAt": "2026-10-26T08:44:37.808Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 11
+}

@@ -1,0 +1,35 @@
+{
+  "name": "key_read_only_me",
+  "group": "Current user",
+  "request": {
+    "method": "GET",
+    "path": "/api/users",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {},
+        "coverPicture": {},
+        "followers": [
+          "6adf12d308ef70e347ff248d",
+          "6adf12d208ef70e347ff248b"
+        ],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6adf12d208ef70e347ff2489",
+        "username": "alice",
+        "createdAt": "2026-10-26T08:44:02.569Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 6
+}

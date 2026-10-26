@@ -1,0 +1,23 @@
+{
+  "name": "key_delete_other_users_post",
+  "group": "Delete a post",
+  "note": "bob's key can't delete alice's post",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/posts/6adf12df08ef70e347ff24bb",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "you can delete only your post"
+    }
+  },
+  "durationMs": 14
+}

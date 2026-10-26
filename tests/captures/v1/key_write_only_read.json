@@ -1,0 +1,23 @@
+{
+  "name": "key_write_only_read",
+  "group": "Search users",
+  "note": "A write-only key can't call read endpoints",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/search?search=bob",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "This API key doesn't have the 'read' scope"
+    }
+  },
+  "durationMs": 10
+}
