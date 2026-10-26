@@ -1,0 +1,94 @@
+/* The frame around signed-in pages (components/AppShell.js).
+   Columns: under 640px the page alone; 640px a rail and the page; 1024px a sidebar and the
+   page; 1280px adds the aside. minmax(0, …) lets columns shrink, so content can't widen the page. */
+
+.shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.shell__main {
+  min-width: 0;
+  --gutter: var(--space-3);
+  /* Room for the fixed tab bar on phones. */
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + var(--space-4));
+}
+
+.shell__main:focus {
+  outline: none;
+}
+
+.aside {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .shell {
+    display: grid;
+    grid-template-columns: var(--nav-rail) minmax(0, 1fr);
+  }
+
+  .shell__main {
+    width: 100%;
+    max-width: var(--content);
+    margin-inline: auto;
+    padding-bottom: var(--space-8);
+    --gutter: var(--space-4);
+  }
+
+  .shell[data-layout="wide"] .shell__main {
+    max-width: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    grid-template-columns: var(--nav-wide) minmax(0, var(--content));
+    justify-content: center;
+    column-gap: var(--space-6);
+  }
+
+  .shell__main {
+    max-width: none;
+    margin: 0;
+    --gutter: 0px;
+  }
+
+  .shell[data-layout="wide"] {
+    grid-template-columns: var(--nav-wide) minmax(0, 920px);
+  }
+}
+
+@media (min-width: 1280px) {
+  .shell {
+    grid-template-columns: var(--nav-wide) minmax(0, var(--content)) var(--aside);
+  }
+
+  .shell[data-layout="wide"] {
+    grid-template-columns: var(--nav-wide) minmax(0, calc(var(--content) + var(--aside) + var(--space-6)));
+  }
+
+  .aside {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    height: 100vh;
+    height: 100dvh;
+    padding: var(--space-3) 0 var(--space-4);
+    overflow-y: auto;
+  }
+}
+
+
+/* Messages manages its own height and scrolling. */
+.shell[data-layout="wide"] .shell__main {
+  padding-bottom: 0;
+}
+
+@media (max-width: 639px) {
+  .shell[data-layout="wide"]:not([data-hide-tabbar]) .shell__main {
+    padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px) + var(--space-4));
+  }
+}

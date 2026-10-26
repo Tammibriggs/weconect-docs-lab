@@ -1,0 +1,26 @@
+.logo-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.logo-mark {
+  flex-shrink: 0;
+}
+
+.logo-wordmark {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-link);
+}
+
+.logo-wordmark span {
+  color: var(--color-text);
+}
+
+.logo-lockup--inverse .logo-wordmark,
+.logo-lockup--inverse .logo-wordmark span {
+  color: var(--color-text-on-brand);
+}

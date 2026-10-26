@@ -1,31 +1,38 @@
+import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import PeopleAltOutlined from '@mui/icons-material/PeopleAltOutlined'
+import Composer from '../components/Composer'
+import PostList from '../components/PostList'
+import PageHeader from '../components/ui/PageHeader'
+import { EmptyState } from '../components/ui/States'
+import { buttonClass } from '../components/ui/Button'
+import { useGetTimelineQuery } from '../redux/services/post'
+import useDocumentTitle from '../lib/useDocumentTitle'
+import { greeting } from '../lib/time'
 import '../styles/home.css'
-import Feed from '../components/Feed'
-import RightSide from '../components/RightSide'
-import LeftSide from '../components/LeftSide'
-import ShareModal from '../components/ShareModal'
-import { useEffect } from 'react'
-import PagesNav from '../components/PagesNav'
-import { useGetTimelinePostQuery } from '../redux/services/post'
-import Share from '../components/Share'
 
-export default function Home({setModalOpened, modalOpened}) {
-  const {data:postsData} = useGetTimelinePostQuery()
-
-  useEffect(() => {
-    window.scrollTo({top: 0})
-  }, [])
+export default function Home() {
+  useDocumentTitle('Home')
+  const me = useSelector((state) => state.auth.user)
+  // Refetch when you come back to Home after 30 seconds or more.
+  const timeline = useGetTimelineQuery(undefined, { refetchOnMountOrArgChange: 30 })
 
   return (
     <div className='home'>
-      <PagesNav rotate={true} setModalOpened={setModalOpened} />
-      <LeftSide />
-      <div className='home__center'>
-        <Share />
-        <Feed postsData={postsData}/>
-      </div>
-      <RightSide setModalOpened={setModalOpened} />
-      <ShareModal modalOpened={modalOpened} setModalOpened={setModalOpened} /> 
-      <PagesNav />
+      <PageHeader title='Home' subtitle={`${greeting()}, ${me.username}`} />
+      <Composer />
+      <PostList
+        query={timeline}
+        empty={
+          <EmptyState
+            icon={<PeopleAltOutlined />}
+            title='Your feed is empty'
+            action={<Link className={buttonClass()} to='/search'>Find people to follow</Link>}
+          >
+            Posts from you and the people you follow show up here.
+          </EmptyState>
+        }
+      />
     </div>
   )
 }

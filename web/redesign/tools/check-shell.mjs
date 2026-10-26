@@ -1,0 +1,42 @@
+// Checks the app shell: redirects, the skip link, deep links and focus after navigation.
+// Usage: node check-shell.mjs <out-dir>
+import path from "node:path";
+import { launch, sleep } from "./cdp.mjs";
+const out = process.argv[2];
+const APP = "http://localhost:3100";
+const BOB = "6adc828b8254b290f811b79f";
+await fetch("http://localhost:8810/__control", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reset: true }) });
+const b = await launch({ profile: path.join(out, ".chrome-shell"), port: 9337 });
+const results = [];
+const check = (name, pass, detail = "") => { results.push(pass); console.log(`${pass ? "PASS" : "FAIL"}  ${name}${detail ? "  — " + detail : ""}`); };
+const where = () => b.evaluate("location.pathname");
+
+await b.viewport(1440, 900);
+await b.goto(`${APP}/profile/${BOB}`);
+check("a deep link while signed out goes to sign-in", (await where()) === "/login");
+await b.evaluate("document.querySelector('input[name=username]').focus(); true"); await b.type("alice");
+await b.evaluate("document.querySelector('input[name=password]').focus(); true"); await b.type("secret1");
+await b.press("Enter"); await sleep(2500);
+check("after sign-in, it returns to the deep link", (await where()) === `/profile/${BOB}`, await where());
+await b.goto(`${APP}/profile/?id=${BOB}`);
+check("old /profile/?id= links redirect", (await where()) === `/profile/${BOB}`, await where());
+await b.goto(`${APP}/messaging`);
+check("old /messaging redirects to /messages", (await where()) === "/messages");
+await b.goto(`${APP}/followers`);
+check("/followers works at desktop width", (await b.evaluate("document.querySelector('main h1')?.textContent")) === "People");
+await b.goto(`${APP}/`);
+await b.press("Tab");
+check("the skip link is the first Tab stop", (await b.focusInfo()).name === "Skip to content");
+await b.press("Enter"); await sleep(200);
+check("the skip link moves focus to main", (await b.evaluate("document.activeElement.id")) === "main");
+await b.click("link", "Search", { exact: true }); await sleep(800);
+check("after navigating, focus is on the new page's h1", (await b.evaluate("document.activeElement.tagName + ':' + document.activeElement.textContent")) === "H1:Search");
+check("the title follows the page", (await b.evaluate("document.title")) === "Search · weConect");
+check("the current nav item is marked", (await b.evaluate("document.querySelector('[aria-current=page]')?.textContent")) === "Search");
+await b.goto(`${APP}/nope`);
+check("unknown URLs show the 404 page", (await b.evaluate("document.querySelector('main h1')?.textContent")) === "Page not found");
+const problems = b.problems();
+check("no console problems", problems.length === 0, problems.join(" | "));
+await b.close();
+console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);
+process.exit(0);

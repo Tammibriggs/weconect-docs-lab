@@ -1,70 +1,80 @@
-# Getting Started with Create React App
+# weConect web
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+The weConect frontend: a React app for posting, following people, and messaging. It talks to the API in [`api/`](../api).
 
-## Available Scripts
+## Run it
 
-In the project directory, you can run:
+You need Node.js 18 or later and the API running. For a safe local API with sample data, run `npm run dev` from the repo root.
 
-### `npm start`
+1. Add the two lines that `npm run dev` prints to `web/.env.local`:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+   ```bash
+   REACT_APP_SEVER_BASE_URL=http://localhost:8800/api/
+   REACT_APP_SOCKET_URL=http://localhost:8800
+   ```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. Install and start:
 
-### `npm test`
+   ```bash
+   npm ci --legacy-peer-deps   # the flag is for @material-ui/icons, which the app doesn't use
+   npm start                   # http://localhost:3000
+   ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3. Sign in as `alice` with the password `npm run dev` printed.
 
-### `npm run build`
+| Command | What it does |
+|---|---|
+| `npm start` | Runs the app at `http://localhost:3000` and reloads it when files change |
+| `npm test` | Runs the unit tests in watch mode. In CI, use `CI=true npm test` |
+| `npm run build` | Builds the production files into `build/` |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## How it's organized
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Folder | What's in it |
+|---|---|
+| `src/router.js` | Every route. All routes work at every screen width. |
+| `src/routes/` | Route guards: `RequireAuth` (signed-in pages) and `PublicOnly` (the sign-in pages) |
+| `src/pages/` | One component per page |
+| `src/components/` | Components for one feature, such as `PostCard` or `ChatPanel` |
+| `src/components/ui/` | The shared building blocks: `Button`, `TextField`, `Dialog`, `Avatar`, `Toast`, and others |
+| `src/redux/` | The Redux store. `services/` holds the RTK Query endpoints for the API |
+| `src/realtime/` | The Socket.io connection, one per signed-in session |
+| `src/lib/` | Helpers with no UI: the session token, dates, numbers, image storage, and hooks |
+| `src/styles/` | Plain CSS. `tokens.css` and `base.css` load first, then one file per feature |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Design system
 
-### `npm run eject`
+- **Tokens.** Every color, size, space, radius, shadow and duration is a custom property in [`src/styles/tokens.css`](src/styles/tokens.css). Use the role tokens, such as `--color-text-muted` or `--color-link`, not raw values.
+  - Text colors pass 4.5:1 contrast on the surfaces they're used on, and icons and control borders pass 3:1.
+  - Brand blue (`#1371EB`) is for fills, icons and focus rings. Brand-colored text uses `--color-link`.
+- **Breakpoints:** 640px (icon rail), 1024px (labeled sidebar), 1280px (aside).
+- **Components.** Before you write new markup for a button, field, dialog or message, use the components in `src/components/ui/`. They handle the accessibility details:
+  - an icon button needs a `label`
+  - dialogs use the native `<dialog>` element
+  - text fields link their hint and error to the input
+- **Class names.** Newer CSS uses kebab-case BEM, such as `.post-card__header`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Rules worth knowing
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **The session.**
+  - The token is kept in `localStorage` under `weconect.token` and checked before use (`src/lib/session.js`).
+  - The app signs out only when the API says the token is invalid or expired (`isAuthFailure` in `src/redux/services/api.js`). The API also uses 403 for things like "you already follow this user".
+- **Lists come from list responses.** Posts render from the timeline or profile response, sorted newest first. Likes update the cached lists optimistically and undo on failure.
+- **API keys** (`src/pages/ApiKeys.js`, at `/settings/api-keys`, linked from your own profile). The page uses the internal `/api/keys` endpoints, which accept only the session's token. A new key is shown once, then only its last four characters.
+- **Images** go through `src/lib/imageStorage.js`. It loads Firebase only when needed, and skips empty filenames.
+- **Accessibility:**
+  - Interactive elements are `<button>` or `<a>`, never a clickable `<div>`.
+  - Every page has one `<h1>`, set with `PageHeader`.
+  - After a page change, focus moves to the new page's heading.
+  - Fields draw their focus ring inside their border (`outline-offset: -2px`). The sticky page header would cover a ring drawn outside.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Testing the UI
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+[`redesign/tools/`](redesign/tools) has the tools used to check the 2026 redesign:
 
-## Learn More
+- a mock API that copies the real API's quirks
+- a headless-Chrome audit: overflow at 7 widths, landmarks, axe, focus and tap targets
+- a check script for each area of the app
+- `check-api-keys.mjs`, which checks the API keys page against the real API from `npm run dev` instead of the mock. Its header says how to start both.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+[`redesign/README.md`](redesign/README.md) explains how to run them, and has before and after screenshots.

@@ -1,52 +1,159 @@
+/* Profiles: pages/Profile.js, components/ProfileHeader.js and components/EditProfileDialog.js. */
+
 .profile {
   display: flex;
-  gap: 0;
+  flex-direction: column;
+}
+
+.profile-header {
+  margin: 0 var(--gutter) var(--space-3);
+  overflow: hidden;
+}
+
+/* With no cover photo, a soft gradient. */
+.profile-header__cover {
+  height: 140px;
+  background: var(--gradient-welcome);
+}
+
+.profile-header__cover img {
+  display: block;
   width: 100%;
-  justify-content: center;
-  min-height: 100vh;
+  height: 100%;
+  object-fit: cover;
 }
 
-.profile .profileCard__cont {
-  padding: 0.5rem;
+.profile-header__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: -44px;
+  padding: 0 var(--space-4);
 }
 
-.profile .share__cont {
-  padding: 0 0.5rem ;
+.profile-header__avatar .avatar {
+  --avatar-size: 88px !important;
+  box-shadow: 0 0 0 4px var(--color-surface);
 }
 
-.profile__left {
-  position: sticky;
-  top: 10px;
-  flex: 30%;
-  height: fit-content;
-  display: none;
-  max-width: 350px;
+.profile-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
 }
 
-.profile .followCard {
-  margin-top: 0;
+.profile-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-4);
 }
 
-.profile__left + div {
+.profile-header__name {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-heading);
+  line-height: var(--leading-tight);
+}
+
+.profile-header__joined {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.profile-header__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  list-style: none;
+  color: var(--color-text-muted);
+}
+
+.profile-header__stats a {
+  /* A 44px touch target around one line of text. */
+  display: inline-block;
+  margin: -10px 0;
+  padding: 10px 0;
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.profile-header__stats a:hover {
+  text-decoration: underline;
+}
+
+/* Your own profile only: the way to the API keys page. A 44px touch target, like the stats. */
+.profile-header__api-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  min-height: var(--tap);
+  margin-bottom: calc(var(--space-2) * -1);
+  color: var(--color-link);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.profile-header__api-keys:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 640px) {
+  .profile-header__cover {
+    height: 200px;
+  }
+
+  .profile-header__top {
+    margin-top: -56px;
+  }
+
+  .profile-header__avatar .avatar {
+    --avatar-size: 112px !important;
+  }
+}
+
+/* ---- Edit profile ---- */
+.edit-profile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.edit-picture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.edit-picture:has(> .avatar) {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.edit-picture__cover {
+  height: 120px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--gradient-welcome);
+}
+
+.edit-picture__cover img {
+  display: block;
   width: 100%;
-  max-width: 600px;
+  height: 100%;
+  object-fit: cover;
 }
 
-@media(min-width: 500px) {
-
-  .profile__left + div {
-    /* margin-right: 10px; */
-  }
-}
-
-@media(min-width: 850px) {
-  .profile {
-    max-width: unset;
-  }
-}
-
-@media(min-width: 1024px) {
-  .profile__left {
-    display: block;
-  }
+.edit-picture__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }

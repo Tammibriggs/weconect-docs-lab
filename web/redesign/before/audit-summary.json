@@ -1,0 +1,29 @@
+{
+  "run": "audit.mjs --ui=old, pre-redesign code (git HEAD 2a81202), mock API with tests/captures/v1 data, 2026-10-25",
+  "summary": {
+    "overflowPages": 14,
+    "overflowExample": "home@320 (5017px)",
+    "pagesMissingLandmarks": 42,
+    "pageChecks": 42,
+    "axeRules": 3,
+    "axeRulesByImpact": {
+      "serious": 2,
+      "minor": 1
+    },
+    "axeNodesTotal": 54,
+    "axeTop": [
+      "color-contrast [serious] 31 nodes on 6 checks: .option | .post:nth-child(1) > .post__head > div > span > span:nth-child(2) | .post:nth-child(2) > .post__head > div > span > span:nth-child(2)",
+      "link-name [serious] 15 nodes on 5 checks: .pageNavAlt > .pagesNav__container > .pagesNav__action[href=\"/\"] | .pageNavAlt > .pagesNav__container > .remove.pagesNav__action[href$=\"messaging\"] | .pageNavAlt > .pagesNav__container > .pagesNav__action:nth-child(5)",
+      "duplicate-id [minor] 8 nodes on 8 checks: .pagesNavVertical"
+    ],
+    "focusWithoutRing": 8,
+    "focusSteps": 17,
+    "tapTargetsUnder44": 4,
+    "signInCalls": 16,
+    "problems": [
+      "console.warning: No routes matched location \"/followers\" ",
+      "console.warning: No routes matched location \"/following\" ",
+      "console.warning: No routes matched location \"/messaging\" "
+    ]
+  }
+}

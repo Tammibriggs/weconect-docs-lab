@@ -1,0 +1,118 @@
+/* Design tokens for weConect. Use these instead of raw values.
+ *
+ * Contrast rules: every text color passes 4.5:1 on the surfaces it's used on,
+ * and every icon and control border passes 3:1. Brand blue (#1371EB) is for
+ * fills, icons and focus rings; brand-colored text uses --color-link.
+ *
+ * Breakpoints (media queries can't read custom properties):
+ *   640px  tablet: the icon rail replaces the bottom tab bar
+ *   1024px desktop: the labeled sidebar
+ *   1280px wide: adds the aside
+ */
+
+:root {
+  /* Brand blue, built around #1371EB */
+  --color-brand-50: #f0f6ff;
+  --color-brand-100: #dcebfe;
+  --color-brand-200: #b6d4fc;
+  --color-brand-300: #81b5f8;
+  --color-brand-400: #4a93f2;
+  --color-brand-500: #1371eb;
+  --color-brand-600: #1061cb;
+  --color-brand-700: #1152a7;
+  --color-brand-800: #104284;
+
+  /* Neutrals at hue 210 */
+  --color-gray-0: #ffffff;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f0f2f4;
+  --color-gray-200: #e8ebef;
+  --color-gray-300: #ced4da;
+  --color-gray-400: #adb5bd;
+  --color-gray-500: #868f99;
+  --color-gray-600: #616b75;
+  --color-gray-700: #484f56;
+  --color-gray-800: #353b41;
+  --color-gray-900: #22262b;
+
+  /* Roles */
+  --color-page: #f7f8fa;
+  --color-surface: var(--color-gray-0);
+  --color-surface-muted: var(--color-gray-50);
+  --color-surface-hover: var(--color-gray-100);
+  --color-text: var(--color-gray-900);
+  --color-text-muted: var(--color-gray-600);
+  --color-text-on-brand: #ffffff;
+  --color-link: var(--color-brand-600);
+  --color-border: var(--color-gray-200);
+  --color-border-strong: var(--color-gray-500);
+  --color-focus: var(--color-brand-500);
+  --color-danger: #b81e1e;
+  --color-danger-hover: #9b1818;
+  --color-danger-bg: #fef1f1;
+  --color-success: #1c7d44;
+  --color-online: #249e57;
+  --color-like: #de4512;
+  --color-overlay: rgb(17 24 39 / 0.5);
+
+  /* Type */
+  --font-sans: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  /* Headings use semibold: lighter than bold, still clearly a heading. */
+  --weight-heading: 600;
+
+  /* Spacing, on a 4px base */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  /* Shadows. xs gives cards a soft edge; the others are for layers that float above the page. */
+  --shadow-xs: 0 1px 2px rgb(16 24 40 / 0.04);
+  --shadow-sm: 0 1px 2px rgb(17 24 39 / 0.08);
+  --shadow-md: 0 4px 12px rgb(17 24 39 / 0.12);
+  --shadow-lg: 0 12px 32px rgb(17 24 39 / 0.18);
+
+  /* Stacking. Dialogs use the browser's top layer instead. */
+  --z-sticky: 10;
+  --z-nav: 20;
+  --z-dropdown: 30;
+  --z-toast: 40;
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration: 200ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* A soft, friendly gradient for empty covers and the sign-in pages. */
+  --gradient-welcome: linear-gradient(135deg, #e0edff 0%, #eef0ff 50%, #fdeef6 100%);
+
+  /* Layout */
+  --nav-rail: 80px;
+  --nav-wide: 240px;
+  --content: 600px;
+  --aside: 320px;
+  --tabbar-h: 56px;
+  --tap: 44px;
+}

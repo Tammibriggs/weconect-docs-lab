@@ -1,0 +1,17 @@
+{
+  "run": "audit.mjs --ui=new, redesigned code with the lighter look (uncommitted, web/), mock API with tests/captures/v1 data, 2026-10-25",
+  "summary": {
+    "overflowPages": 0,
+    "pagesMissingLandmarks": 0,
+    "pageChecks": 70,
+    "axeRules": 0,
+    "axeRulesByImpact": {},
+    "axeNodesTotal": 0,
+    "axeTop": [],
+    "focusWithoutRing": 0,
+    "focusSteps": 19,
+    "tapTargetsUnder44": 0,
+    "signInCalls": 6,
+    "problems": []
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "name": "timeline",
+  "group": "Timeline",
+  "note": "alice's posts, then posts from the users she follows (bob)",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/timeline/all",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "likes": [
+            "6adc828b8254b290f811b7a1"
+          ],
+          "comments": [],
+          "_id": "6adc829a8254b290f811b7d7",
+          "userId": "6adc828b8254b290f811b79d",
+          "desc": "Already liked",
+          "createdAt": "2026-10-24T10:04:10.718Z",
+          "updatedAt": "2026-10-24T10:04:10.718Z",
+          "__v": 0
+        },
+        {
+          "likes": [],
+          "comments": [],
+          "_id": "6adc829a8254b290f811b7d5",
+          "userId": "6adc828b8254b290f811b79d",
+          "desc": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "createdAt": "2026-10-24T10:04:10.400Z",
+          "updatedAt": "2026-10-24T10:04:10.400Z",
+          "__v": 0
+        },
+        {
+          "img": {
+            "url": "https://example.com/photo.jpg",
+            "filename": "photo.jpg"
+          },
+          "likes": [],
+          "comments": [],
+          "_id": "6adc82988254b290f811b7d1",
+          "userId": "6adc828b8254b290f811b79d",
+          "desc": "A photo",
+          "createdAt": "2026-10-24T10:04:08.850Z",
+          "updatedAt": "2026-10-24T10:04:08.850Z",
+          "__v": 0
+        },
+        {
+          "likes": [],
+          "comments": [],
+          "_id": "6adc82988254b290f811b7cf",
+          "userId": "6adc828b8254b290f811b79d",
+          "desc": "Hello from Alice",
+          "createdAt": "2026-10-24T10:04:08.534Z",
+          "updatedAt": "2026-10-24T10:04:08.534Z",
+          "__v": 0
+        },
+        {
+          "likes": [],
+          "comments": [],
+          "_id": "6adc82998254b290f811b7d3",
+          "userId": "6adc828b8254b290f811b79f",
+          "desc": "Hello from Bob",
+          "createdAt": "2026-10-24T10:04:09.165Z",
+          "updatedAt": "2026-10-24T10:04:09.165Z",
+          "__v": 0
+        }
+      ]
+    }
+  },
+  "durationMs": 18
+}

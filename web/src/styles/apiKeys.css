@@ -1,0 +1,176 @@
+/* API keys (pages/ApiKeys.js): the create form, the new-key panel and the list of keys. */
+
+.api-keys {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-bottom: var(--space-8);
+}
+
+.api-keys__intro {
+  margin: 0 var(--gutter);
+  color: var(--color-text-muted);
+}
+
+.api-keys__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 var(--gutter);
+}
+
+.api-keys__heading {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-heading);
+}
+
+.api-keys__form,
+.api-keys__new {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5);
+}
+
+/* ---- Access choice ---- */
+.api-keys__access {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border: 0;
+}
+
+.api-keys__access legend {
+  margin-bottom: var(--space-2);
+}
+
+.api-keys__option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-height: var(--tap);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.api-keys__option:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.api-keys__option:has(input:checked) {
+  border-color: var(--color-brand-500);
+  background-color: var(--color-brand-50);
+}
+
+.api-keys__option input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--color-brand-500);
+}
+
+.api-keys__option-label,
+.api-keys__option-hint {
+  display: block;
+}
+
+.api-keys__option-label {
+  font-weight: var(--weight-semibold);
+}
+
+.api-keys__option-hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.api-keys__form-error {
+  color: var(--color-danger);
+}
+
+/* ---- The new key, shown once ---- */
+.api-keys__new {
+  border-color: var(--color-brand-200);
+  background-color: var(--color-brand-50);
+}
+
+.api-keys__new .api-keys__heading:focus {
+  outline: none;
+}
+
+.api-keys__secret {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.api-keys__secret-value {
+  flex: 1 1 16rem;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--text-sm);
+}
+
+.api-keys__usage {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.api-keys code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+/* ---- Your keys ---- */
+.api-keys__list {
+  overflow: hidden;
+}
+
+.api-keys__items {
+  list-style: none;
+}
+
+.api-key {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+
+.api-key + .api-key {
+  border-top: 1px solid var(--color-border);
+}
+
+.skeleton-list .api-key {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.api-key__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.api-key__name {
+  overflow: hidden;
+  font-weight: var(--weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.api-key__detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.api-key__hint {
+  color: var(--color-text);
+}

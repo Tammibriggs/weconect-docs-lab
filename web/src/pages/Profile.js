@@ -1,61 +1,74 @@
-import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Link, useSearchParams } from 'react-router-dom'
-import Feed from '../components/Feed'
-import FollowCard from '../components/FollowCard'
-import PagesNav from '../components/PagesNav'
-import ProfileCard from '../components/ProfileCard'
-import RightSide from '../components/RightSide'
-import Share from '../components/Share'
-import ShareModal from '../components/ShareModal'
-import { useGetPostsQuery } from '../redux/services/post'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
+import RateReviewOutlined from '@mui/icons-material/RateReviewOutlined'
+import PersonOffOutlined from '@mui/icons-material/PersonOffOutlined'
+import Composer from '../components/Composer'
+import PostList from '../components/PostList'
+import ProfileHeader from '../components/ProfileHeader'
+import PageHeader from '../components/ui/PageHeader'
+import { Skeleton } from '../components/ui/Skeleton'
+import { EmptyState, ErrorState } from '../components/ui/States'
+import { buttonClass } from '../components/ui/Button'
+import { useGetUserPostsQuery } from '../redux/services/post'
 import { useGetUserByIdQuery } from '../redux/services/user'
+import useDocumentTitle from '../lib/useDocumentTitle'
 import '../styles/profile.css'
 
-export default function Profile({setModalOpened, modalOpened}) {
+const OBJECT_ID = /^[a-f\d]{24}$/i
 
-  const user = useSelector((state) => state.auth.user)
-  const [searchParams] = useSearchParams();
-  const [skip, setSkip] = useState(true)
-  const {data: userData} = useGetUserByIdQuery({id: searchParams.get('id')}, {skip})
-  const {data:postsData} = useGetPostsQuery({userId: searchParams.get('id')}, {skip})
+// Old links used /profile/?id=<userId>. They still work: this sends them to /profile/<userId>.
+export function ProfileRedirect() {
+  const [searchParams] = useSearchParams()
+  const me = useSelector((state) => state.auth.user)
+  return <Navigate to={`/profile/${searchParams.get('id') || me._id}`} replace />
+}
 
-  useEffect(() => {
-    window.scrollTo({top: 0})
-  }, [])
+export default function Profile() {
+  const me = useSelector((state) => state.auth.user)
+  const { userId } = useParams()
+  const isMe = userId === me._id
+  // The API answers 500 for an ID that isn't an ObjectId, so don't ask.
+  const validId = OBJECT_ID.test(userId)
+  const userQuery = useGetUserByIdQuery(userId, { skip: isMe || !validId })
+  const posts = useGetUserPostsQuery(userId, { skip: !validId, refetchOnMountOrArgChange: 30 })
+  const user = isMe ? me : userQuery.data
+  const missing = !validId || userQuery.error?.status === 404 || userQuery.error?.status === 500
+  useDocumentTitle(user?.username || (missing ? 'Profile not found' : 'Profile'))
 
-  useEffect(() => {
-    if(searchParams.get('id')) {
-      setSkip(false)
-    }
-  }, [searchParams])
+  if (missing) {
+    return (
+      <div className='profile'>
+        <PageHeader title='Profile not found' back={{ fallback: '/' }} />
+        <EmptyState icon={<PersonOffOutlined />} title="This account doesn't exist" action={<Link className={buttonClass()} to='/search'>Search people</Link>}>
+          The link might be wrong, or the account might have been deleted.
+        </EmptyState>
+      </div>
+    )
+  }
 
   return (
     <div className='profile'>
-      <PagesNav rotate={true} setModalOpened={setModalOpened} />
-      <div className='profile__left'>
-        <Link to='/' className='logo'><h1>weConect</h1></Link>
-        <FollowCard />
-      </div>
-      <div>
-        <ProfileCard
-          name={userData?.data ? userData.data.username : ''}
-          coverImage={userData?.data.coverPicture}
-          profileImage={userData?.data.profilePicture}
-          bio={userData?.data.bio}
-          followers={userData?.data.followers.length}
-          following={userData?.data.followings.length}
-          userId={searchParams.get('id')}
-          showProfileBtn={searchParams.get('id') ? searchParams.get('id') === user._id : false}
-        />
-        {searchParams.get('id') === user._id &&
-          <Share />
+      <PageHeader title={user?.username || 'Profile'} back={{ fallback: '/' }} />
+      {user ? (
+        <ProfileHeader user={user} postCount={posts.data?.length} />
+      ) : userQuery.isError ? (
+        <ErrorState title="Couldn't load this profile" onRetry={userQuery.refetch} />
+      ) : (
+        <div className='profile-header card' role='status'>
+          <span className='visually-hidden'>Loading profile</span>
+          <div className='profile-header__cover' />
+          <div className='profile-header__info'><Skeleton width='40%' height='20px' /></div>
+        </div>
+      )}
+      {isMe && <Composer />}
+      <PostList
+        query={posts}
+        empty={
+          <EmptyState icon={<RateReviewOutlined />} title={isMe ? "You haven't posted yet" : `${user?.username || 'This person'} hasn't posted yet`}>
+            {isMe ? 'Share something with the people who follow you.' : 'Their posts will show up here.'}
+          </EmptyState>
         }
-        <Feed postsData={postsData}/>
-      </div>
-      <RightSide setModalOpened={setModalOpened} />
-      <ShareModal modalOpened={modalOpened} setModalOpened={setModalOpened} /> 
-      <PagesNav />
+      />
     </div>
   )
 }

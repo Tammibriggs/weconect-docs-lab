@@ -1,0 +1,278 @@
+/* The main navigation (components/PrimaryNav.js).
+   Under 640px: a bottom tab bar. 640–1023px: an icon rail. 1024px and up: a labeled sidebar. */
+
+.nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: var(--z-nav);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.nav__list {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  height: var(--tabbar-h);
+  list-style: none;
+}
+
+.nav__entry {
+  display: flex;
+}
+
+.nav__brand,
+.nav__account,
+.nav__entry--wide {
+  display: none;
+}
+
+.nav__item {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav__icon svg {
+  font-size: 24px;
+}
+
+.nav__item[aria-current="page"] {
+  color: var(--color-link);
+}
+
+/* On phones, Post stands out in the middle of the tab bar. */
+.nav__entry--post .nav__icon {
+  width: 44px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-brand-500);
+  color: var(--color-text-on-brand);
+}
+
+.nav__entry--post .nav__icon svg {
+  font-size: 22px;
+}
+
+@media (min-width: 640px) {
+  .nav {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    height: 100vh;
+    height: 100dvh;
+    padding: var(--space-3) 0 var(--space-4);
+    border-top: none;
+    border-right: 1px solid var(--color-border);
+  }
+
+  .nav__brand {
+    display: inline-flex;
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+  }
+
+  /* The rail shows only the mark. The wordmark stays as the link's name for screen readers. */
+  .nav__brand .logo-wordmark {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .nav__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    height: auto;
+  }
+
+  .nav__entry--phone {
+    display: none;
+  }
+
+  .nav__entry--wide {
+    display: flex;
+  }
+
+  .nav__item {
+    flex: none;
+    width: 64px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    font-size: 11px;
+    transition: background-color var(--duration-fast) var(--ease);
+  }
+
+  .nav__item:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+
+  .nav__item[aria-current="page"] {
+    background-color: var(--color-brand-50);
+    color: var(--color-brand-700);
+  }
+
+  .nav__entry--post {
+    margin-top: var(--space-2);
+  }
+
+  .nav__account {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  .nav__me {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav {
+    align-items: stretch;
+    padding: var(--space-4) var(--space-3);
+    border-right: none;
+    background-color: transparent;
+  }
+
+  .nav__brand {
+    align-self: flex-start;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .nav__brand .logo-wordmark {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .nav__item {
+    flex: 1;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--space-4);
+    width: auto;
+    height: 48px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-full);
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+  }
+
+  .nav__item[aria-current="page"] {
+    font-weight: var(--weight-semibold);
+  }
+
+  /* On desktops, Post is a full-width button. */
+  .nav__entry--post .nav__item {
+    justify-content: center;
+    gap: var(--space-2);
+    height: var(--tap);
+    margin-top: var(--space-3);
+    background-color: var(--color-brand-500);
+    color: var(--color-text-on-brand);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+  }
+
+  .nav__entry--post .nav__item:hover {
+    background-color: var(--color-brand-600);
+    color: var(--color-text-on-brand);
+  }
+
+  .nav__entry--post .nav__item[aria-current="page"] {
+    background-color: var(--color-brand-700);
+    color: var(--color-text-on-brand);
+  }
+
+  .nav__entry--post .nav__icon {
+    width: auto;
+    height: auto;
+    background: none;
+  }
+
+  .nav__account {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) 0 var(--space-2) var(--space-3);
+  }
+
+  .nav__me {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+    font-weight: var(--weight-semibold);
+  }
+
+  .nav__me-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Unread messages, on the Messages icon. */
+.nav__icon {
+  position: relative;
+}
+
+.nav__badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-danger);
+  box-shadow: 0 0 0 2px var(--color-surface);
+  color: var(--color-text-on-brand);
+  font-size: 11px;
+  font-weight: var(--weight-bold);
+  line-height: 1;
+}
+
+/* A chat on a phone uses the whole screen. */
+@media (max-width: 639px) {
+  .shell[data-hide-tabbar] .nav {
+    display: none;
+  }
+
+  .shell[data-hide-tabbar] .shell__main {
+    padding-bottom: 0;
+  }
+}
