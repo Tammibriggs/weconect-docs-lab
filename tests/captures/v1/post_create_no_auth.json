@@ -8,7 +8,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae1e5bdfe8b9bb2cd021643",
+      "userId": "6ae239b862c96e9421dfba31",
       "desc": "No key"
     }
   },
@@ -22,5 +22,5 @@
       "message": "You are not authenticated!"
     }
   },
-  "durationMs": 8
+  "durationMs": 4
 }

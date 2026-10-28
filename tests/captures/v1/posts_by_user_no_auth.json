@@ -3,7 +3,7 @@
   "group": "List a user's posts",
   "request": {
     "method": "GET",
-    "path": "/api/posts/6ae1e5bdfe8b9bb2cd021645",
+    "path": "/api/posts/6ae239b862c96e9421dfba33",
     "headers": {}
   },
   "response": {
@@ -16,5 +16,5 @@
       "message": "You are not authenticated!"
     }
   },
-  "durationMs": 5
+  "durationMs": 4
 }

@@ -1,6 +1,6 @@
-# Capture run 2026-10-28T12-08-25
+# Capture run 2026-10-28T18-06-46
 
-152 cases, 152 as expected, 0 different, 1 server restart(s).
+173 cases, 173 as expected, 0 different, 1 server restart(s).
 
 | Case | Group | Expected | Got | Note |
 |---|---|---|---|---|
@@ -61,6 +61,7 @@
 | post_get_unknown | Get a post | 200 | 200 |  |
 | post_get_invalid_id | Get a post | 500 | 500 |  |
 | posts_by_user | List a user's posts | 200 | 200 |  |
+| posts_by_user_with_image | List a user's posts | 200 | 200 | Added 2026-10-28: alice's posts include one with an image |
 | posts_by_unknown_user | List a user's posts | 200 | 200 |  |
 | timeline | Timeline | 200 | 200 | alice's posts, then posts from the users she follows (bob) |
 | timeline_self_follow | Timeline | 200 | 200 | carol follows alice and herself |
@@ -105,6 +106,7 @@
 | key_delete_post | Delete a post | 200 | 200 |  |
 | key_follow | Follow | 200 | 200 |  |
 | key_follow_read_only | Follow | 403 | 403 |  |
+| key_unfollow_read_only | Unfollow | 403 | 403 | Added 2026-10-28: an error object, unlike unfollow's other 403 |
 | key_unfollow | Unfollow | 200 | 200 |  |
 | key_on_internal_endpoint | API keys | 403 | 403 | Keys work only on the 10 public endpoints |
 | key_invalid | API keys | 401 | 401 |  |
@@ -134,6 +136,18 @@
 | key_write_only_timeline | Timeline | 403 | 403 |  |
 | keys_list_with_api_key | List API keys | 403 | 403 |  |
 | keys_delete_with_api_key | Delete an API key | 403 | 403 | The key isn't deleted |
+| user_get_expired_token | Get a user | 403 | 403 |  |
+| search_expired_token | Search users | 403 | 403 |  |
+| follow_expired_token | Follow | 403 | 403 |  |
+| unfollow_expired_token | Unfollow | 403 | 403 |  |
+| post_create_expired_token | Create a post | 403 | 403 |  |
+| posts_by_user_expired_token | List a user's posts | 403 | 403 |  |
+| post_delete_expired_token | Delete a post | 403 | 403 |  |
+| timeline_expired_token | Timeline | 403 | 403 |  |
+| like_expired_token | Like a post | 403 | 403 |  |
+| keys_create_expired_token | Create an API key | 403 | 403 |  |
+| keys_list_expired_token | List API keys | 403 | 403 |  |
+| keys_delete_expired_token | Delete an API key | 403 | 403 |  |
 | search_special_dot | Search users | 200 | 200 | As a regex, a.i would match alice; escaped, it matches nobody |
 | search_special_paren | Search users | 200 | 200 | An unescaped ( would be an invalid regex and a 500 |
 | register_unicode | Register | 200 | 200 |  |
@@ -153,6 +167,13 @@
 | followers_empty | Followers | 200 | 200 |  |
 | following_empty | Following | 200 | 200 |  |
 | timeline_empty | Timeline | 200 | 200 |  |
+| profile_update | Update the current user | 200 | 200 |  |
+| me_with_profile | Current user | 200 | 200 |  |
+| user_get_with_profile | Get a user | 200 | 200 |  |
+| search_with_profile | Search users | 200 | 200 |  |
+| login_with_profile | Log in | 200 | 200 |  |
+| profile_update_long_bio | Update the current user | 200 | 200 | The model's 50-character limit isn't enforced (finding 18) |
+| me_after_long_bio | Current user | 200 | 200 | The 60-character bio was saved |
 | unlike | Like a post | 200 | 200 (server exited) | Liking a second time removes the like |
 | after_unlike | Like a post | ECONNREFUSED | ECONNREFUSED (server exited) | Unlike sends 200, then the server crashes (ERR_HTTP_HEADERS_SENT), so this request is refused |
 | post_get_after_unlike | Get a post | 200 | 200 | After a restart, if one was needed: was the like removed? |

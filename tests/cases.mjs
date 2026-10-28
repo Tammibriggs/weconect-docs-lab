@@ -142,6 +142,8 @@ export const cases = [
   { name: "post_get_unknown", group: "Get a post", method: "GET", path: `/api/posts/${NO_SUCH_ID}/single`, auth: "bob", expect: 200 },
   { name: "post_get_invalid_id", group: "Get a post", method: "GET", path: "/api/posts/abc/single", auth: "bob", expect: 500 },
   { name: "posts_by_user", group: "List a user's posts", method: "GET", path: "/api/posts/{bobId}", auth: "alice", expect: 200 },
+  { name: "posts_by_user_with_image", group: "List a user's posts", method: "GET", path: "/api/posts/{aliceId}", auth: "alice",
+    expect: 200, note: "Added 2026-10-28: alice's posts include one with an image" },
   { name: "posts_by_unknown_user", group: "List a user's posts", method: "GET", path: "/api/posts/nobody", auth: "alice", expect: 200 },
   { name: "timeline", group: "Timeline", method: "GET", path: "/api/posts/timeline/all", auth: "alice", expect: 200,
     note: "alice's posts, then posts from the users she follows (bob)" },
@@ -235,6 +237,8 @@ export const cases = [
     body: { userId: "{carolId}" }, expect: 200 },
   { name: "key_follow_read_only", group: "Follow", method: "PUT", path: "/api/users/follow", auth: { raw: "Bearer {aliceReadKey}" },
     body: { userId: "{carolId}" }, expect: 403 },
+  { name: "key_unfollow_read_only", group: "Unfollow", method: "PUT", path: "/api/users/unfollow", auth: { raw: "Bearer {aliceReadKey}" },
+    body: { userId: "{carolId}" }, expect: 403, note: "Added 2026-10-28: an error object, unlike unfollow's other 403" },
   { name: "key_unfollow", group: "Unfollow", method: "PUT", path: "/api/users/unfollow", auth: { raw: "Bearer {aliceKey}" },
     body: { userId: "{carolId}" }, expect: 200 },
   { name: "key_on_internal_endpoint", group: "API keys", method: "GET", path: "/api/users/followers",
@@ -293,6 +297,24 @@ export const cases = [
   { name: "keys_delete_with_api_key", group: "Delete an API key", method: "DELETE", path: "/api/keys/{aliceKeyId}",
     auth: { raw: "Bearer {aliceKey}" }, expect: 403, note: "The key isn't deleted" },
 
+  // An expired access token: 403 with "expired": true, on every 403 that documents it
+  { name: "user_get_expired_token", group: "Get a user", method: "GET", path: "/api/users/{bobId}/user", auth: "expired", expect: 403 },
+  { name: "search_expired_token", group: "Search users", method: "GET", path: "/api/users/search?search=bob", auth: "expired", expect: 403 },
+  { name: "follow_expired_token", group: "Follow", method: "PUT", path: "/api/users/follow", auth: "expired",
+    body: { userId: "{bobId}" }, expect: 403 },
+  { name: "unfollow_expired_token", group: "Unfollow", method: "PUT", path: "/api/users/unfollow", auth: "expired",
+    body: { userId: "{bobId}" }, expect: 403 },
+  { name: "post_create_expired_token", group: "Create a post", method: "POST", path: "/api/posts", auth: "expired",
+    body: { userId: "{aliceId}", desc: "Too late" }, expect: 403 },
+  { name: "posts_by_user_expired_token", group: "List a user's posts", method: "GET", path: "/api/posts/{bobId}", auth: "expired", expect: 403 },
+  { name: "post_delete_expired_token", group: "Delete a post", method: "DELETE", path: "/api/posts/{postA}", auth: "expired", expect: 403 },
+  { name: "timeline_expired_token", group: "Timeline", method: "GET", path: "/api/posts/timeline/all", auth: "expired", expect: 403 },
+  { name: "like_expired_token", group: "Like a post", method: "PUT", path: "/api/posts/{postB}/like", auth: "expired", body: {}, expect: 403 },
+  { name: "keys_create_expired_token", group: "Create an API key", method: "POST", path: "/api/keys", auth: "expired",
+    body: { name: "Too late", scopes: ["read"] }, expect: 403 },
+  { name: "keys_list_expired_token", group: "List API keys", method: "GET", path: "/api/keys", auth: "expired", expect: 403 },
+  { name: "keys_delete_expired_token", group: "Delete an API key", method: "DELETE", path: "/api/keys/{aliceKeyId}", auth: "expired", expect: 403 },
+
   // ─── Edge cases, added 2026-10-24 ───────────────────────────────
   // After the main flow, so the users they add don't change earlier results.
 
@@ -349,6 +371,28 @@ export const cases = [
   { name: "followers_empty", group: "Followers", method: "GET", path: "/api/users/followers", auth: "erin", expect: 200 },
   { name: "following_empty", group: "Following", method: "GET", path: "/api/users/following", auth: "erin", expect: 200 },
   { name: "timeline_empty", group: "Timeline", method: "GET", path: "/api/posts/timeline/all", auth: "erin", expect: 200 },
+
+  // ─── A saved profile, added 2026-10-28 ──────────────────────────
+  // bio and the pictures' url and filename appear only once a user saves their
+  // profile, as the app's Edit profile dialog does. Update the current user is
+  // out of scope; it's used here only to save erin's profile. erin follows
+  // nobody, so her profile makes a clean example.
+  { name: "profile_update", group: "Update the current user", method: "PUT", path: "/api/users", auth: "erin",
+    body: { username: "erin", bio: "Coffee and code",
+      profilePicture: { url: "https://example.com/erin.jpg", filename: "erin.jpg" },
+      coverPicture: { url: "https://example.com/erin-cover.jpg", filename: "erin-cover.jpg" } }, expect: 200 },
+  { name: "me_with_profile", group: "Current user", method: "GET", path: "/api/users", auth: "erin", expect: 200 },
+  { name: "user_get_with_profile", group: "Get a user", method: "GET", path: "/api/users/{erinId}/user",
+    auth: { raw: "Bearer {aliceKey}" }, expect: 200 },
+  { name: "search_with_profile", group: "Search users", method: "GET", path: "/api/users/search?search=erin",
+    auth: { raw: "Bearer {aliceKey}" }, expect: 200 },
+  { name: "login_with_profile", group: "Log in", method: "POST", path: "/api/auth/login",
+    body: { username: "erin", password: "abcde" }, expect: 200 },
+  { name: "profile_update_long_bio", group: "Update the current user", method: "PUT", path: "/api/users", auth: "erin",
+    body: { username: "erin", bio: LONG_TEXT.slice(0, 60) }, expect: 200,
+    note: "The model's 50-character limit isn't enforced (finding 18)" },
+  { name: "me_after_long_bio", group: "Current user", method: "GET", path: "/api/users", auth: "erin", expect: 200,
+    note: "The 60-character bio was saved" },
 
   // ─── Unlike: last, because the code suggests it crashes the server ──
   { name: "unlike", group: "Like a post", method: "PUT", path: "/api/posts/{postA}/like", auth: "bob",

@@ -25,14 +25,14 @@
         "followers": [],
         "followings": [],
         "isAdmin": false,
-        "_id": "6ae1e601fe8b9bb2cd0216ed",
+        "_id": "6ae239e562c96e9421dfbadd",
         "username": "erin",
-        "createdAt": "2026-10-28T12:09:37.354Z",
-        "updatedAt": "2026-10-28T12:09:37.354Z",
+        "createdAt": "2026-10-28T18:07:33.870Z",
+        "updatedAt": "2026-10-28T18:07:33.870Z",
         "__v": 0,
         "accessToken": "<redacted JWT>"
       }
     }
   },
-  "durationMs": 27
+  "durationMs": 10
 }

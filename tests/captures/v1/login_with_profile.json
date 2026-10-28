@@ -1,0 +1,45 @@
+{
+  "name": "login_with_profile",
+  "group": "Log in",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "erin",
+      "password": "<redacted encrypted password>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {
+          "url": "https://example.com/erin.jpg",
+          "filename": "erin.jpg"
+        },
+        "coverPicture": {
+          "url": "https://example.com/erin-cover.jpg",
+          "filename": "erin-cover.jpg"
+        },
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6ae239e562c96e9421dfbadd",
+        "username": "erin",
+        "createdAt": "2026-10-28T18:07:33.870Z",
+        "updatedAt": "2026-10-28T18:07:38.206Z",
+        "__v": 0,
+        "bio": "Coffee and code",
+        "accessToken": "<redacted JWT>"
+      }
+    }
+  },
+  "durationMs": 6
+}

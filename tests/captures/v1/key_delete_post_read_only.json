@@ -3,7 +3,7 @@
   "group": "Delete a post",
   "request": {
     "method": "DELETE",
-    "path": "/api/posts/6ae1e5f3fe8b9bb2cd0216ba",
+    "path": "/api/posts/6ae239d462c96e9421dfbaa9",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }
@@ -18,5 +18,5 @@
       "message": "This API key doesn't have the 'write' scope"
     }
   },
-  "durationMs": 5
+  "durationMs": 6
 }

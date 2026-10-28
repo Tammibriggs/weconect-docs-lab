@@ -24,18 +24,18 @@
     "body": {
       "status": "ok",
       "data": {
-        "id": "6ae1e5eefe8b9bb2cd02169d",
+        "id": "6ae239ce62c96e9421dfba8c",
         "name": "My bot",
-        "lastFour": "0xRb",
+        "lastFour": "aLMu",
         "scopes": [
           "read",
           "write"
         ],
-        "createdAt": "2026-10-28T12:09:18.039Z",
+        "createdAt": "2026-10-28T18:07:10.766Z",
         "lastUsedAt": null,
         "key": "<redacted API key>"
       }
     }
   },
-  "durationMs": 19
+  "durationMs": 8
 }

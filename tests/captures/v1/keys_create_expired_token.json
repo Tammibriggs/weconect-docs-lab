@@ -1,0 +1,30 @@
+{
+  "name": "keys_create_expired_token",
+  "group": "Create an API key",
+  "request": {
+    "method": "POST",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "Too late",
+      "scopes": [
+        "read"
+      ]
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "expired": true,
+      "message": "Your session has expired"
+    }
+  },
+  "durationMs": 7
+}

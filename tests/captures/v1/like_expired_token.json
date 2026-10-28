@@ -1,0 +1,25 @@
+{
+  "name": "like_expired_token",
+  "group": "Like a post",
+  "request": {
+    "method": "PUT",
+    "path": "/api/posts/6ae239c662c96e9421dfba67/like",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {}
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "expired": true,
+      "message": "Your session has expired"
+    }
+  },
+  "durationMs": 3
+}

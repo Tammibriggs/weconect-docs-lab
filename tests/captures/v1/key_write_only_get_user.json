@@ -3,7 +3,7 @@
   "group": "Get a user",
   "request": {
     "method": "GET",
-    "path": "/api/users/6ae1e5bdfe8b9bb2cd021645/user",
+    "path": "/api/users/6ae239b862c96e9421dfba33/user",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }
@@ -18,5 +18,5 @@
       "message": "This API key doesn't have the 'read' scope"
     }
   },
-  "durationMs": 5
+  "durationMs": 15
 }

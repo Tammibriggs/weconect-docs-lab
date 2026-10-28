@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae1e5bdfe8b9bb2cd021643",
+      "userId": "6ae239b862c96e9421dfba31",
       "desc": "A photo",
       "img": {
         "url": "https://example.com/photo.jpg",
@@ -27,18 +27,18 @@
       "data": {
         "likes": [],
         "comments": [],
-        "_id": "6ae1e5e5fe8b9bb2cd021677",
-        "userId": "6ae1e5bdfe8b9bb2cd021643",
+        "_id": "6ae239c662c96e9421dfba65",
+        "userId": "6ae239b862c96e9421dfba31",
         "desc": "A photo",
         "img": {
           "url": "https://example.com/photo.jpg",
           "filename": "photo.jpg"
         },
-        "createdAt": "2026-10-28T12:09:09.283Z",
-        "updatedAt": "2026-10-28T12:09:09.283Z",
+        "createdAt": "2026-10-28T18:07:02.060Z",
+        "updatedAt": "2026-10-28T18:07:02.060Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 47
+  "durationMs": 9
 }

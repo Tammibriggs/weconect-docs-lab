@@ -10,7 +10,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae1e5bdfe8b9bb2cd021643",
+      "userId": "6ae239b862c96e9421dfba31",
       "desc": "Posting as alice"
     }
   },
@@ -24,5 +24,5 @@
       "message": "you can only post to your account"
     }
   },
-  "durationMs": 14
+  "durationMs": 5
 }

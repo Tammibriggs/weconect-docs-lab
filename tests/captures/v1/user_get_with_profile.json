@@ -1,0 +1,39 @@
+{
+  "name": "user_get_with_profile",
+  "group": "Get a user",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/6ae239e562c96e9421dfbadd/user",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {
+          "url": "https://example.com/erin.jpg",
+          "filename": "erin.jpg"
+        },
+        "coverPicture": {
+          "url": "https://example.com/erin-cover.jpg",
+          "filename": "erin-cover.jpg"
+        },
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6ae239e562c96e9421dfbadd",
+        "username": "erin",
+        "createdAt": "2026-10-28T18:07:33.870Z",
+        "__v": 0,
+        "bio": "Coffee and code"
+      }
+    }
+  },
+  "durationMs": 8
+}

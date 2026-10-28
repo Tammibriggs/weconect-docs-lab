@@ -1,0 +1,27 @@
+{
+  "name": "profile_update_long_bio",
+  "group": "Update the current user",
+  "note": "The model's 50-character limit isn't enforced (finding 18)",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "username": "erin",
+      "bio": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok"
+    }
+  },
+  "durationMs": 11
+}

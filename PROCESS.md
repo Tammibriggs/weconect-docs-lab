@@ -22,9 +22,9 @@ Entries are in date order, newest last. Every number names the file or command i
 | Number | Source |
 |---|---|
 | 15 of 26 endpoints in the full spec, 10 of them public | `openapi/weconect-v1.yaml`, `openapi/weconect-public.yaml` |
-| 152 test cases; 151 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
-| 136 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
-| 55 of 55 documented responses appear in a capture (39 before the 17 coverage cases) | `npm run test:coverage` |
+| 173 test cases; 172 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
+| 155 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
+| 55 of 55 documented responses and 219 of 219 documented fields appear in a capture (before the coverage cases: 39 responses; 42 fields missing) | `npm run test:coverage` |
 | 27 findings, 4 of them fixed: 3 in 1.1, 1 in 1.1.1 | `TESTING.md` |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
@@ -549,6 +549,73 @@ The repo has no remote yet, so nothing is pushed.
 **Who did what**
 - **Me:** asked for the coverage check and the `403` fix, and chose to save finding 27 for 2.0.0.
 - **Claude Code:** wrote the coverage check and the 17 cases, split the response, refreshed the captures, ran the checks, and updated the spec, `TESTING.md`, `CHANGELOG.md`, `README.md`, `CLAUDE.md` and this log.
+
+### 2026-10-28, later: A new repo, and `expired` on every error
+
+**The repo:** the force push had worked, and GitHub's contributors API already listed only me and Safak, but the old commits were still reachable by their IDs (Miracle's `40bc456`, and `e7e87b3` with the Firebase key). I deleted `weconect-docs-lab`, recreated it empty with the same name, and pushed `main` (`02d8292`). Afterwards the API lists only me (12 commits) and Safak (anonymous), and `40bc456` returns `422`: it's gone. Claude Code couldn't push, because its shell has no GitHub login, so I pushed from VS Code.
+
+**What I found in Postman:** the `401` on get the current user documented an `expired` field the endpoint never returns.
+
+**Why:** `expired` was an optional property of the shared `Error` schema, used by 17 responses. Only one capture has ever returned it: `auth_expired`, a `403` for an expired access token from the app.
+
+**Fix (docs only):**
+- `Error` no longer has `expired`. A new `ForbiddenError` schema has it, used by the 7 `403` responses that check access tokens.
+- `expired` is marked `x-internal`, so the public spec doesn't show it: API keys don't expire.
+- First try: `ForbiddenError` as `allOf` of `Error` plus an internal part. The public build then had an `allOf` with one schema, and Redocly warned (`no-illogical-composition-keywords`). A plain object with the one internal property builds cleanly.
+
+**Checks:** `lint:spec` (2 usual warnings each), `test:validate` (136 passed), `test:coverage` (55 of 55); `expired` appears 0 times in the public spec.
+
+**What I learned:**
+- Neither check catches a documented field that's never returned. The validator allows extra fields, and coverage looks at statuses, not fields. I found both of these (`updatedAt` and `expired`) by reading the docs next to real responses.
+- An optional property in a shared schema is the same trap as on 2026-10-27: it shows up everywhere the schema is used.
+- `x-internal` works on a single property, not only on whole operations.
+
+**Who did what**
+- **Me:** deleted and recreated the repo, pushed it, and found `expired` in the `401`.
+- **Claude Code:** checked the remote and the contributors API, committed, explained the cause, changed the schemas, ran the checks, and updated `CHANGELOG.md` and this log.
+
+### 2026-10-28, later: Field coverage, `bio`, and access tokens in the public docs
+
+**What I asked:**
+- Should the public docs mention access tokens, since they work on the public endpoints and can return `expired`?
+- Why does `bio` appear in the get-a-user schemas but not in the responses?
+
+**Answers:**
+- **Tokens:** keep them out of the public reference. Documenting them would make them part of the public contract, which would have to be kept working and versioned. Instead, one sentence in the public Authentication section says to use an API key, because the app's tokens expire and aren't supported for other code.
+- **`bio`:** it's real. The app's Edit profile dialog saves a bio and both pictures through `PUT /api/users` ([`web/src/components/EditProfileDialog.js:110`](web/src/components/EditProfileDialog.js#L110)), but no case saved a profile, so no capture had them.
+
+**A one-off scan, then a permanent check:** for each documented response, which schema fields no capture contains. It found 42, in 5 groups: the profile fields; `expired` on 12 `403` responses (I said 9 at first, which was wrong); `message` in three `500` responses that never send it; unfollow's `403` error object; and `img` in list a user's posts. `npm run test:coverage` now does this check every time ([`tests/coverage.mjs`](tests/coverage.mjs)).
+
+**Decision (mine):** go ahead with all of it: cases, spec fixes, the field check, and the tokens sentence.
+
+**What changed:**
+- **21 cases:**
+  - erin saves a profile, then get the current user, get a user, search, and log in return it.
+  - A 60-character bio is saved, which tests the bio part of finding 18.
+  - An expired token on the 12 `403` responses that document `expired`.
+  - A read-only key unfollowing.
+  - alice's posts, which include one with an image.
+- **Spec:**
+  - `bio` is described.
+  - Get a user's example is erin's saved profile, and the `userId` example is her ID, so the request and response match.
+  - `message` is removed from the `500` errors.
+  - The tokens sentence is added to the Authentication section.
+- **A mistake the linter caught:** removing `message` from the shared error schema also removed it from register's `409`, which does send it. Redocly flagged that the `409` example no longer matched its schema. The `409` now adds `message` to the shared schema with `allOf`. `test:validate` didn't catch it, because it allows extra fields.
+- **Another one, caught by the remap script:** I first saved carol's profile, but she follows herself (finding 19), which made a confusing example. When I switched to erin, the script found carol's ID mapping to two values and refused to write. I left the profile captures out of the mapping, because they weren't in any example yet.
+
+**Checks:**
+- `npm run test:capture` (port 8810): 173 cases, all as predicted, 1 restart (the unlike crash).
+- `npm run test:validate`: 155 passed, 0 failed, 18 skipped.
+- `npm run test:coverage`: 55 of 55 responses and 219 of 219 fields.
+- `npm run lint:spec`: 2 usual warnings each.
+
+**What I learned:**
+- A response schema can be wrong in two ways: a field that never appears, or a field that appears but isn't documented. Field coverage catches the first. The second would need a strict validator that rejects extra fields; Redocly's example check catches it only in examples.
+- A field that depends on the data, such as `bio`, needs a case that creates that data.
+
+**Who did what**
+- **Me:** asked about tokens in the public docs, found `bio` missing from the responses, and approved the fixes.
+- **Claude Code:** scanned the fields, explained the causes, wrote the cases and the field check, updated the spec, refreshed the captures, ran the checks, and updated `TESTING.md`, `CHANGELOG.md`, `README.md`, `CLAUDE.md` and this log.
 
 ## Post and portfolio ideas
 

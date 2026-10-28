@@ -25,6 +25,10 @@ info:
     as you, so keep it secret. If a key leaks, delete it on the same page; it
     stops working at once.
 
+    Use an API key in your code. The access tokens the weConect app uses when
+    you sign in aren't supported for other code: they expire, and they can
+    change without notice.
+
     ### Scopes
 
     Each key has one or both of these scopes:
@@ -150,7 +154,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorWithDetail'
+                allOf:
+                  - $ref: '#/components/schemas/ErrorWithDetail'
+                  - type: object
+                    required: [message]
+                    properties:
+                      message:
+                        type: string
               example:
                 status: error
                 message: Username already exists
@@ -206,10 +216,10 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae1e5bdfe8b9bb2cd021643
+                  _id: 6ae239b862c96e9421dfba31
                   username: alice
-                  createdAt: '2026-10-28T12:08:29.485Z'
-                  updatedAt: '2026-10-28T12:08:29.485Z'
+                  createdAt: '2026-10-28T18:06:48.303Z'
+                  updatedAt: '2026-10-28T18:06:48.303Z'
                   __v: 0
                   accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.PAYLOAD.SIGNATURE
         '400':
@@ -271,11 +281,11 @@ paths:
               example:
                 status: ok
                 data:
-                  id: 6ae1e5eefe8b9bb2cd02169d
+                  id: 6ae239ce62c96e9421dfba8c
                   name: My bot
-                  lastFour: 0xRb
+                  lastFour: aLMu
                   scopes: [read, write]
-                  createdAt: '2026-10-28T12:09:18.039Z'
+                  createdAt: '2026-10-28T18:07:10.766Z'
                   lastUsedAt: null
                   key: wck_REDACTED
         '400':
@@ -326,18 +336,18 @@ paths:
               example:
                 status: ok
                 data:
-                  - id: 6ae1e5eefe8b9bb2cd0216a3
+                  - id: 6ae239cf62c96e9421dfba92
                     name: Poster
-                    lastFour: dFLV
+                    lastFour: qsvc
                     scopes: [write]
-                    createdAt: '2026-10-28T12:09:18.987Z'
+                    createdAt: '2026-10-28T18:07:11.691Z'
                     lastUsedAt: null
-                  - id: 6ae1e5eefe8b9bb2cd02169d
+                  - id: 6ae239ce62c96e9421dfba8c
                     name: My bot
-                    lastFour: 0xRb
+                    lastFour: aLMu
                     scopes: [read, write]
-                    createdAt: '2026-10-28T12:09:18.039Z'
-                    lastUsedAt: '2026-10-28T12:09:26.844Z'
+                    createdAt: '2026-10-28T18:07:10.766Z'
+                    lastUsedAt: '2026-10-28T18:07:19.770Z'
         '401':
           $ref: '#/components/responses/NotAuthenticated'
         '403':
@@ -359,7 +369,7 @@ paths:
           description: The key's `id`, as returned by **List API keys**.
           schema:
             type: string
-          example: 6ae1e5eefe8b9bb2cd02169d
+          example: 6ae239ce62c96e9421dfba8c
       responses:
         '200':
           description: The key was deleted.
@@ -409,9 +419,9 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae1e5bdfe8b9bb2cd021643
+                  _id: 6ae239b862c96e9421dfba31
                   username: alice
-                  createdAt: '2026-10-28T12:08:29.485Z'
+                  createdAt: '2026-10-28T18:06:48.303Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -441,15 +451,20 @@ paths:
               example:
                 status: ok
                 data:
-                  profilePicture: {}
-                  coverPicture: {}
+                  profilePicture:
+                    url: https://example.com/erin.jpg
+                    filename: erin.jpg
+                  coverPicture:
+                    url: https://example.com/erin-cover.jpg
+                    filename: erin-cover.jpg
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae1e5bdfe8b9bb2cd021645
-                  username: bob
-                  createdAt: '2026-10-28T12:08:29.833Z'
+                  _id: 6ae239e562c96e9421dfbadd
+                  username: erin
+                  createdAt: '2026-10-28T18:07:33.870Z'
                   __v: 0
+                  bio: Coffee and code
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -534,10 +549,10 @@ paths:
                   - followers: []
                     followings: []
                     isAdmin: false
-                    _id: 6ae1e5bdfe8b9bb2cd021643
+                    _id: 6ae239b862c96e9421dfba31
                     username: alice
-                    createdAt: '2026-10-28T12:08:29.485Z'
-                    updatedAt: '2026-10-28T12:08:29.485Z'
+                    createdAt: '2026-10-28T18:06:48.303Z'
+                    updatedAt: '2026-10-28T18:06:48.303Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -563,7 +578,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ae1e5bdfe8b9bb2cd021645
+              userId: 6ae239b862c96e9421dfba33
       responses:
         '200':
           description: The current user now follows the user.
@@ -592,7 +607,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ForbiddenError'
               examples:
                 alreadyFollowing:
                   summary: Already following
@@ -642,7 +657,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ae1e5bdfe8b9bb2cd021645
+              userId: 6ae239b862c96e9421dfba33
       responses:
         '200':
           description: The current user no longer follows the user.
@@ -671,7 +686,7 @@ paths:
               schema:
                 oneOf:
                   - type: string
-                  - $ref: '#/components/schemas/Error'
+                  - $ref: '#/components/schemas/ForbiddenError'
               examples:
                 notFollowing:
                   summary: Not following
@@ -713,12 +728,12 @@ paths:
               text:
                 summary: Text only
                 value:
-                  userId: 6ae1e5bdfe8b9bb2cd021643
+                  userId: 6ae239b862c96e9421dfba31
                   desc: Hello from Alice
               withImage:
                 summary: With an image
                 value:
-                  userId: 6ae1e5bdfe8b9bb2cd021643
+                  userId: 6ae239b862c96e9421dfba31
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
@@ -735,14 +750,14 @@ paths:
                 data:
                   likes: []
                   comments: []
-                  _id: 6ae1e5e5fe8b9bb2cd021677
-                  userId: 6ae1e5bdfe8b9bb2cd021643
+                  _id: 6ae239c662c96e9421dfba65
+                  userId: 6ae239b862c96e9421dfba31
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
                     filename: photo.jpg
-                  createdAt: '2026-10-28T12:09:09.283Z'
-                  updatedAt: '2026-10-28T12:09:09.283Z'
+                  createdAt: '2026-10-28T18:07:02.060Z'
+                  updatedAt: '2026-10-28T18:07:02.060Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -753,7 +768,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ForbiddenError'
               examples:
                 missingUserId:
                   summary: userId is missing
@@ -797,7 +812,7 @@ paths:
           description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
           schema:
             type: string
-          example: 6ae1e5bdfe8b9bb2cd021645
+          example: 6ae239b862c96e9421dfba33
       responses:
         '200':
           description: The user's posts, possibly none.
@@ -810,11 +825,11 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ae1e5e5fe8b9bb2cd021679
-                    userId: 6ae1e5bdfe8b9bb2cd021645
+                    _id: 6ae239c662c96e9421dfba67
+                    userId: 6ae239b862c96e9421dfba33
                     desc: Hello from Bob
-                    createdAt: '2026-10-28T12:09:09.621Z'
-                    updatedAt: '2026-10-28T12:09:09.621Z'
+                    createdAt: '2026-10-28T18:07:02.370Z'
+                    updatedAt: '2026-10-28T18:07:02.370Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -840,7 +855,7 @@ paths:
           description: The post's ID.
           schema:
             $ref: '#/components/schemas/ObjectId'
-          example: 6ae1e5e5fe8b9bb2cd021677
+          example: 6ae239c662c96e9421dfba65
       responses:
         '200':
           description: The post was deleted.
@@ -857,7 +872,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ForbiddenError'
               examples:
                 notYours:
                   summary: The post belongs to another user
@@ -925,19 +940,19 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ae1e5e4fe8b9bb2cd021675
-                    userId: 6ae1e5bdfe8b9bb2cd021643
+                    _id: 6ae239c562c96e9421dfba63
+                    userId: 6ae239b862c96e9421dfba31
                     desc: Hello from Alice
-                    createdAt: '2026-10-28T12:09:08.699Z'
-                    updatedAt: '2026-10-28T12:09:08.699Z'
+                    createdAt: '2026-10-28T18:07:01.747Z'
+                    updatedAt: '2026-10-28T18:07:01.747Z'
                     __v: 0
                   - likes: []
                     comments: []
-                    _id: 6ae1e5e5fe8b9bb2cd021679
-                    userId: 6ae1e5bdfe8b9bb2cd021645
+                    _id: 6ae239c662c96e9421dfba67
+                    userId: 6ae239b862c96e9421dfba33
                     desc: Hello from Bob
-                    createdAt: '2026-10-28T12:09:09.621Z'
-                    updatedAt: '2026-10-28T12:09:09.621Z'
+                    createdAt: '2026-10-28T18:07:02.370Z'
+                    updatedAt: '2026-10-28T18:07:02.370Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -1029,7 +1044,7 @@ components:
       description: The user's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ae1e5bdfe8b9bb2cd021645
+      example: 6ae239e562c96e9421dfbadd
     PostId:
       name: postId
       in: path
@@ -1037,7 +1052,7 @@ components:
       description: The post's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ae1e5e4fe8b9bb2cd021675
+      example: 6ae239c562c96e9421dfba63
 
   responses:
     InvalidJson:
@@ -1082,7 +1097,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/ForbiddenError'
           examples:
             missingScope:
               summary: The key doesn't have the read scope
@@ -1107,7 +1122,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/ForbiddenError'
           examples:
             missingScope:
               summary: The key doesn't have the write scope
@@ -1144,7 +1159,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/ForbiddenError'
           examples:
             apiKey:
               summary: An API key instead of an access token
@@ -1196,9 +1211,21 @@ components:
         message:
           type: string
           description: What went wrong.
+
+    ForbiddenError:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: string
+          const: error
+        message:
+          type: string
+          description: What went wrong.
         expired:
           type: boolean
-          description: Present and `true` only when a session token from the weConect app has expired.
+          description: Present and `true` only when an access token from the weConect app has expired. API keys don't expire.
+          x-internal: true
 
     ErrorWithDetail:
       type: object
@@ -1207,8 +1234,6 @@ components:
         status:
           type: string
           const: error
-        message:
-          type: string
         error:
           type: object
           description: |
@@ -1339,6 +1364,9 @@ components:
           $ref: '#/components/schemas/Image'
         bio:
           type: string
+          description: |
+            The user's bio. Present only once the user has saved their profile
+            in the weConect app.
         followers:
           type: array
           description: IDs of the users who follow this user, in the order they followed.

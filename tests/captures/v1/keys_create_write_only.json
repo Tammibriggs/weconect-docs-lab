@@ -23,17 +23,17 @@
     "body": {
       "status": "ok",
       "data": {
-        "id": "6ae1e5eefe8b9bb2cd0216a3",
+        "id": "6ae239cf62c96e9421dfba92",
         "name": "Poster",
-        "lastFour": "dFLV",
+        "lastFour": "qsvc",
         "scopes": [
           "write"
         ],
-        "createdAt": "2026-10-28T12:09:18.987Z",
+        "createdAt": "2026-10-28T18:07:11.691Z",
         "lastUsedAt": null,
         "key": "<redacted API key>"
       }
     }
   },
-  "durationMs": 15
+  "durationMs": 6
 }

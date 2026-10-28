@@ -1,0 +1,70 @@
+{
+  "name": "posts_by_user_with_image",
+  "group": "List a user's posts",
+  "note": "Added 2026-10-28: alice's posts include one with an image",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/6ae239b862c96e9421dfba31",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": [
+        {
+          "likes": [
+            "6ae239b862c96e9421dfba35"
+          ],
+          "comments": [],
+          "_id": "6ae239c762c96e9421dfba6b",
+          "userId": "6ae239b862c96e9421dfba31",
+          "desc": "Already liked",
+          "createdAt": "2026-10-28T18:07:03.900Z",
+          "updatedAt": "2026-10-28T18:07:03.900Z",
+          "__v": 0
+        },
+        {
+          "likes": [],
+          "comments": [],
+          "_id": "6ae239c762c96e9421dfba69",
+          "userId": "6ae239b862c96e9421dfba31",
+          "desc": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+          "createdAt": "2026-10-28T18:07:03.591Z",
+          "updatedAt": "2026-10-28T18:07:03.591Z",
+          "__v": 0
+        },
+        {
+          "img": {
+            "url": "https://example.com/photo.jpg",
+            "filename": "photo.jpg"
+          },
+          "likes": [],
+          "comments": [],
+          "_id": "6ae239c662c96e9421dfba65",
+          "userId": "6ae239b862c96e9421dfba31",
+          "desc": "A photo",
+          "createdAt": "2026-10-28T18:07:02.060Z",
+          "updatedAt": "2026-10-28T18:07:02.060Z",
+          "__v": 0
+        },
+        {
+          "likes": [],
+          "comments": [],
+          "_id": "6ae239c562c96e9421dfba63",
+          "userId": "6ae239b862c96e9421dfba31",
+          "desc": "Hello from Alice",
+          "createdAt": "2026-10-28T18:07:01.747Z",
+          "updatedAt": "2026-10-28T18:07:01.747Z",
+          "__v": 0
+        }
+      ]
+    }
+  },
+  "durationMs": 13
+}

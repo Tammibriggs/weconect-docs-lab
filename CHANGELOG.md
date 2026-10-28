@@ -7,7 +7,11 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 ### Documentation
 
 - **The `403` for a missing scope now shows the right message.** The read endpoints (get the current user, get a user, search users, list a user's posts, and get the timeline) showed `"This API key doesn't have the 'write' scope"`, which they never return. They now show the `'read'` message, and the authentication errors table lists both. The API behaves as before.
-- Every documented response now has a captured example behind it: 17 new test cases cover the `401` and `403` responses that were documented from shared code but not captured.
+- **`expired` is documented only where it can appear.** It was in the shared error schema, so every error response showed it, including `401`. It's now only on the `403` responses, in a new `ForbiddenError` schema, and only in the full spec: API keys don't expire, so the public reference doesn't show it.
+- **`bio` and the pictures' `url` and `filename` are explained.** They appear only once a user has saved their profile in the app. **Get a user**'s example now shows a saved profile.
+- **The `500` errors of get a user, follow, and like no longer list `message`**, which they never return. Register's `409` still has it.
+- **The public reference says to use an API key.** The access tokens the app uses work on the public endpoints, but they expire and aren't supported for other code.
+- Every documented response and response field now has a captured example behind it: 38 new test cases cover the `401` and `403` responses that were documented from shared code, and fields such as `bio`, `expired`, and `img` that no case had returned.
 
 ## 1.1.1: 2026-10-27
 

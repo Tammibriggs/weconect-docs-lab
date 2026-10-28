@@ -10,7 +10,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae1e5bdfe8b9bb2cd021643",
+      "userId": "6ae239b862c96e9421dfba31",
       "desc": "Not allowed"
     }
   },
@@ -24,5 +24,5 @@
       "message": "This API key doesn't have the 'write' scope"
     }
   },
-  "durationMs": 6
+  "durationMs": 4
 }

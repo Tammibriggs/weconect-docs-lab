@@ -1,0 +1,27 @@
+{
+  "name": "key_unfollow_read_only",
+  "group": "Unfollow",
+  "note": "Added 2026-10-28: an error object, unlike unfollow's other 403",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/unfollow",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "6ae239b862c96e9421dfba35"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "This API key doesn't have the 'write' scope"
+    }
+  },
+  "durationMs": 8
+}

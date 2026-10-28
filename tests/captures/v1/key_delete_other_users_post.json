@@ -4,7 +4,7 @@
   "note": "bob's key can't delete alice's post",
   "request": {
     "method": "DELETE",
-    "path": "/api/posts/6ae1e5e4fe8b9bb2cd021675",
+    "path": "/api/posts/6ae239c562c96e9421dfba63",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }
@@ -19,5 +19,5 @@
       "message": "you can delete only your post"
     }
   },
-  "durationMs": 45
+  "durationMs": 13
 }

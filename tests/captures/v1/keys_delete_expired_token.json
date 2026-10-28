@@ -1,0 +1,23 @@
+{
+  "name": "keys_delete_expired_token",
+  "group": "Delete an API key",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/keys/6ae239ce62c96e9421dfba8c",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "expired": true,
+      "message": "Your session has expired"
+    }
+  },
+  "durationMs": 3
+}

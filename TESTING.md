@@ -4,16 +4,16 @@ This file records how the documented endpoints were tested, what the tests found
 
 ## How the tests ran
 
-`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 152 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), and `npm run test:coverage` checks the other direction: that every response the spec documents appears in a capture.
+`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 173 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture.
 
 | Item | Value |
 |---|---|
-| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28, committed as `tests/captures/v1/` |
+| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28; 21 cases for field coverage added and all 173 re-run later that day, committed as `tests/captures/v1/` |
 | Stack | Node.js 24, Express 4.18.2, Mongoose 5.13.15 (MongoDB driver 3.7.3), MongoDB 6.0.19 |
-| Cases | 152: 151 returned the status predicted from reading the code; 1 confirmed a crash |
-| Spec check | 136 captures pass, 0 fail; 16 skipped: 12 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
+| Cases | 173: 172 returned the status predicted from reading the code; 1 confirmed a crash |
+| Spec check | 155 captures pass, 0 fail; 18 skipped: 14 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
 | Validator check | 3 deliberately wrong captures (wrong type, undocumented status, missing field) were all rejected |
-| Response coverage | 55 of 55 documented responses appear in a capture. With the spec from before 1.1.1, the check lists the two `500` responses that version removed |
+| Response coverage | 55 of 55 documented responses and 219 of 219 documented fields appear in a capture. With the spec from before 1.1.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
 
 The captures redact access tokens, API keys and encrypted passwords, and replace local paths with `<repo>`. IDs and timestamps change on every run, so each refresh also updates the spec's examples to the new values.
 
@@ -64,7 +64,7 @@ These are behaviours a later version should change. The spec documents them as t
 
 ### Validation
 
-18. **Length limits aren't enforced**: a 600-character post is accepted [`post_create_long_desc`], and so are 2- and 30-character usernames [`register_username_short`, `register_username_long`]. The models set `min` and `max`, but Mongoose applies those only to numbers; strings need `minlength` and `maxlength`. The bio limit in [`api/models/User.js`](api/models/User.js) has the same problem, but that's from reading the code: bio can only be set through an out-of-scope endpoint, so it's untested. *(Corrected 2026-10-24: this finding first stated the username and bio part without a test.)*
+18. **Length limits aren't enforced**: a 600-character post is accepted [`post_create_long_desc`], and so are 2- and 30-character usernames [`register_username_short`, `register_username_long`]. The models set `min` and `max`, but Mongoose applies those only to numbers; strings need `minlength` and `maxlength`. The bio limit in [`api/models/User.js`](api/models/User.js) has the same problem: a 60-character bio is saved [`profile_update_long_bio`, `me_after_long_bio`]. *(Corrected 2026-10-24: this finding first stated the username and bio part without a test. The bio part was tested on 2026-10-28.)*
 19. **Users can follow themselves** [`follow_self`]. The timeline code would then list their own posts twice; the test user had no posts, so this is untested [`timeline_self_follow`].
 
 ### API design
@@ -135,7 +135,6 @@ Added 2026-10-26, in version 1.1. The keys cases are the `keys_*` and `key_*` ca
 | Area | Why |
 |---|---|
 | The 8 undocumented endpoints and the Socket.io events | Planned for later phases |
-| The bio length limit | Bio can only be set through update the current user, which is out of scope |
 | Self-follow with posts (finding 19) | Needs a self-follower who has posts |
 | Token expiry after the real two days | Simulated instead, with a token whose `exp` has passed [`auth_expired`] |
 | Behaviour with `NODE_ENV=production` | The tests run in development mode, so HTML errors include stack traces |

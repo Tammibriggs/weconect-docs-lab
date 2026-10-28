@@ -1,0 +1,23 @@
+{
+  "name": "search_expired_token",
+  "group": "Search users",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/search?search=bob",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "expired": true,
+      "message": "Your session has expired"
+    }
+  },
+  "durationMs": 4
+}

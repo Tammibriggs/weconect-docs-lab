@@ -25,14 +25,14 @@
         "followers": [],
         "followings": [],
         "isAdmin": false,
-        "_id": "6ae1e600fe8b9bb2cd0216e8",
+        "_id": "6ae239e462c96e9421dfbad8",
         "username": "zoë",
-        "createdAt": "2026-10-28T12:09:36.405Z",
-        "updatedAt": "2026-10-28T12:09:36.405Z",
+        "createdAt": "2026-10-28T18:07:32.952Z",
+        "updatedAt": "2026-10-28T18:07:32.952Z",
         "__v": 0,
         "accessToken": "<redacted JWT>"
       }
     }
   },
-  "durationMs": 15
+  "durationMs": 6
 }

@@ -1,0 +1,40 @@
+{
+  "name": "me_after_long_bio",
+  "group": "Current user",
+  "note": "The 60-character bio was saved",
+  "request": {
+    "method": "GET",
+    "path": "/api/users",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {
+          "url": "https://example.com/erin.jpg",
+          "filename": "erin.jpg"
+        },
+        "coverPicture": {
+          "url": "https://example.com/erin-cover.jpg",
+          "filename": "erin-cover.jpg"
+        },
+        "followers": [],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6ae239e562c96e9421dfbadd",
+        "username": "erin",
+        "createdAt": "2026-10-28T18:07:33.870Z",
+        "__v": 0,
+        "bio": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    }
+  },
+  "durationMs": 9
+}
