@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: weConect API
-  version: 1.1.0
+  version: 1.1.1
   summary: Profiles, follows, posts, and timelines for the weConect social app.
   description: |
     The weConect API lets your code use weConect as you: read profiles and
@@ -41,9 +41,8 @@ info:
     | Problem | Status |
     |---|---|
     | No `Authorization` header | `401` with `"You are not authenticated!"` |
-    | The key is wrong, or was deleted | `401` with `"Invalid API key"` |
+    | The key is wrong or was deleted, doesn't start with `wck_`, or has no `Bearer` in front | `401` with `"Invalid API key"` |
     | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'write' scope"` |
-    | The header holds something other than an API key, such as a malformed token | `500` with an HTML error page |
 
     ## Errors
 
@@ -52,9 +51,8 @@ info:
 
     - Some `500` responses return the raw database error in an `error` field.
     - **Unfollow a user** returns its messages as plain JSON strings.
-    - A body that isn't valid JSON, or a malformed token, returns Express's
-      HTML error page. So does a path or method that doesn't exist, with
-      `404`.
+    - A body that isn't valid JSON returns Express's HTML error page. So does
+      a path or method that doesn't exist, with `404`.
 
     ## Request bodies
 
@@ -108,16 +106,14 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6adf12d208ef70e347ff2489
+                  _id: 6ae0d98ca99fcaa5cf793680
                   username: alice
-                  createdAt: '2026-10-26T08:44:02.569Z'
+                  createdAt: '2026-10-27T17:04:12.409Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/MalformedToken'
   /api/users/{userId}/user:
     get:
       tags:
@@ -148,9 +144,9 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6adf12d208ef70e347ff248b
+                  _id: 6ae0d98ca99fcaa5cf793682
                   username: bob
-                  createdAt: '2026-10-26T08:44:02.890Z'
+                  createdAt: '2026-10-27T17:04:12.732Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -167,9 +163,8 @@ paths:
                 message: User not found
         '500':
           description: |
-            `userId` isn't a valid ObjectId (the body includes the raw database
-            error), or the `Authorization` header holds a malformed token (an
-            HTML error page).
+            `userId` isn't a valid ObjectId. The body includes the raw database
+            error.
           content:
             application/json:
               schema:
@@ -233,24 +228,22 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/User'
+                      $ref: '#/components/schemas/UserWithUpdatedAt'
               example:
                 status: ok
                 data:
                   - followers: []
                     followings: []
                     isAdmin: false
-                    _id: 6adf12d208ef70e347ff2489
+                    _id: 6ae0d98ca99fcaa5cf793680
                     username: alice
-                    createdAt: '2026-10-26T08:44:02.569Z'
-                    updatedAt: '2026-10-26T08:44:02.569Z'
+                    createdAt: '2026-10-27T17:04:12.409Z'
+                    updatedAt: '2026-10-27T17:04:12.409Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/MalformedToken'
   /api/users/follow:
     put:
       tags:
@@ -272,7 +265,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6adf12d208ef70e347ff248b
+              userId: 6ae0d98ca99fcaa5cf793682
       responses:
         '200':
           description: The current user now follows the user.
@@ -346,7 +339,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6adf12d208ef70e347ff248b
+              userId: 6ae0d98ca99fcaa5cf793682
       responses:
         '200':
           description: The current user no longer follows the user.
@@ -412,12 +405,12 @@ paths:
               text:
                 summary: Text only
                 value:
-                  userId: 6adf12d208ef70e347ff2489
+                  userId: 6ae0d98ca99fcaa5cf793680
                   desc: Hello from Alice
               withImage:
                 summary: With an image
                 value:
-                  userId: 6adf12d208ef70e347ff2489
+                  userId: 6ae0d98ca99fcaa5cf793680
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
@@ -434,14 +427,14 @@ paths:
                 data:
                   likes: []
                   comments: []
-                  _id: 6adf12e008ef70e347ff24bd
-                  userId: 6adf12d208ef70e347ff2489
+                  _id: 6ae0d99aa99fcaa5cf7936b4
+                  userId: 6ae0d98ca99fcaa5cf793680
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
                     filename: photo.jpg
-                  createdAt: '2026-10-26T08:44:16.194Z'
-                  updatedAt: '2026-10-26T08:44:16.194Z'
+                  createdAt: '2026-10-27T17:04:26.403Z'
+                  updatedAt: '2026-10-27T17:04:26.403Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -497,7 +490,7 @@ paths:
           description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
           schema:
             type: string
-          example: 6adf12d208ef70e347ff248b
+          example: 6ae0d98ca99fcaa5cf793682
       responses:
         '200':
           description: The user's posts, possibly none.
@@ -510,11 +503,11 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6adf12e008ef70e347ff24bf
-                    userId: 6adf12d208ef70e347ff248b
+                    _id: 6ae0d99aa99fcaa5cf7936b6
+                    userId: 6ae0d98ca99fcaa5cf793682
                     desc: Hello from Bob
-                    createdAt: '2026-10-26T08:44:16.511Z'
-                    updatedAt: '2026-10-26T08:44:16.511Z'
+                    createdAt: '2026-10-27T17:04:26.722Z'
+                    updatedAt: '2026-10-27T17:04:26.722Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -542,7 +535,7 @@ paths:
           description: The post's ID.
           schema:
             $ref: '#/components/schemas/ObjectId'
-          example: 6adf12e008ef70e347ff24bd
+          example: 6ae0d99aa99fcaa5cf7936b4
       responses:
         '200':
           description: The post was deleted.
@@ -622,19 +615,19 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6adf12df08ef70e347ff24bb
-                    userId: 6adf12d208ef70e347ff2489
+                    _id: 6ae0d99aa99fcaa5cf7936b2
+                    userId: 6ae0d98ca99fcaa5cf793680
                     desc: Hello from Alice
-                    createdAt: '2026-10-26T08:44:15.875Z'
-                    updatedAt: '2026-10-26T08:44:15.875Z'
+                    createdAt: '2026-10-27T17:04:26.083Z'
+                    updatedAt: '2026-10-27T17:04:26.083Z'
                     __v: 0
                   - likes: []
                     comments: []
-                    _id: 6adf12e008ef70e347ff24bf
-                    userId: 6adf12d208ef70e347ff248b
+                    _id: 6ae0d99aa99fcaa5cf7936b6
+                    userId: 6ae0d98ca99fcaa5cf793682
                     desc: Hello from Bob
-                    createdAt: '2026-10-26T08:44:16.511Z'
-                    updatedAt: '2026-10-26T08:44:16.511Z'
+                    createdAt: '2026-10-27T17:04:26.722Z'
+                    updatedAt: '2026-10-27T17:04:26.722Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -705,7 +698,7 @@ components:
       description: The user's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6adf12d208ef70e347ff248b
+      example: 6ae0d98ca99fcaa5cf793682
     PostId:
       name: postId
       in: path
@@ -713,10 +706,13 @@ components:
       description: The post's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6adf12df08ef70e347ff24bb
+      example: 6ae0d99aa99fcaa5cf7936b2
   responses:
     Unauthorized:
-      description: The `Authorization` header is missing, or the API key is wrong or was deleted.
+      description: |
+        The `Authorization` header is missing, or doesn't hold a current API
+        key: the key is wrong or was deleted, doesn't start with `wck_`, or has
+        no `Bearer` in front.
       content:
         application/json:
           schema:
@@ -728,7 +724,7 @@ components:
                 status: error
                 message: You are not authenticated!
             invalidKey:
-              summary: The key is wrong or was deleted
+              summary: Not a current API key
               value:
                 status: error
                 message: Invalid API key
@@ -744,26 +740,6 @@ components:
               value:
                 status: error
                 message: This API key doesn't have the 'write' scope
-    MalformedToken:
-      description: |
-        The `Authorization` header holds something other than an API key or a
-        valid token, or has no scheme word before it. Express returns its HTML
-        error page.
-      content:
-        text/html:
-          schema:
-            $ref: '#/components/schemas/HtmlErrorPage'
-          example: |
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-            <meta charset="utf-8">
-            <title>Error</title>
-            </head>
-            <body>
-            <pre>TypeError: Cannot read properties of null (reading &#39;exp&#39;)<br> &nbsp; &nbsp;at verifyToken (api/routes/verifyToken.js:24:34)<br> ...</pre>
-            </body>
-            </html>
   schemas:
     ObjectId:
       type: string
@@ -882,13 +858,20 @@ components:
         createdAt:
           type: string
           format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          description: Among the public endpoints, only **Search users** returns it.
         __v:
           type: integer
           description: MongoDB's internal document version.
+    UserWithUpdatedAt:
+      description: A user's profile, plus the time it last changed.
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          required:
+            - updatedAt
+          properties:
+            updatedAt:
+              type: string
+              format: date-time
     UserResponse:
       type: object
       required:

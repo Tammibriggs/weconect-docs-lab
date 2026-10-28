@@ -11,7 +11,7 @@ Entries are in date order, newest last. Every number names the file or command i
 | 0. Setup | Choose the project, combine the repos | Done 2026-10-22 |
 | 1. Foundation | Test v1 and write its spec (done); upgrade dependencies and hash passwords; Docusaurus site; style guide and Vale | In progress |
 | 2. CI | Spec linting, prose linting, link checks, deploy previews, a pull-request workflow; deploy the API (Render, MongoDB Atlas) | Not started |
-| 3. Change management | Change the API and its spec together, changelog with `oasdiff`, deprecation notices, migration guide | Started 2026-10-26: version 1.1.0 with a hand-written changelog and one deprecated field |
+| 3. Change management | Change the API and its spec together, changelog with `oasdiff`, deprecation notices, migration guide | Started 2026-10-26: version 1.1.0 with a hand-written changelog and one deprecated field; 1.1.1 (a bug fix) on 2026-10-27 |
 | 4. AI readers | `llms.txt`, Markdown versions of pages, a docs MCP server | Not started |
 | 5. AI automation | AutoDoc flags docs affected by each pull request | Not started |
 | 6. Developer experience | SDK and code samples, search, analytics, feedback; AsyncAPI for messaging | Not started |
@@ -22,9 +22,9 @@ Entries are in date order, newest last. Every number names the file or command i
 | Number | Source |
 |---|---|
 | 15 of 26 endpoints in the full spec, 10 of them public | `openapi/weconect-v1.yaml`, `openapi/weconect-public.yaml` |
-| 132 test cases; 131 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
-| 117 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
-| 26 findings, 3 of them fixed in 1.1 | `TESTING.md` |
+| 135 test cases; 134 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
+| 119 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
+| 26 findings, 4 of them fixed: 3 in 1.1, 1 in 1.1.1 | `TESTING.md` |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
@@ -441,6 +441,64 @@ The repo has no remote yet, so nothing is pushed.
 **Who did what**
 - **Me:** chose to remove Miracle from the list, and chose this option.
 - **Claude Code:** checked the authorship, rewrote the history, verified it, and updated the README and this log.
+
+**Correction (2026-10-27):** the repo had been pushed. I pushed the old history to `Tammibriggs/weconect-docs-lab` at 12:46 on 2026-10-26, before the squash, so GitHub still has Miracle's commits until the squashed `main` is force-pushed. Local `main` and `origin/main` have diverged (`git status`: ahead 7, behind 15).
+
+### 2026-10-27: Testing in Postman, and a misleading user schema
+
+**What I'm doing:** testing the 10 public endpoints in Postman, using the public spec imported as a collection, an environment, the API key set once on the collection, a Setup folder that logs in and creates the keys, and test scripts on each request. In progress.
+
+**What I found so far:**
+- **Get the current user's schema showed `updatedAt`, but the response didn't have it.** The route removes it along with the password ([`api/routes/users.js:88`](api/routes/users.js#L88), and `:101` for get a user), while search removes only the password (finding 16). The spec used one `User` schema for all three, with `updatedAt` optional and a note in its description. The validator passed, but the docs showed a field these two endpoints never return.
+- **My status check failed on creating an API key:** it returns `201`, not `200`. The public endpoints all return `200` on success, even create a post (finding 13).
+
+**Fix (docs only; the API and captures are unchanged):** `User` no longer has `updatedAt`. A new `UserWithUpdatedAt` schema adds it, as required, using `allOf`; search and login use it.
+
+**Checks:**
+- `npm run lint:spec`: both specs valid; the public spec has its 2 usual warnings.
+- `npm run test:validate`: 117 passed, 0 failed, 15 skipped, as before.
+- Copies of the search, login, and get-the-current-user captures with `updatedAt` removed: search and login now fail, and get the current user passes. Before the fix, all three passed.
+
+**What I learned:**
+- An optional field in a shared schema shows up in every operation that uses it. "Optional" reads as "sometimes returned", not "only returned by another endpoint". When fields differ by endpoint, split the schema.
+- The expected status comes from each operation's `responses` in the spec, not from a rule such as "success is 200".
+- Error cases in Postman are usually duplicated requests, one per case, because each needs its own key, path, or body.
+- **What to call the Postman tests:** black-box functional API tests, with positive and negative cases, chained into a workflow. They're integration-level (real HTTP, real code, a database), not unit or end-to-end tests. They aren't contract tests yet, because they check chosen fields, not every response against its schema; `npm run test:validate` is the contract check. The repo's own cases are characterization tests: they recorded the behaviour the spec was written from, while the Postman tests start from the spec.
+
+**Who did what**
+- **Me:** set up Postman and ran the collection; spotted the `updatedAt` mismatch and the `201`.
+- **Claude Code:** explained the causes, split the schema, ran the checks, and updated the spec, `CHANGELOG.md`, `TESTING.md`, and this log.
+
+### 2026-10-27, later: Version 1.1.1: a value that isn't a key returns `401`, not `500`
+
+**What I found in Postman:** `Authorization: Bearer 2434143` on get the current user returned `500`, an HTML page with a stack trace. I expected the documented `401 Invalid API key`.
+
+**Why:** the API decides what a value is by its prefix. Anything without `wck_` is treated as an access token; `jwt.decode()` returns `null` for a value that isn't a JWT, and the middleware read `.exp` from `null` and threw (finding 7). The docs listed the `500`, but in terms ("something other than an API key") a reader can't match to a mistyped key.
+
+**Decision (mine):** fix the API rather than only clarify the docs. A bad credential is the client's mistake, so it should get a `4xx`, and the `500` page leaked a stack trace.
+
+**The fix** ([`api/routes/verifyToken.js`](api/routes/verifyToken.js)):
+- Public endpoints: a header value that's neither an API key nor a JWT returns `401 "Invalid API key"`, like any other wrong key. That covers a key without its prefix and a key without `Bearer` in front.
+- Internal endpoints: the same value returns `403 "Token is invalid"`, like any other bad token. The app already signs out on that response ([`web/src/redux/services/api.js:18-19`](web/src/redux/services/api.js#L18-L19)), so `web/` needed no change.
+- Version 1.1.1: a bug fix that changes an error status, not anything that worked before.
+
+**Tests:** 2 cases changed their expected status from `500` (`auth_malformed_token`, `auth_no_scheme`), and 3 are new: `key_without_prefix` (the value I tried), `key_without_bearer`, and `auth_malformed_token_internal`. Run on port 8810, because my `npm run dev` was using 8800.
+
+**Spec:** removed the `500` from get the current user and search users, the malformed-token part of get a user's `500`, and the `MalformedToken` response; the authentication errors table and the `401` description now spell out the `wck_` prefix and `Bearer`.
+
+**Checks:**
+- `npm run test:capture`: 135 cases, all as predicted, 1 restart (the unlike crash).
+- `npm run test:validate`: 119 passed, 0 failed, 16 skipped.
+- `npm run lint:spec`: both specs valid, 2 usual warnings each.
+- The refresh gave every user, post and key a new ID. A script mapped the spec's example IDs and timestamps from the old captures to the new ones (42 replacements). It also showed that two key endings in the examples (`9XAa`, `W1_B`) had never matched any capture; they now do.
+
+**What I learned:**
+- The validator checks that each captured response is documented, but not that each documented response still happens. Removing the `500` from the spec had to be done by hand.
+- A documented bug is still a bug. Docs that describe a `500` accurately can still fail the reader, when they're written in the API's terms ("not an API key") instead of the reader's ("I mistyped my key").
+
+**Who did what**
+- **Me:** found the `500` in Postman and chose to fix the API.
+- **Claude Code:** traced the cause, changed the middleware, added and updated the cases, refreshed the captures, updated the spec, `CHANGELOG.md`, `TESTING.md`, `CLAUDE.md` and this log, and ran the checks.
 
 ## Post and portfolio ideas
 

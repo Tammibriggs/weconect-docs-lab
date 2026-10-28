@@ -21,7 +21,8 @@ const verifyToken = (req, res, next) => {
     if (typeof token === 'string' && token.startsWith(API_KEY_PREFIX)) {
       return res.status(403).json({status: 'error', message: 'API keys can\'t be used with this endpoint. Use an access token from logging in.'})
     }
-    const exp = jwt.decode(token).exp
+    // decode() returns null for anything that isn't a JWT (finding 7)
+    const exp = jwt.decode(token)?.exp
     if(!exp) return res.status(403).json({status: 'error', message: 'Token is invalid'})
     if (Date.now() >= exp * 1000) return res.status(403).json({status:'error', expired: true, message: 'Your session has expired'})
     jwt.verify(token, process.env.JWT_SECT, (err, user) => {
@@ -36,11 +37,16 @@ const verifyToken = (req, res, next) => {
 
 // For the public endpoints: accepts an API key with the given scope ("read" or
 // "write"), or an access token from logging in, which the app uses.
-// Not async on purpose: verifyToken can throw (finding 7), and Express 4 turns
-// a synchronous throw into a 500 but lets a rejected promise crash the server.
+// Not async on purpose: Express 4 turns a synchronous throw into a 500 but lets
+// a rejected promise crash the server.
 const verifyTokenOrApiKey = (scope) => (req, res, next) => {
   const token = tokenFrom(req)
   if (typeof token !== 'string' || !token.startsWith(API_KEY_PREFIX)) {
+    // Neither an API key nor an access token, such as a key without its prefix or
+    // without "Bearer ": answer as for any other wrong key
+    if (req.headers.authorization && !jwt.decode(token)) {
+      return res.status(401).json({status: 'error', message: 'Invalid API key'})
+    }
     return verifyToken(req, res, next)
   }
   checkApiKey(token, scope, req, res, next)

@@ -1,0 +1,23 @@
+{
+  "name": "auth_malformed_token_internal",
+  "group": "Authentication",
+  "note": "An internal endpoint: treated as a bad token; 500 before 1.1.1",
+  "request": {
+    "method": "GET",
+    "path": "/api/users/followers",
+    "headers": {
+      "Authorization": "Bearer not-a-jwt"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "Token is invalid"
+    }
+  },
+  "durationMs": 6
+}

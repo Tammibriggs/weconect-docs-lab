@@ -3,7 +3,7 @@
   "group": "Delete a post",
   "request": {
     "method": "DELETE",
-    "path": "/api/posts/6adf12e008ef70e347ff24bd",
+    "path": "/api/posts/6ae0d99aa99fcaa5cf7936b4",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -15,5 +15,5 @@
     },
     "body": {}
   },
-  "durationMs": 5
+  "durationMs": 13
 }

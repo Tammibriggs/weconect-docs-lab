@@ -3,13 +3,13 @@
   "group": "Like a post",
   "request": {
     "method": "PUT",
-    "path": "/api/posts/6adf12df08ef70e347ff24bb/like",
+    "path": "/api/posts/6ae0d99aa99fcaa5cf7936b2/like",
     "headers": {
       "Authorization": "Bearer <redacted JWT>",
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6adf12d208ef70e347ff248b"
+      "userId": "6ae0d98ca99fcaa5cf793682"
     }
   },
   "response": {
@@ -21,5 +21,5 @@
       "status": "ok"
     }
   },
-  "durationMs": 11
+  "durationMs": 10
 }

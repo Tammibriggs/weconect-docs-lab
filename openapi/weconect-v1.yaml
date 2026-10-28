@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: weConect API
-  version: 1.1.0
+  version: 1.1.1
   summary: Profiles, follows, posts, and timelines for the weConect social app.
   description: |
     The weConect API lets your code use weConect as you: read profiles and
@@ -41,9 +41,8 @@ info:
     | Problem | Status |
     |---|---|
     | No `Authorization` header | `401` with `"You are not authenticated!"` |
-    | The key is wrong, or was deleted | `401` with `"Invalid API key"` |
+    | The key is wrong or was deleted, doesn't start with `wck_`, or has no `Bearer` in front | `401` with `"Invalid API key"` |
     | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'write' scope"` |
-    | The header holds something other than an API key, such as a malformed token | `500` with an HTML error page |
 
     ## Errors
 
@@ -52,9 +51,8 @@ info:
 
     - Some `500` responses return the raw database error in an `error` field.
     - **Unfollow a user** returns its messages as plain JSON strings.
-    - A body that isn't valid JSON, or a malformed token, returns Express's
-      HTML error page. So does a path or method that doesn't exist, with
-      `404`.
+    - A body that isn't valid JSON returns Express's HTML error page. So does
+      a path or method that doesn't exist, with `404`.
 
     ## Request bodies
 
@@ -208,10 +206,10 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6adf12d208ef70e347ff2489
+                  _id: 6ae0d98ca99fcaa5cf793680
                   username: alice
-                  createdAt: '2026-10-26T08:44:02.569Z'
-                  updatedAt: '2026-10-26T08:44:02.569Z'
+                  createdAt: '2026-10-27T17:04:12.409Z'
+                  updatedAt: '2026-10-27T17:04:12.409Z'
                   __v: 0
                   accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.PAYLOAD.SIGNATURE
         '400':
@@ -273,11 +271,11 @@ paths:
               example:
                 status: ok
                 data:
-                  id: 6adf12e808ef70e347ff24e3
+                  id: 6ae0d9a2a99fcaa5cf7936da
                   name: My bot
-                  lastFour: 9XAa
+                  lastFour: pOe4
                   scopes: [read, write]
-                  createdAt: '2026-10-26T08:44:24.654Z'
+                  createdAt: '2026-10-27T17:04:34.841Z'
                   lastUsedAt: null
                   key: wck_REDACTED
         '400':
@@ -328,18 +326,18 @@ paths:
               example:
                 status: ok
                 data:
-                  - id: 6adf12e908ef70e347ff24e9
+                  - id: 6ae0d9a3a99fcaa5cf7936e0
                     name: Poster
-                    lastFour: W1_B
+                    lastFour: zADC
                     scopes: [write]
-                    createdAt: '2026-10-26T08:44:25.606Z'
+                    createdAt: '2026-10-27T17:04:35.790Z'
                     lastUsedAt: null
-                  - id: 6adf12e808ef70e347ff24e3
+                  - id: 6ae0d9a2a99fcaa5cf7936da
                     name: My bot
-                    lastFour: 9XAa
+                    lastFour: pOe4
                     scopes: [read, write]
-                    createdAt: '2026-10-26T08:44:24.654Z'
-                    lastUsedAt: '2026-10-26T08:44:33.447Z'
+                    createdAt: '2026-10-27T17:04:34.841Z'
+                    lastUsedAt: '2026-10-27T17:04:43.631Z'
         '401':
           $ref: '#/components/responses/NotAuthenticated'
         '403':
@@ -361,7 +359,7 @@ paths:
           description: The key's `id`, as returned by **List API keys**.
           schema:
             type: string
-          example: 6adf12e808ef70e347ff24e3
+          example: 6ae0d9a2a99fcaa5cf7936da
       responses:
         '200':
           description: The key was deleted.
@@ -411,16 +409,14 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6adf12d208ef70e347ff2489
+                  _id: 6ae0d98ca99fcaa5cf793680
                   username: alice
-                  createdAt: '2026-10-26T08:44:02.569Z'
+                  createdAt: '2026-10-27T17:04:12.409Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/MalformedToken'
 
   /api/users/{userId}/user:
     get:
@@ -450,9 +446,9 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6adf12d208ef70e347ff248b
+                  _id: 6ae0d98ca99fcaa5cf793682
                   username: bob
-                  createdAt: '2026-10-26T08:44:02.890Z'
+                  createdAt: '2026-10-27T17:04:12.732Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -469,9 +465,8 @@ paths:
                 message: User not found
         '500':
           description: |
-            `userId` isn't a valid ObjectId (the body includes the raw database
-            error), or the `Authorization` header holds a malformed token (an
-            HTML error page).
+            `userId` isn't a valid ObjectId. The body includes the raw database
+            error.
           content:
             application/json:
               schema:
@@ -532,24 +527,22 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/User'
+                      $ref: '#/components/schemas/UserWithUpdatedAt'
               example:
                 status: ok
                 data:
                   - followers: []
                     followings: []
                     isAdmin: false
-                    _id: 6adf12d208ef70e347ff2489
+                    _id: 6ae0d98ca99fcaa5cf793680
                     username: alice
-                    createdAt: '2026-10-26T08:44:02.569Z'
-                    updatedAt: '2026-10-26T08:44:02.569Z'
+                    createdAt: '2026-10-27T17:04:12.409Z'
+                    updatedAt: '2026-10-27T17:04:12.409Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '500':
-          $ref: '#/components/responses/MalformedToken'
 
   /api/users/follow:
     put:
@@ -570,7 +563,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6adf12d208ef70e347ff248b
+              userId: 6ae0d98ca99fcaa5cf793682
       responses:
         '200':
           description: The current user now follows the user.
@@ -649,7 +642,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6adf12d208ef70e347ff248b
+              userId: 6ae0d98ca99fcaa5cf793682
       responses:
         '200':
           description: The current user no longer follows the user.
@@ -720,12 +713,12 @@ paths:
               text:
                 summary: Text only
                 value:
-                  userId: 6adf12d208ef70e347ff2489
+                  userId: 6ae0d98ca99fcaa5cf793680
                   desc: Hello from Alice
               withImage:
                 summary: With an image
                 value:
-                  userId: 6adf12d208ef70e347ff2489
+                  userId: 6ae0d98ca99fcaa5cf793680
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
@@ -742,14 +735,14 @@ paths:
                 data:
                   likes: []
                   comments: []
-                  _id: 6adf12e008ef70e347ff24bd
-                  userId: 6adf12d208ef70e347ff2489
+                  _id: 6ae0d99aa99fcaa5cf7936b4
+                  userId: 6ae0d98ca99fcaa5cf793680
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
                     filename: photo.jpg
-                  createdAt: '2026-10-26T08:44:16.194Z'
-                  updatedAt: '2026-10-26T08:44:16.194Z'
+                  createdAt: '2026-10-27T17:04:26.403Z'
+                  updatedAt: '2026-10-27T17:04:26.403Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -804,7 +797,7 @@ paths:
           description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
           schema:
             type: string
-          example: 6adf12d208ef70e347ff248b
+          example: 6ae0d98ca99fcaa5cf793682
       responses:
         '200':
           description: The user's posts, possibly none.
@@ -817,11 +810,11 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6adf12e008ef70e347ff24bf
-                    userId: 6adf12d208ef70e347ff248b
+                    _id: 6ae0d99aa99fcaa5cf7936b6
+                    userId: 6ae0d98ca99fcaa5cf793682
                     desc: Hello from Bob
-                    createdAt: '2026-10-26T08:44:16.511Z'
-                    updatedAt: '2026-10-26T08:44:16.511Z'
+                    createdAt: '2026-10-27T17:04:26.722Z'
+                    updatedAt: '2026-10-27T17:04:26.722Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -847,7 +840,7 @@ paths:
           description: The post's ID.
           schema:
             $ref: '#/components/schemas/ObjectId'
-          example: 6adf12e008ef70e347ff24bd
+          example: 6ae0d99aa99fcaa5cf7936b4
       responses:
         '200':
           description: The post was deleted.
@@ -932,19 +925,19 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6adf12df08ef70e347ff24bb
-                    userId: 6adf12d208ef70e347ff2489
+                    _id: 6ae0d99aa99fcaa5cf7936b2
+                    userId: 6ae0d98ca99fcaa5cf793680
                     desc: Hello from Alice
-                    createdAt: '2026-10-26T08:44:15.875Z'
-                    updatedAt: '2026-10-26T08:44:15.875Z'
+                    createdAt: '2026-10-27T17:04:26.083Z'
+                    updatedAt: '2026-10-27T17:04:26.083Z'
                     __v: 0
                   - likes: []
                     comments: []
-                    _id: 6adf12e008ef70e347ff24bf
-                    userId: 6adf12d208ef70e347ff248b
+                    _id: 6ae0d99aa99fcaa5cf7936b6
+                    userId: 6ae0d98ca99fcaa5cf793682
                     desc: Hello from Bob
-                    createdAt: '2026-10-26T08:44:16.511Z'
-                    updatedAt: '2026-10-26T08:44:16.511Z'
+                    createdAt: '2026-10-27T17:04:26.722Z'
+                    updatedAt: '2026-10-27T17:04:26.722Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -1023,7 +1016,7 @@ components:
         | Signed with the wrong secret | `403` with `"Token is invalid"` |
         | Expired | `403` with `"expired": true` and `"Your session has expired"` |
         | An API key, on an endpoint that accepts only this token | `403` with `"API keys can't be used with this endpoint..."` |
-        | Not a JWT, or no scheme word before it | `500` with an HTML error page |
+        | Not a JWT, or no scheme word before it | `403` with `"Token is invalid"` on the internal endpoints; `401` with `"Invalid API key"` on the public ones |
 
         The API reads the second word of the header as the token and doesn't
         check the first, so `Bearer` is a convention rather than a requirement.
@@ -1036,7 +1029,7 @@ components:
       description: The user's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6adf12d208ef70e347ff248b
+      example: 6ae0d98ca99fcaa5cf793682
     PostId:
       name: postId
       in: path
@@ -1044,7 +1037,7 @@ components:
       description: The post's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6adf12df08ef70e347ff24bb
+      example: 6ae0d99aa99fcaa5cf7936b2
 
   responses:
     InvalidJson:
@@ -1065,7 +1058,10 @@ components:
             </body>
             </html>
     Unauthorized:
-      description: The `Authorization` header is missing, or the API key is wrong or was deleted.
+      description: |
+        The `Authorization` header is missing, or doesn't hold a current API
+        key: the key is wrong or was deleted, doesn't start with `wck_`, or has
+        no `Bearer` in front.
       content:
         application/json:
           schema:
@@ -1077,7 +1073,7 @@ components:
                 status: error
                 message: You are not authenticated!
             invalidKey:
-              summary: The key is wrong or was deleted
+              summary: Not a current API key
               value:
                 status: error
                 message: Invalid API key
@@ -1117,8 +1113,9 @@ components:
             message: You are not authenticated!
     AccessTokenForbidden:
       description: |
-        The access token is signed with the wrong secret or has expired, or the
-        request used an API key, which this endpoint doesn't accept.
+        The access token is signed with the wrong secret, has expired, or isn't
+        a JWT, or the request used an API key, which this endpoint doesn't
+        accept.
       content:
         application/json:
           schema:
@@ -1130,7 +1127,7 @@ components:
                 status: error
                 message: API keys can't be used with this endpoint. Use an access token from logging in.
             invalid:
-              summary: Signed with the wrong secret
+              summary: Signed with the wrong secret, or not a JWT
               value:
                 status: error
                 message: Token is invalid
@@ -1140,27 +1137,6 @@ components:
                 status: error
                 expired: true
                 message: Your session has expired
-    MalformedToken:
-      description: |
-        The `Authorization` header holds something other than an API key or a
-        valid token, or has no scheme word before it. Express returns its HTML
-        error page.
-      content:
-        text/html:
-          schema:
-            $ref: '#/components/schemas/HtmlErrorPage'
-          example: |
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-            <meta charset="utf-8">
-            <title>Error</title>
-            </head>
-            <body>
-            <pre>TypeError: Cannot read properties of null (reading &#39;exp&#39;)<br> &nbsp; &nbsp;at verifyToken (api/routes/verifyToken.js:24:34)<br> ...</pre>
-            </body>
-            </html>
-
   schemas:
     ObjectId:
       type: string
@@ -1353,13 +1329,20 @@ components:
         createdAt:
           type: string
           format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-          description: Among the public endpoints, only **Search users** returns it.
         __v:
           type: integer
           description: MongoDB's internal document version.
+
+    UserWithUpdatedAt:
+      description: A user's profile, plus the time it last changed.
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          required: [updatedAt]
+          properties:
+            updatedAt:
+              type: string
+              format: date-time
 
     UserResponse:
       type: object
@@ -1373,7 +1356,7 @@ components:
 
     LoginData:
       allOf:
-        - $ref: '#/components/schemas/User'
+        - $ref: '#/components/schemas/UserWithUpdatedAt'
         - type: object
           required: [accessToken]
           properties:

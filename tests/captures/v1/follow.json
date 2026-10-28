@@ -10,7 +10,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6adf12d208ef70e347ff248b"
+      "userId": "6ae0d98ca99fcaa5cf793682"
     }
   },
   "response": {
@@ -23,5 +23,5 @@
       "message": "user has been followed"
     }
   },
-  "durationMs": 55
+  "durationMs": 54
 }

@@ -17,5 +17,5 @@
     "code": 1,
     "signal": null
   },
-  "serverLog": "\nError [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client\n    at ServerResponse.setHeader (node:_http_outgoing:684:11)\n    at ServerResponse.header (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:794:10)\n    at ServerResponse.send (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:174:12)\n    at ServerResponse.json (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:278:15)\n    at <repo>/api/routes/posts.js:72:21\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  code: 'ERR_HTTP_HEADERS_SENT'\n}\n\nNode.js v24.20.0"
+  "serverLog": "\nError [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client\n    at ServerResponse.setHeader (node:_http_outgoing:684:11)\n    at ServerResponse.header (<repo>/api/node_modules/express/lib/response.js:794:10)\n    at ServerResponse.send (<repo>/api/node_modules/express/lib/response.js:174:12)\n    at ServerResponse.json (<repo>/api/node_modules/express/lib/response.js:278:15)\n    at <repo>/api/routes/posts.js:72:21\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {\n  code: 'ERR_HTTP_HEADERS_SENT'\n}\n\nNode.js v24.20.0"
 }

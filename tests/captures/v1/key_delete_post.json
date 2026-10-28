@@ -3,7 +3,7 @@
   "group": "Delete a post",
   "request": {
     "method": "DELETE",
-    "path": "/api/posts/6adf12ed08ef70e347ff2500",
+    "path": "/api/posts/6ae0d9a8a99fcaa5cf7936f7",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }
@@ -17,5 +17,5 @@
       "status": "ok"
     }
   },
-  "durationMs": 17
+  "durationMs": 27
 }

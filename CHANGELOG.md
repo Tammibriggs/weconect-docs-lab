@@ -2,6 +2,16 @@
 
 Changes to the weConect API, newest first. Versions follow [semantic versioning](https://semver.org/): a minor version adds features without breaking existing clients, and a major version can break them. Each change links to its evidence in [`TESTING.md`](TESTING.md).
 
+## 1.1.1: 2026-10-27
+
+### Fixed
+
+- **A value that isn't an API key returns `401`, not `500`.** A key without its `wck_` prefix, a key without `Bearer` in front, or anything else that's neither an API key nor an access token now returns `401` with `"Invalid API key"`, like any other wrong key. Before, it returned `500` with an HTML error page that included a stack trace (finding 7). The internal endpoints return `403` with `"Token is invalid"` for it, as for any other bad token.
+
+### Documentation
+
+- **Get the current user** and **Get a user** no longer show `updatedAt` in their response schema, because they never return it (finding 16). **Search users** returns it, so its results now use a new `UserWithUpdatedAt` schema, where `updatedAt` is required. These endpoints behave as before.
+
 ## 1.1.0: 2026-10-26
 
 ### Added

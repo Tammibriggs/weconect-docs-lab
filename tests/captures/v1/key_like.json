@@ -3,7 +3,7 @@
   "group": "Like a post",
   "request": {
     "method": "PUT",
-    "path": "/api/posts/6adf12ed08ef70e347ff2500/like",
+    "path": "/api/posts/6ae0d9a8a99fcaa5cf7936f7/like",
     "headers": {
       "Authorization": "Bearer <redacted API key>",
       "Content-Type": "application/json"
@@ -19,5 +19,5 @@
       "status": "ok"
     }
   },
-  "durationMs": 17
+  "durationMs": 9
 }

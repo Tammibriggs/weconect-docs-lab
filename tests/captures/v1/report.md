@@ -1,6 +1,6 @@
-# Capture run 2026-10-26T08-44-00
+# Capture run 2026-10-27T17-04-10
 
-132 cases, 132 as expected, 0 different, 1 server restart(s).
+135 cases, 135 as expected, 0 different, 1 server restart(s).
 
 | Case | Group | Expected | Got | Note |
 |---|---|---|---|---|
@@ -26,11 +26,12 @@
 | login_empty_body | Log in | 404 | 404 |  |
 | me | Current user | 200 | 200 |  |
 | auth_missing | Authentication | 401 | 401 |  |
-| auth_malformed_token | Authentication | 500 | 500 | jwt.decode() returns null for a non-JWT |
+| auth_malformed_token | Authentication | 401 | 401 | Neither a key nor a token; 500 before 1.1.1 (finding 7) |
 | auth_bad_signature | Authentication | 403 | 403 | A JWT signed with a different secret |
 | auth_expired | Authentication | 403 | 403 | A JWT signed with the right secret whose exp has passed |
 | auth_other_scheme | Authentication | 200 | 200 | The scheme word isn't checked |
-| auth_no_scheme | Authentication | 500 | 500 | A token with no scheme word in front |
+| auth_no_scheme | Authentication | 401 | 401 | A token with no scheme word in front; 500 before 1.1.1 |
+| auth_malformed_token_internal | Authentication | 403 | 403 | An internal endpoint: treated as a bad token; 500 before 1.1.1 |
 | user_get | Get a user | 200 | 200 |  |
 | user_get_unknown | Get a user | 404 | 404 |  |
 | user_get_invalid_id | Get a user | 500 | 500 |  |
@@ -107,6 +108,8 @@
 | key_unfollow | Unfollow | 200 | 200 |  |
 | key_on_internal_endpoint | API keys | 403 | 403 | Keys work only on the 10 public endpoints |
 | key_invalid | API keys | 401 | 401 |  |
+| key_without_prefix | API keys | 401 | 401 | Found in Postman: 500 before 1.1.1 |
+| key_without_bearer | API keys | 401 | 401 | A real key, but no "Bearer " in front |
 | keys_delete_other_user | Delete an API key | 404 | 404 | bob can't delete alice's key |
 | keys_delete_unknown | Delete an API key | 404 | 404 |  |
 | keys_delete_invalid_id | Delete an API key | 404 | 404 |  |

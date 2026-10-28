@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6adf12d208ef70e347ff2489",
+      "userId": "6ae0d98ca99fcaa5cf793680",
       "img": {
         "url": "https://example.com/photo.jpg"
       }

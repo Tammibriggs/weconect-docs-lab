@@ -22,12 +22,12 @@
         "followers": [],
         "followings": [],
         "isAdmin": false,
-        "_id": "6adf12d208ef70e347ff2489",
+        "_id": "6ae0d98ca99fcaa5cf793680",
         "username": "alice",
-        "createdAt": "2026-10-26T08:44:02.569Z",
+        "createdAt": "2026-10-27T17:04:12.409Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 12
+  "durationMs": 16
 }

@@ -21,44 +21,44 @@
           "followers": [],
           "followings": [],
           "isAdmin": false,
-          "_id": "6adf12d208ef70e347ff2489",
+          "_id": "6ae0d98ca99fcaa5cf793680",
           "username": "alice",
-          "createdAt": "2026-10-26T08:44:02.569Z",
-          "updatedAt": "2026-10-26T08:44:02.569Z",
+          "createdAt": "2026-10-27T17:04:12.409Z",
+          "updatedAt": "2026-10-27T17:04:12.409Z",
           "__v": 0
         },
         {
           "followers": [],
           "followings": [],
           "isAdmin": false,
-          "_id": "6adf12d208ef70e347ff248b",
+          "_id": "6ae0d98ca99fcaa5cf793682",
           "username": "bob",
-          "createdAt": "2026-10-26T08:44:02.890Z",
-          "updatedAt": "2026-10-26T08:44:02.890Z",
+          "createdAt": "2026-10-27T17:04:12.732Z",
+          "updatedAt": "2026-10-27T17:04:12.732Z",
           "__v": 0
         },
         {
           "followers": [],
           "followings": [],
           "isAdmin": false,
-          "_id": "6adf12d308ef70e347ff248d",
+          "_id": "6ae0d98da99fcaa5cf793684",
           "username": "carol",
-          "createdAt": "2026-10-26T08:44:03.215Z",
-          "updatedAt": "2026-10-26T08:44:03.215Z",
+          "createdAt": "2026-10-27T17:04:13.044Z",
+          "updatedAt": "2026-10-27T17:04:13.044Z",
           "__v": 0
         },
         {
           "followers": [],
           "followings": [],
           "isAdmin": false,
-          "_id": "6adf12d508ef70e347ff2491",
+          "_id": "6ae0d98fa99fcaa5cf793688",
           "username": "dave",
-          "createdAt": "2026-10-26T08:44:05.733Z",
-          "updatedAt": "2026-10-26T08:44:05.733Z",
+          "createdAt": "2026-10-27T17:04:15.545Z",
+          "updatedAt": "2026-10-27T17:04:15.545Z",
           "__v": 0
         }
       ]
     }
   },
-  "durationMs": 13
+  "durationMs": 18
 }

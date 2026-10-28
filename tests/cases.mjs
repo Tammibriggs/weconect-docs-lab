@@ -76,7 +76,7 @@ export const cases = [
   { name: "me", group: "Current user", method: "GET", path: "/api/users", auth: "alice", expect: 200 },
   { name: "auth_missing", group: "Authentication", method: "GET", path: "/api/users", expect: 401 },
   { name: "auth_malformed_token", group: "Authentication", method: "GET", path: "/api/users",
-    auth: { raw: "Bearer not-a-jwt" }, expect: 500, note: "jwt.decode() returns null for a non-JWT" },
+    auth: { raw: "Bearer not-a-jwt" }, expect: 401, note: "Neither a key nor a token; 500 before 1.1.1 (finding 7)" },
   { name: "auth_bad_signature", group: "Authentication", method: "GET", path: "/api/users",
     auth: "badsig", expect: 403, note: "A JWT signed with a different secret" },
   { name: "auth_expired", group: "Authentication", method: "GET", path: "/api/users",
@@ -84,7 +84,9 @@ export const cases = [
   { name: "auth_other_scheme", group: "Authentication", method: "GET", path: "/api/users",
     auth: { raw: "Token {aliceToken}" }, expect: 200, note: "The scheme word isn't checked" },
   { name: "auth_no_scheme", group: "Authentication", method: "GET", path: "/api/users",
-    auth: { raw: "{aliceToken}" }, expect: 500, note: "A token with no scheme word in front" },
+    auth: { raw: "{aliceToken}" }, expect: 401, note: "A token with no scheme word in front; 500 before 1.1.1" },
+  { name: "auth_malformed_token_internal", group: "Authentication", method: "GET", path: "/api/users/followers",
+    auth: { raw: "Bearer not-a-jwt" }, expect: 403, note: "An internal endpoint: treated as a bad token; 500 before 1.1.1" },
 
   // ─── Users ──────────────────────────────────────────────────────
   { name: "user_get", group: "Get a user", method: "GET", path: "/api/users/{bobId}/user", auth: "alice", expect: 200 },
@@ -239,6 +241,10 @@ export const cases = [
     auth: { raw: "Bearer {aliceKey}" }, expect: 403, note: "Keys work only on the 10 public endpoints" },
   { name: "key_invalid", group: "API keys", method: "GET", path: "/api/users",
     auth: { raw: "Bearer wck_thisIsNotARealKey000" }, expect: 401 },
+  { name: "key_without_prefix", group: "API keys", method: "GET", path: "/api/users",
+    auth: { raw: "Bearer 2434143" }, expect: 401, note: "Found in Postman: 500 before 1.1.1" },
+  { name: "key_without_bearer", group: "API keys", method: "GET", path: "/api/users",
+    auth: { raw: "{aliceKey}" }, expect: 401, note: "A real key, but no \"Bearer \" in front" },
 
   { name: "keys_delete_other_user", group: "Delete an API key", method: "DELETE", path: "/api/keys/{aliceReadKeyId}", auth: "bob",
     expect: 404, note: "bob can't delete alice's key" },

@@ -1,7 +1,7 @@
 {
   "name": "auth_no_scheme",
   "group": "Authentication",
-  "note": "A token with no scheme word in front",
+  "note": "A token with no scheme word in front; 500 before 1.1.1",
   "request": {
     "method": "GET",
     "path": "/api/users",
@@ -10,11 +10,14 @@
     }
   },
   "response": {
-    "status": 500,
+    "status": 401,
     "headers": {
-      "content-type": "text/html; charset=utf-8"
+      "content-type": "application/json; charset=utf-8"
     },
-    "body": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>TypeError: Cannot read properties of null (reading &#39;exp&#39;)<br> &nbsp; &nbsp;at verifyToken (<repo>/api/routes/verifyToken.js:24:34)<br> &nbsp; &nbsp;at <repo>/api/routes/verifyToken.js:44:12<br> &nbsp; &nbsp;at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)<br> &nbsp; &nbsp;at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/route.js:144:13)<br> &nbsp; &nbsp;at Route.dispatch (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/route.js:114:3)<br> &nbsp; &nbsp;at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)<br> &nbsp; &nbsp;at <home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:284:15<br> &nbsp; &nbsp;at router.process_params (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:346:12)<br> &nbsp; &nbsp;at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:280:10)<br> &nbsp; &nbsp;at router.handle (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:175:3)<br> &nbsp; &nbsp;at router (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:47:12)<br> &nbsp; &nbsp;at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)<br> &nbsp; &nbsp;at trim_prefix (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:328:13)<br> &nbsp; &nbsp;at <home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:286:9<br> &nbsp; &nbsp;at router.process_params (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:346:12)<br> &nbsp; &nbsp;at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:280:10)</pre>\n</body>\n</html>\n"
+    "body": {
+      "status": "error",
+      "message": "Invalid API key"
+    }
   },
   "durationMs": 8
 }

@@ -26,14 +26,14 @@
         "followers": [],
         "followings": [],
         "isAdmin": false,
-        "_id": "6adf12d508ef70e347ff2491",
+        "_id": "6ae0d98fa99fcaa5cf793688",
         "username": "dave",
-        "createdAt": "2026-10-26T08:44:05.733Z",
-        "updatedAt": "2026-10-26T08:44:05.733Z",
+        "createdAt": "2026-10-27T17:04:15.545Z",
+        "updatedAt": "2026-10-27T17:04:15.545Z",
         "__v": 0,
         "accessToken": "<redacted JWT>"
       }
     }
   },
-  "durationMs": 13
+  "durationMs": 9
 }

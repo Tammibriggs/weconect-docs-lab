@@ -1,188 +1,157 @@
 Backend server is running!
 Connected to MongoDB
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:01 +0000] "GET /api/nope HTTP/1.1" 404 147
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:01 +0000] "GET /api/nope HTTP/1.1" 404 147
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:02 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:02 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:03 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:03 +0000] "POST /api/auth/register HTTP/1.1" 409 181
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:03 +0000] "POST /api/auth/register HTTP/1.1" 401 47
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:04 +0000] "POST /api/auth/register HTTP/1.1" 401 47
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:04 +0000] "POST /api/auth/register HTTP/1.1" 401 54
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:04 +0000] "POST /api/auth/register HTTP/1.1" 401 82
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:05 +0000] "POST /api/auth/register HTTP/1.1" 401 54
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:11 +0000] "GET /api/nope HTTP/1.1" 404 147
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:11 +0000] "GET /api/nope HTTP/1.1" 404 147
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:12 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:12 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:13 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:13 +0000] "POST /api/auth/register HTTP/1.1" 409 181
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:13 +0000] "POST /api/auth/register HTTP/1.1" 401 47
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:13 +0000] "POST /api/auth/register HTTP/1.1" 401 47
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:14 +0000] "POST /api/auth/register HTTP/1.1" 401 54
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:14 +0000] "POST /api/auth/register HTTP/1.1" 401 82
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:14 +0000] "POST /api/auth/register HTTP/1.1" 401 54
 SyntaxError: Expected double-quoted property name in JSON at position 20 (line 1 column 21)
     at JSON.parse (<anonymous>)
-    at parse (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/body-parser/lib/types/json.js:89:19)
-    at <home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/body-parser/lib/read.js:128:18
+    at parse (<repo>/api/node_modules/body-parser/lib/types/json.js:89:19)
+    at <repo>/api/node_modules/body-parser/lib/read.js:128:18
     at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
-    at invokeCallback (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/raw-body/index.js:231:16)
-    at done (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/raw-body/index.js:220:7)
-    at IncomingMessage.onEnd (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/raw-body/index.js:280:7)
+    at invokeCallback (<repo>/api/node_modules/raw-body/index.js:231:16)
+    at done (<repo>/api/node_modules/raw-body/index.js:220:7)
+    at IncomingMessage.onEnd (<repo>/api/node_modules/raw-body/index.js:280:7)
     at IncomingMessage.emit (node:events:514:28)
     at endReadableNT (node:internal/streams/readable:1757:12)
     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:05 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:06 +0000] "POST /api/auth/login HTTP/1.1" 200 435
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:06 +0000] "POST /api/auth/login HTTP/1.1" 200 433
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:06 +0000] "POST /api/auth/login HTTP/1.1" 200 435
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:07 +0000] "POST /api/auth/login HTTP/1.1" 200 434
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:07 +0000] "POST /api/auth/login HTTP/1.1" 404 56
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:07 +0000] "POST /api/auth/login HTTP/1.1" 400 56
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:07 +0000] "POST /api/auth/login HTTP/1.1" 404 56
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:08 +0000] "GET /api/users HTTP/1.1" 200 208
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:08 +0000] "GET /api/users HTTP/1.1" 401 57
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:08 +0000] "GET /api/users HTTP/1.1" 500 2456
-TypeError: Cannot read properties of null (reading 'exp')
-    at verifyToken (<repo>/api/routes/verifyToken.js:24:34)
-    at <repo>/api/routes/verifyToken.js:44:12
-    at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)
-    at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/route.js:144:13)
-    at Route.dispatch (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/route.js:114:3)
-    at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)
-    at <home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:284:15
-    at router.process_params (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:346:12)
-    at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:280:10)
-    at router.handle (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:175:3)
-    at router (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:47:12)
-    at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)
-    at trim_prefix (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:328:13)
-    at <home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:286:9
-    at router.process_params (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:346:12)
-    at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:280:10)
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:09 +0000] "GET /api/users HTTP/1.1" 403 47
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:09 +0000] "GET /api/users HTTP/1.1" 403 70
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:09 +0000] "GET /api/users HTTP/1.1" 200 208
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:10 +0000] "GET /api/users HTTP/1.1" 500 2456
-TypeError: Cannot read properties of null (reading 'exp')
-    at verifyToken (<repo>/api/routes/verifyToken.js:24:34)
-    at <repo>/api/routes/verifyToken.js:44:12
-    at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)
-    at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/route.js:144:13)
-    at Route.dispatch (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/route.js:114:3)
-    at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)
-    at <home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:284:15
-    at router.process_params (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:346:12)
-    at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:280:10)
-    at router.handle (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:175:3)
-    at router (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:47:12)
-    at Layer.handle [as handle_request] (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/layer.js:95:5)
-    at trim_prefix (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:328:13)
-    at <home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:286:9
-    at router.process_params (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:346:12)
-    at next (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/router/index.js:280:10)
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:10 +0000] "GET /api/users/6adf12d208ef70e347ff248b/user HTTP/1.1" 200 206
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:10 +0000] "GET /api/users/000000000000000000000000/user HTTP/1.1" 404 45
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:11 +0000] "GET /api/users/abc/user HTTP/1.1" 500 252
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:11 +0000] "GET /api/users/search HTTP/1.1" 200 769
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:11 +0000] "GET /api/users/search?search=ali HTTP/1.1" 200 211
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:11 +0000] "GET /api/users/search?search=BOB HTTP/1.1" 200 209
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:12 +0000] "GET /api/users/search?search=zzz HTTP/1.1" 200 25
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:12 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:12 +0000] "PUT /api/users/follow HTTP/1.1" 403 59
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:13 +0000] "PUT /api/users/follow HTTP/1.1" 400 55
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:13 +0000] "PUT /api/users/follow HTTP/1.1" 500 29
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:13 +0000] "PUT /api/users/follow HTTP/1.1" 500 252
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:14 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:14 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:14 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:15 +0000] "GET /api/users/followers HTTP/1.1" 200 185
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:15 +0000] "GET /api/users/following HTTP/1.1" 200 86
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:15 +0000] "POST /api/posts HTTP/1.1" 200 230
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:16 +0000] "POST /api/posts HTTP/1.1" 200 290
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:16 +0000] "POST /api/posts HTTP/1.1" 200 228
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:16 +0000] "POST /api/posts HTTP/1.1" 403 50
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:17 +0000] "POST /api/posts HTTP/1.1" 403 64
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:17 +0000] "POST /api/posts HTTP/1.1" 403 102
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:17 +0000] "POST /api/posts HTTP/1.1" 200 814
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:18 +0000] "POST /api/posts HTTP/1.1" 200 253
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:18 +0000] "GET /api/posts/6adf12df08ef70e347ff24bb/single HTTP/1.1" 200 230
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:18 +0000] "GET /api/posts/000000000000000000000000/single HTTP/1.1" 200 27
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:19 +0000] "GET /api/posts/abc/single HTTP/1.1" 500 252
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:19 +0000] "GET /api/posts/6adf12d208ef70e347ff248b HTTP/1.1" 200 230
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:19 +0000] "GET /api/posts/nobody HTTP/1.1" 200 25
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:19 +0000] "GET /api/posts/timeline/all HTTP/1.1" 200 1729
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:20 +0000] "GET /api/posts/timeline/all HTTP/1.1" 200 1523
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:20 +0000] "PUT /api/posts/6adf12df08ef70e347ff24bb/like HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:20 +0000] "PUT /api/posts/6adf12df08ef70e347ff24bb/like HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:21 +0000] "PUT /api/posts/6adf12e008ef70e347ff24bf/like HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:21 +0000] "PUT /api/posts/000000000000000000000000/like HTTP/1.1" 500 29
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:21 +0000] "GET /api/posts/6adf12df08ef70e347ff24bb/single HTTP/1.1" 200 283
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:22 +0000] "GET /api/posts/6adf12e008ef70e347ff24bf/single HTTP/1.1" 200 254
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:22 +0000] "PUT /api/users/unfollow HTTP/1.1" 200 26
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:22 +0000] "PUT /api/users/unfollow HTTP/1.1" 403 28
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:23 +0000] "PUT /api/users/unfollow HTTP/1.1" 400 55
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:23 +0000] "DELETE /api/posts/6adf12df08ef70e347ff24bb HTTP/1.1" 403 60
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:23 +0000] "DELETE /api/posts/6adf12e008ef70e347ff24bd HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:24 +0000] "DELETE /api/posts/6adf12e008ef70e347ff24bd HTTP/1.1" 500 2
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:24 +0000] "DELETE /api/posts/abc HTTP/1.1" 500 225
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:24 +0000] "POST /api/keys HTTP/1.1" 201 218
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:24 +0000] "POST /api/keys HTTP/1.1" 201 213
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:25 +0000] "POST /api/keys HTTP/1.1" 201 224
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:25 +0000] "POST /api/keys HTTP/1.1" 201 211
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:25 +0000] "POST /api/keys HTTP/1.1" 400 74
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:26 +0000] "POST /api/keys HTTP/1.1" 400 74
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:26 +0000] "POST /api/keys HTTP/1.1" 400 83
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:26 +0000] "POST /api/keys HTTP/1.1" 400 83
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:27 +0000] "POST /api/keys HTTP/1.1" 401 57
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:27 +0000] "POST /api/keys HTTP/1.1" 403 110
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:27 +0000] "GET /api/keys HTTP/1.1" 200 465
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:28 +0000] "GET /api/users HTTP/1.1" 200 261
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:28 +0000] "GET /api/users HTTP/1.1" 200 261
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:28 +0000] "GET /api/users/6adf12d208ef70e347ff248b/user HTTP/1.1" 200 232
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:29 +0000] "GET /api/users/search?search=bob HTTP/1.1" 200 235
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:29 +0000] "GET /api/posts/6adf12d208ef70e347ff248b HTTP/1.1" 200 256
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:29 +0000] "GET /api/posts/timeline/all HTTP/1.1" 200 1308
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:30 +0000] "POST /api/posts HTTP/1.1" 200 236
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:30 +0000] "POST /api/posts HTTP/1.1" 403 74
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:30 +0000] "POST /api/posts HTTP/1.1" 403 64
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:30 +0000] "GET /api/users/search?search=bob HTTP/1.1" 403 73
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:31 +0000] "PUT /api/posts/6adf12ed08ef70e347ff2500/like HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:31 +0000] "PUT /api/posts/6adf12ed08ef70e347ff2500/like HTTP/1.1" 403 74
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:31 +0000] "DELETE /api/posts/6adf12ed08ef70e347ff2500 HTTP/1.1" 403 74
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:32 +0000] "DELETE /api/posts/6adf12df08ef70e347ff24bb HTTP/1.1" 403 60
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:32 +0000] "DELETE /api/posts/6adf12ed08ef70e347ff2500 HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:32 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:33 +0000] "PUT /api/users/follow HTTP/1.1" 403 74
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:33 +0000] "PUT /api/users/unfollow HTTP/1.1" 200 26
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:33 +0000] "GET /api/users/followers HTTP/1.1" 403 110
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:34 +0000] "GET /api/users HTTP/1.1" 401 46
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:34 +0000] "DELETE /api/keys/6adf12e808ef70e347ff24e5 HTTP/1.1" 404 48
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:34 +0000] "DELETE /api/keys/000000000000000000000000 HTTP/1.1" 404 48
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:35 +0000] "DELETE /api/keys/abc HTTP/1.1" 404 48
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:35 +0000] "DELETE /api/keys/6adf12e808ef70e347ff24e5 HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:35 +0000] "GET /api/users HTTP/1.1" 401 46
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:35 +0000] "GET /api/keys HTTP/1.1" 200 341
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:36 +0000] "GET /api/keys HTTP/1.1" 200 203
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:36 +0000] "GET /api/users/search?search=a.i HTTP/1.1" 200 25
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:36 +0000] "GET /api/users/search?search=( HTTP/1.1" 200 25
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:37 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:37 +0000] "POST /api/auth/login HTTP/1.1" 200 434
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:37 +0000] "POST /api/posts HTTP/1.1" 200 242
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:38 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:38 +0000] "POST /api/auth/login HTTP/1.1" 200 434
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:38 +0000] "POST /api/auth/register HTTP/1.1" 401 47
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:39 +0000] "POST /api/auth/register HTTP/1.1" 401 47
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:39 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:39 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:39 +0000] "POST /api/posts HTTP/1.1" 200 214
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:40 +0000] "POST /api/auth/register HTTP/1.1" 200 15
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:40 +0000] "POST /api/auth/login HTTP/1.1" 404 56
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:40 +0000] "POST /api/auth/register HTTP/1.1" 401 47
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:41 +0000] "DELETE /api/auth/login HTTP/1.1" 404 156
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:41 +0000] "GET /api/users/followers HTTP/1.1" 200 25
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:41 +0000] "GET /api/users/following HTTP/1.1" 200 25
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:42 +0000] "GET /api/posts/timeline/all HTTP/1.1" 200 25
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:42 +0000] "PUT /api/posts/6adf12df08ef70e347ff24bb/like HTTP/1.1" 500 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:15 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:15 +0000] "POST /api/auth/login HTTP/1.1" 200 435
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:16 +0000] "POST /api/auth/login HTTP/1.1" 200 433
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:16 +0000] "POST /api/auth/login HTTP/1.1" 200 435
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:16 +0000] "POST /api/auth/login HTTP/1.1" 200 434
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:17 +0000] "POST /api/auth/login HTTP/1.1" 404 56
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:17 +0000] "POST /api/auth/login HTTP/1.1" 400 56
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:17 +0000] "POST /api/auth/login HTTP/1.1" 404 56
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:18 +0000] "GET /api/users HTTP/1.1" 200 208
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:18 +0000] "GET /api/users HTTP/1.1" 401 57
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:18 +0000] "GET /api/users HTTP/1.1" 401 46
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:19 +0000] "GET /api/users HTTP/1.1" 403 47
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:19 +0000] "GET /api/users HTTP/1.1" 403 70
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:19 +0000] "GET /api/users HTTP/1.1" 200 208
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:20 +0000] "GET /api/users HTTP/1.1" 401 46
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:20 +0000] "GET /api/users/followers HTTP/1.1" 403 47
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:20 +0000] "GET /api/users/6ae0d98ca99fcaa5cf793682/user HTTP/1.1" 200 206
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:20 +0000] "GET /api/users/000000000000000000000000/user HTTP/1.1" 404 45
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:21 +0000] "GET /api/users/abc/user HTTP/1.1" 500 252
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:21 +0000] "GET /api/users/search HTTP/1.1" 200 769
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:21 +0000] "GET /api/users/search?search=ali HTTP/1.1" 200 211
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:22 +0000] "GET /api/users/search?search=BOB HTTP/1.1" 200 209
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:22 +0000] "GET /api/users/search?search=zzz HTTP/1.1" 200 25
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:22 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:23 +0000] "PUT /api/users/follow HTTP/1.1" 403 59
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:23 +0000] "PUT /api/users/follow HTTP/1.1" 400 55
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:23 +0000] "PUT /api/users/follow HTTP/1.1" 500 29
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:24 +0000] "PUT /api/users/follow HTTP/1.1" 500 252
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:24 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:24 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:25 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:25 +0000] "GET /api/users/followers HTTP/1.1" 200 185
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:25 +0000] "GET /api/users/following HTTP/1.1" 200 86
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:26 +0000] "POST /api/posts HTTP/1.1" 200 230
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:26 +0000] "POST /api/posts HTTP/1.1" 200 290
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:26 +0000] "POST /api/posts HTTP/1.1" 200 228
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:27 +0000] "POST /api/posts HTTP/1.1" 403 50
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:27 +0000] "POST /api/posts HTTP/1.1" 403 64
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:27 +0000] "POST /api/posts HTTP/1.1" 403 102
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:27 +0000] "POST /api/posts HTTP/1.1" 200 814
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:28 +0000] "POST /api/posts HTTP/1.1" 200 253
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:28 +0000] "GET /api/posts/6ae0d99aa99fcaa5cf7936b2/single HTTP/1.1" 200 230
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:28 +0000] "GET /api/posts/000000000000000000000000/single HTTP/1.1" 200 27
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:29 +0000] "GET /api/posts/abc/single HTTP/1.1" 500 252
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:29 +0000] "GET /api/posts/6ae0d98ca99fcaa5cf793682 HTTP/1.1" 200 230
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:29 +0000] "GET /api/posts/nobody HTTP/1.1" 200 25
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:30 +0000] "GET /api/posts/timeline/all HTTP/1.1" 200 1729
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:30 +0000] "GET /api/posts/timeline/all HTTP/1.1" 200 1523
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:30 +0000] "PUT /api/posts/6ae0d99aa99fcaa5cf7936b2/like HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:31 +0000] "PUT /api/posts/6ae0d99aa99fcaa5cf7936b2/like HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:31 +0000] "PUT /api/posts/6ae0d99aa99fcaa5cf7936b6/like HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:31 +0000] "PUT /api/posts/000000000000000000000000/like HTTP/1.1" 500 29
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:32 +0000] "GET /api/posts/6ae0d99aa99fcaa5cf7936b2/single HTTP/1.1" 200 283
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:32 +0000] "GET /api/posts/6ae0d99aa99fcaa5cf7936b6/single HTTP/1.1" 200 254
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:32 +0000] "PUT /api/users/unfollow HTTP/1.1" 200 26
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:32 +0000] "PUT /api/users/unfollow HTTP/1.1" 403 28
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:33 +0000] "PUT /api/users/unfollow HTTP/1.1" 400 55
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:33 +0000] "DELETE /api/posts/6ae0d99aa99fcaa5cf7936b2 HTTP/1.1" 403 60
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:33 +0000] "DELETE /api/posts/6ae0d99aa99fcaa5cf7936b4 HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:34 +0000] "DELETE /api/posts/6ae0d99aa99fcaa5cf7936b4 HTTP/1.1" 500 2
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:34 +0000] "DELETE /api/posts/abc HTTP/1.1" 500 225
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:34 +0000] "POST /api/keys HTTP/1.1" 201 218
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:35 +0000] "POST /api/keys HTTP/1.1" 201 213
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:35 +0000] "POST /api/keys HTTP/1.1" 201 224
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:35 +0000] "POST /api/keys HTTP/1.1" 201 211
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:36 +0000] "POST /api/keys HTTP/1.1" 400 74
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:36 +0000] "POST /api/keys HTTP/1.1" 400 74
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:36 +0000] "POST /api/keys HTTP/1.1" 400 83
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:37 +0000] "POST /api/keys HTTP/1.1" 400 83
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:37 +0000] "POST /api/keys HTTP/1.1" 401 57
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:37 +0000] "POST /api/keys HTTP/1.1" 403 110
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:37 +0000] "GET /api/keys HTTP/1.1" 200 465
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:38 +0000] "GET /api/users HTTP/1.1" 200 261
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:38 +0000] "GET /api/users HTTP/1.1" 200 261
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:38 +0000] "GET /api/users/6ae0d98ca99fcaa5cf793682/user HTTP/1.1" 200 232
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:39 +0000] "GET /api/users/search?search=bob HTTP/1.1" 200 235
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:39 +0000] "GET /api/posts/6ae0d98ca99fcaa5cf793682 HTTP/1.1" 200 256
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:39 +0000] "GET /api/posts/timeline/all HTTP/1.1" 200 1308
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:40 +0000] "POST /api/posts HTTP/1.1" 200 236
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:40 +0000] "POST /api/posts HTTP/1.1" 403 74
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:40 +0000] "POST /api/posts HTTP/1.1" 403 64
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:41 +0000] "GET /api/users/search?search=bob HTTP/1.1" 403 73
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:41 +0000] "PUT /api/posts/6ae0d9a8a99fcaa5cf7936f7/like HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:41 +0000] "PUT /api/posts/6ae0d9a8a99fcaa5cf7936f7/like HTTP/1.1" 403 74
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:42 +0000] "DELETE /api/posts/6ae0d9a8a99fcaa5cf7936f7 HTTP/1.1" 403 74
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:42 +0000] "DELETE /api/posts/6ae0d99aa99fcaa5cf7936b2 HTTP/1.1" 403 60
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:42 +0000] "DELETE /api/posts/6ae0d9a8a99fcaa5cf7936f7 HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:43 +0000] "PUT /api/users/follow HTTP/1.1" 200 50
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:43 +0000] "PUT /api/users/follow HTTP/1.1" 403 74
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:43 +0000] "PUT /api/users/unfollow HTTP/1.1" 200 26
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:43 +0000] "GET /api/users/followers HTTP/1.1" 403 110
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:44 +0000] "GET /api/users HTTP/1.1" 401 46
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:44 +0000] "GET /api/users HTTP/1.1" 401 46
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:44 +0000] "GET /api/users HTTP/1.1" 401 46
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:45 +0000] "DELETE /api/keys/6ae0d9a3a99fcaa5cf7936dc HTTP/1.1" 404 48
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:45 +0000] "DELETE /api/keys/000000000000000000000000 HTTP/1.1" 404 48
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:45 +0000] "DELETE /api/keys/abc HTTP/1.1" 404 48
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:46 +0000] "DELETE /api/keys/6ae0d9a3a99fcaa5cf7936dc HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:46 +0000] "GET /api/users HTTP/1.1" 401 46
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:46 +0000] "GET /api/keys HTTP/1.1" 200 341
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:47 +0000] "GET /api/keys HTTP/1.1" 200 203
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:47 +0000] "GET /api/users/search?search=a.i HTTP/1.1" 200 25
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:47 +0000] "GET /api/users/search?search=( HTTP/1.1" 200 25
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:47 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:48 +0000] "POST /api/auth/login HTTP/1.1" 200 434
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:48 +0000] "POST /api/posts HTTP/1.1" 200 242
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:48 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:49 +0000] "POST /api/auth/login HTTP/1.1" 200 434
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:49 +0000] "POST /api/auth/register HTTP/1.1" 401 47
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:49 +0000] "POST /api/auth/register HTTP/1.1" 401 47
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:50 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:50 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:50 +0000] "POST /api/posts HTTP/1.1" 200 214
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:51 +0000] "POST /api/auth/register HTTP/1.1" 200 15
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:51 +0000] "POST /api/auth/login HTTP/1.1" 404 56
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:51 +0000] "POST /api/auth/register HTTP/1.1" 401 47
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:52 +0000] "DELETE /api/auth/login HTTP/1.1" 404 156
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:52 +0000] "GET /api/users/followers HTTP/1.1" 200 25
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:52 +0000] "GET /api/users/following HTTP/1.1" 200 25
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:52 +0000] "GET /api/posts/timeline/all HTTP/1.1" 200 25
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:53 +0000] "PUT /api/posts/6ae0d99aa99fcaa5cf7936b2/like HTTP/1.1" 500 15
 node:_http_outgoing:684
     throw new ERR_HTTP_HEADERS_SENT('set');
           ^
 
 Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
     at ServerResponse.setHeader (node:_http_outgoing:684:11)
-    at ServerResponse.header (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:794:10)
-    at ServerResponse.send (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:174:12)
-    at ServerResponse.json (<home>/Desktop/Code/OpenAPI/we-conect/api/node_modules/express/lib/response.js:278:15)
+    at ServerResponse.header (<repo>/api/node_modules/express/lib/response.js:794:10)
+    at ServerResponse.send (<repo>/api/node_modules/express/lib/response.js:174:12)
+    at ServerResponse.json (<repo>/api/node_modules/express/lib/response.js:278:15)
     at <repo>/api/routes/posts.js:72:21
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
   code: 'ERR_HTTP_HEADERS_SENT'
@@ -191,5 +160,5 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
 Node.js v24.20.0
 Backend server is running!
 Connected to MongoDB
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:43 +0000] "GET /api/nope HTTP/1.1" 404 147
-::ffff:127.0.0.1 - - [26/Oct/2026:08:44:43 +0000] "GET /api/posts/6adf12df08ef70e347ff24bb/single HTTP/1.1" 200 256
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:54 +0000] "GET /api/nope HTTP/1.1" 404 147
+::ffff:127.0.0.1 - - [27/Oct/2026:17:04:54 +0000] "GET /api/posts/6ae0d99aa99fcaa5cf7936b2/single HTTP/1.1" 200 256

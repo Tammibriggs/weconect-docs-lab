@@ -4,7 +4,7 @@
   "note": "After a restart, if one was needed: was the like removed?",
   "request": {
     "method": "GET",
-    "path": "/api/posts/6adf12df08ef70e347ff24bb/single",
+    "path": "/api/posts/6ae0d99aa99fcaa5cf7936b2/single",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -18,17 +18,17 @@
       "status": "ok",
       "data": {
         "likes": [
-          "6adf12d208ef70e347ff2489"
+          "6ae0d98ca99fcaa5cf793680"
         ],
         "comments": [],
-        "_id": "6adf12df08ef70e347ff24bb",
-        "userId": "6adf12d208ef70e347ff2489",
+        "_id": "6ae0d99aa99fcaa5cf7936b2",
+        "userId": "6ae0d98ca99fcaa5cf793680",
         "desc": "Hello from Alice",
-        "createdAt": "2026-10-26T08:44:15.875Z",
-        "updatedAt": "2026-10-26T08:44:42.461Z",
+        "createdAt": "2026-10-27T17:04:26.083Z",
+        "updatedAt": "2026-10-27T17:04:53.292Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 26
+  "durationMs": 71
 }
