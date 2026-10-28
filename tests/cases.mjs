@@ -258,6 +258,41 @@ export const cases = [
   { name: "keys_list_bob", group: "List API keys", method: "GET", path: "/api/keys", auth: "bob", expect: 200,
     note: "Each user sees only their own keys" },
 
+  // ─── Response coverage, added 2026-10-28 ─────────────────────────
+  // One case for each documented response no other case produced, so that
+  // npm run test:coverage finds every documented status in a capture.
+  // Each is rejected before it changes anything.
+
+  // No Authorization header
+  { name: "user_get_no_auth", group: "Get a user", method: "GET", path: "/api/users/{bobId}/user", expect: 401 },
+  { name: "search_no_auth", group: "Search users", method: "GET", path: "/api/users/search?search=bob", expect: 401 },
+  { name: "follow_no_auth", group: "Follow", method: "PUT", path: "/api/users/follow", body: { userId: "{bobId}" }, expect: 401 },
+  { name: "unfollow_no_auth", group: "Unfollow", method: "PUT", path: "/api/users/unfollow", body: { userId: "{bobId}" }, expect: 401 },
+  { name: "post_create_no_auth", group: "Create a post", method: "POST", path: "/api/posts",
+    body: { userId: "{aliceId}", desc: "No key" }, expect: 401 },
+  { name: "posts_by_user_no_auth", group: "List a user's posts", method: "GET", path: "/api/posts/{bobId}", expect: 401 },
+  { name: "post_delete_no_auth", group: "Delete a post", method: "DELETE", path: "/api/posts/{postA}", expect: 401 },
+  { name: "timeline_no_auth", group: "Timeline", method: "GET", path: "/api/posts/timeline/all", expect: 401 },
+  { name: "like_no_auth", group: "Like a post", method: "PUT", path: "/api/posts/{postB}/like", body: {}, expect: 401 },
+  { name: "keys_list_no_auth", group: "List API keys", method: "GET", path: "/api/keys", expect: 401 },
+  { name: "keys_delete_no_auth", group: "Delete an API key", method: "DELETE", path: "/api/keys/{aliceKeyId}", expect: 401 },
+
+  // A write-only key on the read endpoints: 403, naming the 'read' scope
+  { name: "key_write_only_me", group: "Current user", method: "GET", path: "/api/users",
+    auth: { raw: "Bearer {aliceWriteKey}" }, expect: 403 },
+  { name: "key_write_only_get_user", group: "Get a user", method: "GET", path: "/api/users/{bobId}/user",
+    auth: { raw: "Bearer {aliceWriteKey}" }, expect: 403 },
+  { name: "key_write_only_user_posts", group: "List a user's posts", method: "GET", path: "/api/posts/{bobId}",
+    auth: { raw: "Bearer {aliceWriteKey}" }, expect: 403 },
+  { name: "key_write_only_timeline", group: "Timeline", method: "GET", path: "/api/posts/timeline/all",
+    auth: { raw: "Bearer {aliceWriteKey}" }, expect: 403 },
+
+  // An API key on the internal endpoints for managing keys
+  { name: "keys_list_with_api_key", group: "List API keys", method: "GET", path: "/api/keys",
+    auth: { raw: "Bearer {aliceKey}" }, expect: 403 },
+  { name: "keys_delete_with_api_key", group: "Delete an API key", method: "DELETE", path: "/api/keys/{aliceKeyId}",
+    auth: { raw: "Bearer {aliceKey}" }, expect: 403, note: "The key isn't deleted" },
+
   // ─── Edge cases, added 2026-10-24 ───────────────────────────────
   // After the main flow, so the users they add don't change earlier results.
 

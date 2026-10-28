@@ -20,14 +20,14 @@
           "followers": [],
           "followings": [],
           "isAdmin": false,
-          "_id": "6ae0d98ca99fcaa5cf793682",
+          "_id": "6ae1e5bdfe8b9bb2cd021645",
           "username": "bob",
-          "createdAt": "2026-10-27T17:04:12.732Z",
-          "updatedAt": "2026-10-27T17:04:12.732Z",
+          "createdAt": "2026-10-28T12:08:29.833Z",
+          "updatedAt": "2026-10-28T12:08:29.833Z",
           "__v": 0
         }
       ]
     }
   },
-  "durationMs": 15
+  "durationMs": 786
 }

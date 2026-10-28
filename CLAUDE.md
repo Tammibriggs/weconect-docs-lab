@@ -18,6 +18,8 @@ weConect is a small social app used to practise API documentation end to end: te
 | `tests/cases.mjs` | The live test cases, as data |
 | `tests/capture.mjs` | Runs the cases against the API with an in-memory MongoDB and saves each request and response |
 | `tests/validate.mjs` | Checks a folder of captures against the spec |
+| `tests/coverage.mjs` | Checks that every response the spec documents appears in a capture |
+| `tests/spec.mjs` | Shared by the two checks: loads the spec and the captures, and matches request paths to spec paths |
 | `tests/captures/v1/` | Committed evidence: one request and response per case, plus `report.md` |
 | `TESTING.md` | Test results, findings (the v2 backlog), and what's untested |
 | `PROCESS.md` | The process log: decisions, numbers, problems, and who did what |
@@ -32,6 +34,7 @@ These are free and safe to run without asking. They use an in-memory database an
 | `npm run test:capture` | Runs every case; captures go to `tests/runs/<timestamp>/` (gitignored). Fails if port 8800 is in use, for example by `npm run dev` |
 | `npm run test:capture -- --out tests/captures/v1` | Refreshes the committed captures |
 | `npm run test:validate [folder]` | Checks captures against the spec; exits 1 on any failure |
+| `npm run test:coverage [folder]` | Lists documented responses that no capture shows; exits 1 if there are any |
 | `npm run lint:spec` | Lints the full spec, rebuilds the public spec, and lints it |
 | `npm run build:spec` | Rebuilds `openapi/weconect-public.yaml` from the full spec |
 
@@ -46,8 +49,8 @@ Any of these accepts `PORT=<port>` to avoid a server already on 8800, such as `n
 - **Document the API as it behaves.** Don't correct its behaviour in the spec. Record problems as findings in `TESTING.md`. When the user asks for a fix, change `api/`, then the spec and `CHANGELOG.md`, and mark the finding fixed with its evidence.
 - **Public or internal.** The public endpoints accept API keys (`verifyTokenOrApiKey(scope)` in `api/routes/verifyToken.js`). Endpoints only the app uses accept login tokens only (`verifyToken`) and are marked `x-internal: true` in the spec, along with their tags and any examples about login tokens. A public endpoint lists only `ApiKeyAuth`: Redocly removes an internal security scheme but not references to it, so listing `AccessToken` too would break the public spec.
 - **Express 4 and async middleware.** A rejected promise in middleware crashes the server, while a synchronous throw becomes a `500`. Keep code that can throw synchronous, or catch everything in `async` code.
-- **Claims need evidence.** Every status code, example, and behaviour in the spec traces to a capture. If something wasn't tested, say so.
-- **Update together.** When the API or the spec changes, refresh the captures, then update the spec, `TESTING.md`, `CHANGELOG.md`, and `PROCESS.md`, and run `npm run lint:spec` so the public spec is rebuilt. Refreshing the captures gives every user and post a new ID, so update the spec's example IDs and timestamps to the new captures too.
+- **Claims need evidence.** Every status code, example, and behaviour in the spec traces to a capture. If something wasn't tested, say so. `npm run test:coverage` checks the status codes; it can't check the wording of a description, so when a behaviour changes, also search the spec for text about it.
+- **Update together.** When the API or the spec changes, refresh the captures, then update the spec, `TESTING.md`, `CHANGELOG.md`, and `PROCESS.md`, and run `npm run lint:spec` so the public spec is rebuilt, then `npm run test:validate` and `npm run test:coverage`. Refreshing the captures gives every user and post a new ID, so update the spec's example IDs and timestamps to the new captures too.
 - **The frontend's mock API** (`web/redesign/tools/mock-api.mjs`) reads its own frozen copy of two captures in `web/redesign/tools/fixtures/captures/`, because its IDs are hard-coded. Don't point it back at `tests/captures/v1`.
 - **Ask first** before pushing, deploying, changing `api/` or `web/` behaviour, or anything that costs money or uses an external account.
 - **Commits:** no `Co-Authored-By` trailer.

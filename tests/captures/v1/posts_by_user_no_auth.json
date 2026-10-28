@@ -1,0 +1,20 @@
+{
+  "name": "posts_by_user_no_auth",
+  "group": "List a user's posts",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/6ae1e5bdfe8b9bb2cd021645",
+    "headers": {}
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "You are not authenticated!"
+    }
+  },
+  "durationMs": 5
+}

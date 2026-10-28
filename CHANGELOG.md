@@ -2,6 +2,13 @@
 
 Changes to the weConect API, newest first. Versions follow [semantic versioning](https://semver.org/): a minor version adds features without breaking existing clients, and a major version can break them. Each change links to its evidence in [`TESTING.md`](TESTING.md).
 
+## Unreleased
+
+### Documentation
+
+- **The `403` for a missing scope now shows the right message.** The read endpoints (get the current user, get a user, search users, list a user's posts, and get the timeline) showed `"This API key doesn't have the 'write' scope"`, which they never return. They now show the `'read'` message, and the authentication errors table lists both. The API behaves as before.
+- Every documented response now has a captured example behind it: 17 new test cases cover the `401` and `403` responses that were documented from shared code but not captured.
+
 ## 1.1.1: 2026-10-27
 
 ### Fixed

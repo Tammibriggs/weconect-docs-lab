@@ -19,5 +19,5 @@
       "message": "API keys can't be used with this endpoint. Use an access token from logging in."
     }
   },
-  "durationMs": 10
+  "durationMs": 5
 }

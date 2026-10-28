@@ -1,0 +1,20 @@
+{
+  "name": "keys_delete_no_auth",
+  "group": "Delete an API key",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/keys/6ae1e5eefe8b9bb2cd02169d",
+    "headers": {}
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "You are not authenticated!"
+    }
+  },
+  "durationMs": 3
+}

@@ -20,14 +20,14 @@
           "followers": [],
           "followings": [],
           "isAdmin": false,
-          "_id": "6ae0d98ca99fcaa5cf793680",
+          "_id": "6ae1e5bdfe8b9bb2cd021643",
           "username": "alice",
-          "createdAt": "2026-10-27T17:04:12.409Z",
-          "updatedAt": "2026-10-27T17:04:12.409Z",
+          "createdAt": "2026-10-28T12:08:29.485Z",
+          "updatedAt": "2026-10-28T12:08:29.485Z",
           "__v": 0
         }
       ]
     }
   },
-  "durationMs": 11
+  "durationMs": 1060
 }

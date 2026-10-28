@@ -4,7 +4,7 @@
   "note": "Since 2026-10-26 this adds alice's ID; before, it added null (finding 17 fixed)",
   "request": {
     "method": "PUT",
-    "path": "/api/posts/6ae0d99aa99fcaa5cf7936b6/like",
+    "path": "/api/posts/6ae1e5e5fe8b9bb2cd021679/like",
     "headers": {
       "Authorization": "Bearer <redacted JWT>",
       "Content-Type": "application/json"
@@ -20,5 +20,5 @@
       "status": "ok"
     }
   },
-  "durationMs": 7
+  "durationMs": 13
 }

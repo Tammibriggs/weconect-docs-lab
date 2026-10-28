@@ -18,15 +18,15 @@
       "status": "ok",
       "data": [
         {
-          "id": "6ae0d9a3a99fcaa5cf7936de",
+          "id": "6ae1e5eefe8b9bb2cd0216a1",
           "name": "Bob's script",
-          "lastFour": "DPIr",
+          "lastFour": "qaCO",
           "scopes": [
             "read",
             "write"
           ],
-          "createdAt": "2026-10-27T17:04:35.472Z",
-          "lastUsedAt": "2026-10-27T17:04:42.339Z"
+          "createdAt": "2026-10-28T12:09:18.672Z",
+          "lastUsedAt": "2026-10-28T12:09:25.572Z"
         }
       ]
     }

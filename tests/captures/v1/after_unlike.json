@@ -12,7 +12,7 @@
   "response": {
     "error": "ECONNREFUSED"
   },
-  "durationMs": 3,
+  "durationMs": 7,
   "serverExited": {
     "code": 1,
     "signal": null

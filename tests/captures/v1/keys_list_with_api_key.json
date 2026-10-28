@@ -1,0 +1,22 @@
+{
+  "name": "keys_list_with_api_key",
+  "group": "List API keys",
+  "request": {
+    "method": "GET",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "API keys can't be used with this endpoint. Use an access token from logging in."
+    }
+  },
+  "durationMs": 3
+}

@@ -42,7 +42,7 @@ info:
     |---|---|
     | No `Authorization` header | `401` with `"You are not authenticated!"` |
     | The key is wrong or was deleted, doesn't start with `wck_`, or has no `Bearer` in front | `401` with `"Invalid API key"` |
-    | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'write' scope"` |
+    | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'read' scope"`, or `'write'` |
 
     ## Errors
 
@@ -106,14 +106,14 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae0d98ca99fcaa5cf793680
+                  _id: 6ae1e5bdfe8b9bb2cd021643
                   username: alice
-                  createdAt: '2026-10-27T17:04:12.409Z'
+                  createdAt: '2026-10-28T12:08:29.485Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/ReadScopeForbidden'
   /api/users/{userId}/user:
     get:
       tags:
@@ -144,14 +144,14 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae0d98ca99fcaa5cf793682
+                  _id: 6ae1e5bdfe8b9bb2cd021645
                   username: bob
-                  createdAt: '2026-10-27T17:04:12.732Z'
+                  createdAt: '2026-10-28T12:08:29.833Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/ReadScopeForbidden'
         '404':
           description: No user has this ID.
           content:
@@ -235,15 +235,15 @@ paths:
                   - followers: []
                     followings: []
                     isAdmin: false
-                    _id: 6ae0d98ca99fcaa5cf793680
+                    _id: 6ae1e5bdfe8b9bb2cd021643
                     username: alice
-                    createdAt: '2026-10-27T17:04:12.409Z'
-                    updatedAt: '2026-10-27T17:04:12.409Z'
+                    createdAt: '2026-10-28T12:08:29.485Z'
+                    updatedAt: '2026-10-28T12:08:29.485Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/ReadScopeForbidden'
   /api/users/follow:
     put:
       tags:
@@ -265,7 +265,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ae0d98ca99fcaa5cf793682
+              userId: 6ae1e5bdfe8b9bb2cd021645
       responses:
         '200':
           description: The current user now follows the user.
@@ -339,7 +339,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ae0d98ca99fcaa5cf793682
+              userId: 6ae1e5bdfe8b9bb2cd021645
       responses:
         '200':
           description: The current user no longer follows the user.
@@ -405,12 +405,12 @@ paths:
               text:
                 summary: Text only
                 value:
-                  userId: 6ae0d98ca99fcaa5cf793680
+                  userId: 6ae1e5bdfe8b9bb2cd021643
                   desc: Hello from Alice
               withImage:
                 summary: With an image
                 value:
-                  userId: 6ae0d98ca99fcaa5cf793680
+                  userId: 6ae1e5bdfe8b9bb2cd021643
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
@@ -427,14 +427,14 @@ paths:
                 data:
                   likes: []
                   comments: []
-                  _id: 6ae0d99aa99fcaa5cf7936b4
-                  userId: 6ae0d98ca99fcaa5cf793680
+                  _id: 6ae1e5e5fe8b9bb2cd021677
+                  userId: 6ae1e5bdfe8b9bb2cd021643
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
                     filename: photo.jpg
-                  createdAt: '2026-10-27T17:04:26.403Z'
-                  updatedAt: '2026-10-27T17:04:26.403Z'
+                  createdAt: '2026-10-28T12:09:09.283Z'
+                  updatedAt: '2026-10-28T12:09:09.283Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -490,7 +490,7 @@ paths:
           description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
           schema:
             type: string
-          example: 6ae0d98ca99fcaa5cf793682
+          example: 6ae1e5bdfe8b9bb2cd021645
       responses:
         '200':
           description: The user's posts, possibly none.
@@ -503,16 +503,16 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ae0d99aa99fcaa5cf7936b6
-                    userId: 6ae0d98ca99fcaa5cf793682
+                    _id: 6ae1e5e5fe8b9bb2cd021679
+                    userId: 6ae1e5bdfe8b9bb2cd021645
                     desc: Hello from Bob
-                    createdAt: '2026-10-27T17:04:26.722Z'
-                    updatedAt: '2026-10-27T17:04:26.722Z'
+                    createdAt: '2026-10-28T12:09:09.621Z'
+                    updatedAt: '2026-10-28T12:09:09.621Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/ReadScopeForbidden'
     delete:
       tags:
         - Posts
@@ -535,7 +535,7 @@ paths:
           description: The post's ID.
           schema:
             $ref: '#/components/schemas/ObjectId'
-          example: 6ae0d99aa99fcaa5cf7936b4
+          example: 6ae1e5e5fe8b9bb2cd021677
       responses:
         '200':
           description: The post was deleted.
@@ -615,24 +615,24 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ae0d99aa99fcaa5cf7936b2
-                    userId: 6ae0d98ca99fcaa5cf793680
+                    _id: 6ae1e5e4fe8b9bb2cd021675
+                    userId: 6ae1e5bdfe8b9bb2cd021643
                     desc: Hello from Alice
-                    createdAt: '2026-10-27T17:04:26.083Z'
-                    updatedAt: '2026-10-27T17:04:26.083Z'
+                    createdAt: '2026-10-28T12:09:08.699Z'
+                    updatedAt: '2026-10-28T12:09:08.699Z'
                     __v: 0
                   - likes: []
                     comments: []
-                    _id: 6ae0d99aa99fcaa5cf7936b6
-                    userId: 6ae0d98ca99fcaa5cf793682
+                    _id: 6ae1e5e5fe8b9bb2cd021679
+                    userId: 6ae1e5bdfe8b9bb2cd021645
                     desc: Hello from Bob
-                    createdAt: '2026-10-27T17:04:26.722Z'
-                    updatedAt: '2026-10-27T17:04:26.722Z'
+                    createdAt: '2026-10-28T12:09:09.621Z'
+                    updatedAt: '2026-10-28T12:09:09.621Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/ReadScopeForbidden'
   /api/posts/{postId}/like:
     put:
       tags:
@@ -671,7 +671,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
-          $ref: '#/components/responses/Forbidden'
+          $ref: '#/components/responses/WriteScopeForbidden'
         '500':
           description: No post has this ID. The body includes the raw error, which is `{}`.
           content:
@@ -698,7 +698,7 @@ components:
       description: The user's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ae0d98ca99fcaa5cf793682
+      example: 6ae1e5bdfe8b9bb2cd021645
     PostId:
       name: postId
       in: path
@@ -706,7 +706,7 @@ components:
       description: The post's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ae0d99aa99fcaa5cf7936b2
+      example: 6ae1e5e4fe8b9bb2cd021675
   responses:
     Unauthorized:
       description: |
@@ -728,15 +728,27 @@ components:
               value:
                 status: error
                 message: Invalid API key
-    Forbidden:
-      description: The API key doesn't have the scope this endpoint needs.
+    ReadScopeForbidden:
+      description: The API key doesn't have the `read` scope.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           examples:
             missingScope:
-              summary: The key doesn't have the scope
+              summary: The key doesn't have the read scope
+              value:
+                status: error
+                message: This API key doesn't have the 'read' scope
+    WriteScopeForbidden:
+      description: The API key doesn't have the `write` scope.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            missingScope:
+              summary: The key doesn't have the write scope
               value:
                 status: error
                 message: This API key doesn't have the 'write' scope

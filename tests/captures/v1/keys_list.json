@@ -18,38 +18,38 @@
       "status": "ok",
       "data": [
         {
-          "id": "6ae0d9a3a99fcaa5cf7936e0",
+          "id": "6ae1e5eefe8b9bb2cd0216a3",
           "name": "Poster",
-          "lastFour": "zADC",
+          "lastFour": "dFLV",
           "scopes": [
             "write"
           ],
-          "createdAt": "2026-10-27T17:04:35.790Z",
+          "createdAt": "2026-10-28T12:09:18.987Z",
           "lastUsedAt": null
         },
         {
-          "id": "6ae0d9a3a99fcaa5cf7936dc",
+          "id": "6ae1e5eefe8b9bb2cd02169f",
           "name": "Dashboard",
-          "lastFour": "MbJi",
+          "lastFour": "MgJZ",
           "scopes": [
             "read"
           ],
-          "createdAt": "2026-10-27T17:04:35.156Z",
+          "createdAt": "2026-10-28T12:09:18.357Z",
           "lastUsedAt": null
         },
         {
-          "id": "6ae0d9a2a99fcaa5cf7936da",
+          "id": "6ae1e5eefe8b9bb2cd02169d",
           "name": "My bot",
-          "lastFour": "pOe4",
+          "lastFour": "0xRb",
           "scopes": [
             "read",
             "write"
           ],
-          "createdAt": "2026-10-27T17:04:34.841Z",
+          "createdAt": "2026-10-28T12:09:18.039Z",
           "lastUsedAt": null
         }
       ]
     }
   },
-  "durationMs": 5
+  "durationMs": 23
 }

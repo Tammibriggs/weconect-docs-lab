@@ -7,6 +7,7 @@
     "start:real": "node scripts/start.mjs",
     "test:capture": "node tests/capture.mjs",
     "test:validate": "node tests/validate.mjs",
+    "test:coverage": "node tests/coverage.mjs",
     "lint:spec": "redocly lint full && npm run --silent build:spec && redocly lint openapi/weconect-public.yaml",
     "build:spec": "redocly bundle public -o openapi/weconect-public.yaml"
   },

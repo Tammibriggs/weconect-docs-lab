@@ -1,6 +1,6 @@
-# Capture run 2026-10-27T17-04-10
+# Capture run 2026-10-28T12-08-25
 
-135 cases, 135 as expected, 0 different, 1 server restart(s).
+152 cases, 152 as expected, 0 different, 1 server restart(s).
 
 | Case | Group | Expected | Got | Note |
 |---|---|---|---|---|
@@ -117,6 +117,23 @@
 | key_deleted | API keys | 401 | 401 | A deleted key stops working at once |
 | keys_list_after_delete | List API keys | 200 | 200 | One key left; lastUsedAt is set because the key was used above |
 | keys_list_bob | List API keys | 200 | 200 | Each user sees only their own keys |
+| user_get_no_auth | Get a user | 401 | 401 |  |
+| search_no_auth | Search users | 401 | 401 |  |
+| follow_no_auth | Follow | 401 | 401 |  |
+| unfollow_no_auth | Unfollow | 401 | 401 |  |
+| post_create_no_auth | Create a post | 401 | 401 |  |
+| posts_by_user_no_auth | List a user's posts | 401 | 401 |  |
+| post_delete_no_auth | Delete a post | 401 | 401 |  |
+| timeline_no_auth | Timeline | 401 | 401 |  |
+| like_no_auth | Like a post | 401 | 401 |  |
+| keys_list_no_auth | List API keys | 401 | 401 |  |
+| keys_delete_no_auth | Delete an API key | 401 | 401 |  |
+| key_write_only_me | Current user | 403 | 403 |  |
+| key_write_only_get_user | Get a user | 403 | 403 |  |
+| key_write_only_user_posts | List a user's posts | 403 | 403 |  |
+| key_write_only_timeline | Timeline | 403 | 403 |  |
+| keys_list_with_api_key | List API keys | 403 | 403 |  |
+| keys_delete_with_api_key | Delete an API key | 403 | 403 | The key isn't deleted |
 | search_special_dot | Search users | 200 | 200 | As a regex, a.i would match alice; escaped, it matches nobody |
 | search_special_paren | Search users | 200 | 200 | An unescaped ( would be an invalid regex and a 500 |
 | register_unicode | Register | 200 | 200 |  |

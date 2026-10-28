@@ -1,0 +1,22 @@
+{
+  "name": "key_write_only_timeline",
+  "group": "Timeline",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/timeline/all",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "This API key doesn't have the 'read' scope"
+    }
+  },
+  "durationMs": 9
+}

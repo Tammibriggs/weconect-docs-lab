@@ -1,0 +1,20 @@
+{
+  "name": "post_delete_no_auth",
+  "group": "Delete a post",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/posts/6ae1e5e4fe8b9bb2cd021675",
+    "headers": {}
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "You are not authenticated!"
+    }
+  },
+  "durationMs": 6
+}

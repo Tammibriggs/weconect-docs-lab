@@ -4,15 +4,16 @@ This file records how the documented endpoints were tested, what the tests found
 
 ## How the tests ran
 
-`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 135 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml).
+`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 152 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), and `npm run test:coverage` checks the other direction: that every response the spec documents appears in a capture.
 
 | Item | Value |
 |---|---|
-| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27, committed as `tests/captures/v1/` |
+| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28, committed as `tests/captures/v1/` |
 | Stack | Node.js 24, Express 4.18.2, Mongoose 5.13.15 (MongoDB driver 3.7.3), MongoDB 6.0.19 |
-| Cases | 135: 134 returned the status predicted from reading the code; 1 confirmed a crash |
-| Spec check | 119 captures pass, 0 fail; 16 skipped: 12 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
+| Cases | 152: 151 returned the status predicted from reading the code; 1 confirmed a crash |
+| Spec check | 136 captures pass, 0 fail; 16 skipped: 12 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
 | Validator check | 3 deliberately wrong captures (wrong type, undocumented status, missing field) were all rejected |
+| Response coverage | 55 of 55 documented responses appear in a capture. With the spec from before 1.1.1, the check lists the two `500` responses that version removed |
 
 The captures redact access tokens, API keys and encrypted passwords, and replace local paths with `<repo>`. IDs and timestamps change on every run, so each refresh also updates the spec's examples to the new values.
 
@@ -44,7 +45,7 @@ These are behaviours a later version should change. The spec documents them as t
 
 6. **Unliking a post crashes the server** [`unlike`, `after_unlike`]. The response is sent, then a stray `url` expression ([`api/routes/posts.js:69`](api/routes/posts.js#L69)) throws, the error handler tries to send a second response, and Node exits with `ERR_HTTP_HEADERS_SENT`. The like is removed [`post_get_after_unlike`].
 7. **Fixed in 1.1.1: a malformed token returned `500`**, an HTML page with a stack trace. `jwt.decode()` returns `null` for anything that isn't a JWT, and the middleware read `.exp` from it. Testing in Postman on 2026-10-27 found the same `500` for an API key without its `wck_` prefix, because the API treats any value without the prefix as a token. Since 1.1.1, a value that's neither an API key nor a token returns `401 "Invalid API key"` on the public endpoints [`auth_malformed_token`, `auth_no_scheme`, `key_without_prefix`, `key_without_bearer`] and `403 "Token is invalid"` on the internal ones, like any other bad token [`auth_malformed_token_internal`].
-8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `post_get_invalid_id`, `post_delete_invalid_id`].
+8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `post_get_invalid_id`, `post_delete_invalid_id`]. Planned for 2.0.0, because changing these statuses can break clients.
 
 ### Status codes
 
@@ -79,6 +80,10 @@ These are behaviours a later version should change. The spec documents them as t
 25. **A body that isn't JSON is silently ignored**: a form-encoded register returns `401 Invalid username` [`register_form_encoded`], where `415 Unsupported Media Type` would explain the problem.
 26. **An unsupported method returns Express's `404` page** [`wrong_method`], where `405 Method Not Allowed` is the usual status.
 
+### Added 2026-10-28, from testing in Postman
+
+27. **List a user's posts returns an empty list for a user who doesn't exist** [`posts_by_unknown_user`], so a mistyped ID looks like a user with no posts. Get a user returns `404` for the same ID [`user_get_unknown`]. `Post.userId` is a plain string ([`api/models/Post.js:5-8`](api/models/Post.js#L5-L8)), so any value is a valid query, and the route never checks that the user exists ([`api/routes/posts.js:87-94`](api/routes/posts.js#L87-L94)). The spec documents this on the `id` parameter. Planned for 2.0.0, with finding 8: the empty list is documented, so returning `404` instead is a breaking change. Deleting an account doesn't delete its posts ([`api/routes/users.js:75-82`](api/routes/users.js#L75-L82)), so the change would also turn a deleted user's posts into `404` (from reading the code).
+
 ### Edge cases that behave correctly
 
 - Special characters in a search term match only themselves: `a.i` and `(` both return no users [`search_special_dot`, `search_special_paren`].
@@ -110,10 +115,11 @@ Added 2026-10-26, in version 1.1. The keys cases are the `keys_*` and `key_*` ca
 |---|---|
 | Creating a key returns `201` with the key, once; scopes come back in the order `read`, `write` | `keys_create`, `keys_create_read_only`, `keys_create_write_only`, `keys_create_bob` |
 | A missing or too-long name, and unknown or empty scopes, return `400` | `keys_create_missing_name`, `keys_create_long_name`, `keys_create_bad_scope`, `keys_create_no_scopes` |
-| Managing keys needs an access token: no header returns `401`, and an API key returns `403` | `keys_create_no_auth`, `keys_create_with_api_key` |
+| Managing keys needs an access token: no header returns `401`, and an API key returns `403` | `keys_create_no_auth`, `keys_create_with_api_key`, `keys_list_no_auth`, `keys_list_with_api_key`, `keys_delete_no_auth`, `keys_delete_with_api_key` |
 | Listing keys never returns the key itself, shows newest first, and shows only your own keys | `keys_list`, `keys_list_bob` |
 | A key works on all 10 public endpoints and acts as its owner | `key_me`, `key_get_user`, `key_search`, `key_user_posts`, `key_timeline`, `key_create_post`, `key_delete_post`, `key_like`, `key_follow`, `key_unfollow`, `key_create_post_as_other_user`, `key_delete_other_users_post` |
-| Scopes are enforced both ways: a read-only key can't write, and a write-only key can't read (`403`) | `key_create_post_read_only`, `key_delete_post_read_only`, `key_like_read_only`, `key_follow_read_only`, `key_write_only_read` |
+| Scopes are enforced both ways: a read-only key can't write, and a write-only key can't read (`403`) | `key_create_post_read_only`, `key_delete_post_read_only`, `key_like_read_only`, `key_follow_read_only`, `key_write_only_read`, `key_write_only_me`, `key_write_only_get_user`, `key_write_only_user_posts`, `key_write_only_timeline` |
+| Every public endpoint returns `401` without an `Authorization` header | `auth_missing` and the 9 `*_no_auth` cases added 2026-10-28 |
 | Keys don't work on internal endpoints (`403`) | `key_on_internal_endpoint` |
 | A wrong key returns `401`; a deleted key stops working at once (`401`) | `key_invalid`, `keys_delete`, `key_deleted` |
 | A key without its `wck_` prefix, or without `Bearer` in front, returns `401` (since 1.1.1; `500` before) | `key_without_prefix`, `key_without_bearer` |

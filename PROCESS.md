@@ -11,7 +11,7 @@ Entries are in date order, newest last. Every number names the file or command i
 | 0. Setup | Choose the project, combine the repos | Done 2026-10-22 |
 | 1. Foundation | Test v1 and write its spec (done); upgrade dependencies and hash passwords; Docusaurus site; style guide and Vale | In progress |
 | 2. CI | Spec linting, prose linting, link checks, deploy previews, a pull-request workflow; deploy the API (Render, MongoDB Atlas) | Not started |
-| 3. Change management | Change the API and its spec together, changelog with `oasdiff`, deprecation notices, migration guide | Started 2026-10-26: version 1.1.0 with a hand-written changelog and one deprecated field; 1.1.1 (a bug fix) on 2026-10-27 |
+| 3. Change management | Change the API and its spec together, changelog with `oasdiff`, deprecation notices, migration guide | Started 2026-10-26: version 1.1.0 with a hand-written changelog and one deprecated field; 1.1.1 (a bug fix) on 2026-10-27; first breaking changes planned for 2.0.0 on 2026-10-28 (findings 8 and 27) |
 | 4. AI readers | `llms.txt`, Markdown versions of pages, a docs MCP server | Not started |
 | 5. AI automation | AutoDoc flags docs affected by each pull request | Not started |
 | 6. Developer experience | SDK and code samples, search, analytics, feedback; AsyncAPI for messaging | Not started |
@@ -22,9 +22,10 @@ Entries are in date order, newest last. Every number names the file or command i
 | Number | Source |
 |---|---|
 | 15 of 26 endpoints in the full spec, 10 of them public | `openapi/weconect-v1.yaml`, `openapi/weconect-public.yaml` |
-| 135 test cases; 134 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
-| 119 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
-| 26 findings, 4 of them fixed: 3 in 1.1, 1 in 1.1.1 | `TESTING.md` |
+| 152 test cases; 151 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
+| 136 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
+| 55 of 55 documented responses appear in a capture (39 before the 17 coverage cases) | `npm run test:coverage` |
+| 27 findings, 4 of them fixed: 3 in 1.1, 1 in 1.1.1 | `TESTING.md` |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
@@ -499,6 +500,55 @@ The repo has no remote yet, so nothing is pushed.
 **Who did what**
 - **Me:** found the `500` in Postman and chose to fix the API.
 - **Claude Code:** traced the cause, changed the middleware, added and updated the cases, refreshed the captures, updated the spec, `CHANGELOG.md`, `TESTING.md`, `CLAUDE.md` and this log, and ran the checks.
+
+### 2026-10-28: How API keys are checked, and a wrong scope example
+
+**What I learned by asking:**
+- **Only a hash of each key is stored.** When a key is created, the API stores its SHA-256 hash and returns the key itself once ([`api/routes/keys.js:42-47`](api/routes/keys.js#L42-L47)). On each request it hashes the key it receives and looks for that hash ([`api/routes/verifyToken.js:58`](api/routes/verifyToken.js#L58)). Nothing is hashed twice: SHA-256 always gives the same output for the same input, so a correct key finds its record. A leaked database holds no usable keys, and SHA-256 can't be reversed.
+- **Why SHA-256 and not bcrypt**, which suits passwords: a key is 24 random bytes, far too many combinations to guess, so a fast hash is safe. bcrypt adds a random salt to every hash, so the API couldn't look a key up by its hash; it would have to check every stored key.
+- **A key can be write-only.** The app's page offers read only, and read and write, but the API also accepts `["write"]` alone [`keys_create_write_only`]. Such a key gets `403 "This API key doesn't have the 'read' scope"` on the read endpoints, including get the current user.
+
+**What my question found:** the shared `Forbidden` response, used by the 5 read endpoints and like, shows only the `'write'` message, which can't happen on a read endpoint. The read-scope `403` is captured only on search [`key_write_only_read`], not on get the current user.
+
+**More from Postman (mine):**
+- **List a user's posts with an ID that isn't a user returned `200`** with an empty list. That's documented on the `id` parameter and tested [`posts_by_unknown_user`], but it wasn't a finding. It's now finding 27: a mistyped ID looks like a user with no posts, while get a user returns `404` for the same ID.
+- **Like in my Errors folder returned `500`**, because the post no longer existed: `findById` returns `null`, reading `likes` from it throws, and the error serializes as `{}` (finding 8, `like_unknown_post`).
+- **Liking an existing post returned `200` without a crash.** Only removing a like crashes (finding 6), and the crash doesn't show in Postman: the `200` is sent first, and `npm run dev` restarts the API within about a second. A reproduction on port 8830 showed it only in the terminal (`ERR_HTTP_HEADERS_SENT`, then "The API exited… Restarting"); a request sent at once was refused, and one sent 3 seconds later worked.
+
+**Who did what**
+- **Me:** asked why the key is hashed before the lookup, and whether get the current user can return a scope error; found the empty list and the `500` in Postman.
+- **Claude Code:** explained both from the code and the captures, found the wrong example, reproduced the like behaviour, and recorded finding 27.
+
+### 2026-10-28, later: Response coverage, the scope `403`, and planning 2.0.0
+
+**Decisions (mine):**
+- Add a response coverage check and fix the `403` example: docs and tests only, no version change.
+- **Save the list-posts fix (finding 27) for 2.0.0**, with finding 8. I'd asked for it as a fix, then learned it's a breaking change: the empty list is documented, and GitHub's REST API docs count "adding a new validation rule to an existing parameter" as breaking. Companies batch breaking changes so clients migrate once, with notice.
+
+**Response coverage** (`npm run test:coverage`, [`tests/coverage.mjs`](tests/coverage.mjs)):
+- `test:validate` checks that every captured response is documented. Coverage checks the reverse: that every documented status appears in a capture. A documented status with no capture is either untested or stale.
+- The route lookup moved from `validate.mjs` into [`tests/spec.mjs`](tests/spec.mjs), shared by both. `validate` gave the same result before and after (119 passed, 0 failed, 16 skipped).
+- First run: 39 of 55 documented responses had a capture. The 16 missing were all `401` and `403` responses, documented because every public endpoint shares the same middleware, but captured on only some of them.
+- **17 new cases** (16 for the missing responses, plus `key_write_only_me` for the `'read'` message on get the current user), added after the API keys cases. Each is rejected before it changes anything, so earlier results stayed the same.
+- **Proof it works:** with the spec from before 1.1.1 and the captures from after it, coverage lists the two stale `500` responses I'd removed by hand. Its limit: it checks statuses, not wording, so it would have missed the stale sentence in get a user's `500`, which still happens for an invalid ID.
+
+**The `403` fix:** the shared `Forbidden` response became `ReadScopeForbidden` (the 5 read endpoints, `'read'` message) and `WriteScopeForbidden` (like, `'write'` message). The authentication errors table lists both messages.
+
+**Checks:**
+- `npm run test:capture` (port 8810, because my `npm run dev` was on 8800): 152 cases, all as predicted, 1 restart (the unlike crash).
+- `npm run test:validate`: 136 passed, 0 failed, 16 skipped.
+- `npm run test:coverage`: 55 of 55.
+- `npm run lint:spec`: both specs valid, 2 usual warnings each.
+- The spec's example IDs, timestamps and key endings were remapped to the new captures by a script (45 replacements, none left unmapped).
+
+**What I learned:**
+- Checking captures against the spec is only half the check. The other half asks whether everything the spec documents still happens.
+- Whether a change is breaking depends on what was documented, not on whether the old behaviour was good. A bad but documented behaviour is still a promise.
+- Versioning is decided before coding: the version decides when a change can ship.
+
+**Who did what**
+- **Me:** asked for the coverage check and the `403` fix, and chose to save finding 27 for 2.0.0.
+- **Claude Code:** wrote the coverage check and the 17 cases, split the response, refreshed the captures, ran the checks, and updated the spec, `TESTING.md`, `CHANGELOG.md`, `README.md`, `CLAUDE.md` and this log.
 
 ## Post and portfolio ideas
 

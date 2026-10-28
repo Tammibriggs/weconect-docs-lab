@@ -1,0 +1,22 @@
+{
+  "name": "key_write_only_user_posts",
+  "group": "List a user's posts",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/6ae1e5bdfe8b9bb2cd021645",
+    "headers": {
+      "Authorization": "Bearer <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 403,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "This API key doesn't have the 'read' scope"
+    }
+  },
+  "durationMs": 8
+}

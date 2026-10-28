@@ -25,6 +25,7 @@ npm install                 # test tooling
 (cd api && npm ci)          # the API's dependencies
 npm run test:capture        # run every case; captures go to tests/runs/<timestamp>/
 npm run test:validate       # check the committed captures against the spec
+npm run test:coverage       # check that every documented response appears in a capture
 npm run lint:spec           # lint the full spec, rebuild the public spec, and lint that too
 npm run build:spec          # rebuild only the public spec
 ```

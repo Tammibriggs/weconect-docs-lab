@@ -3,7 +3,7 @@
   "group": "Delete an API key",
   "request": {
     "method": "DELETE",
-    "path": "/api/keys/6ae0d9a3a99fcaa5cf7936dc",
+    "path": "/api/keys/6ae1e5eefe8b9bb2cd02169f",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -17,5 +17,5 @@
       "status": "ok"
     }
   },
-  "durationMs": 8
+  "durationMs": 7
 }

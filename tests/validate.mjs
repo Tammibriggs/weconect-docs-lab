@@ -5,20 +5,15 @@
 //   npm run test:validate -- tests/runs/<run>    checks another run
 //
 // Captures for paths the spec doesn't cover (out of scope, or not an API route)
-// are listed separately, not failed.
+// are listed separately, not failed. coverage.mjs checks the other direction:
+// that every documented response appears in a capture.
 
-import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-import YAML from "yaml";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
+import { ROOT, spec, captureDir, readCaptures, specPath } from "./spec.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SPEC = path.join(ROOT, "openapi", "weconect-v1.yaml");
-const DIR = path.resolve(ROOT, process.argv[2] || path.join("tests", "captures", "v1"));
-
-const spec = YAML.parse(fs.readFileSync(SPEC, "utf8"));
+const DIR = captureDir(process.argv[2]);
 
 // Inline local $refs ("#/components/...") so each schema stands alone.
 function deref(node, stack = []) {
@@ -32,30 +27,22 @@ function deref(node, stack = []) {
   return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, deref(v, stack)]));
 }
 
-// Static paths are tried before templated ones, so /api/posts/timeline/all wins over /api/posts/{id}.
-const routes = Object.keys(spec.paths)
-  .map((p) => ({ p, re: new RegExp(`^${p.replace(/\{[^}]+\}/g, "[^/]+")}$`), params: (p.match(/\{/g) || []).length }))
-  .sort((a, b) => a.params - b.params);
-
 const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
 
 const results = { pass: [], fail: [], skipped: [] };
-const files = fs.readdirSync(DIR).filter((f) => f.endsWith(".json")).sort();
 
-for (const file of files) {
-  const cap = JSON.parse(fs.readFileSync(path.join(DIR, file), "utf8"));
+for (const cap of readCaptures(DIR)) {
   const label = `${cap.request.method} ${cap.request.path} → ${cap.response.status ?? cap.response.error}  [${cap.name}]`;
   if (cap.response.error) { results.skipped.push(`${label}: no response`); continue; }
 
-  const pathname = cap.request.path.split("?")[0];
-  const route = routes.find((r) => r.re.test(pathname));
-  const op = route && spec.paths[route.p][cap.request.method.toLowerCase()];
+  const route = specPath(cap.request.path);
+  const op = route && spec.paths[route][cap.request.method.toLowerCase()];
   if (!op) { results.skipped.push(`${label}: not in the spec`); continue; }
 
   const status = String(cap.response.status);
   const response = op.responses[status] || op.responses[`${status[0]}XX`] || op.responses.default;
-  if (!response) { results.fail.push(`${label}: status ${status} isn't documented for ${cap.request.method} ${route.p}`); continue; }
+  if (!response) { results.fail.push(`${label}: status ${status} isn't documented for ${cap.request.method} ${route}`); continue; }
 
   const resolved = deref(response);
   const contentType = (cap.response.headers["content-type"] || "").split(";")[0].trim();
