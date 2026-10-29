@@ -1,6 +1,6 @@
-# Capture run 2026-10-28T18-06-46
+# Capture run 2026-10-29T06-59-05
 
-173 cases, 173 as expected, 0 different, 1 server restart(s).
+183 cases, 183 as expected, 0 different, 1 server restart(s).
 
 | Case | Group | Expected | Got | Note |
 |---|---|---|---|---|
@@ -35,6 +35,7 @@
 | user_get | Get a user | 200 | 200 |  |
 | user_get_unknown | Get a user | 404 | 404 |  |
 | user_get_invalid_id | Get a user | 500 | 500 |  |
+| user_get_12_char_id | Get a user | 404 | 404 | Mongoose reads any 12 characters as an ObjectId, so this is an unknown ID, not an invalid one |
 | search_all | Search users | 200 | 200 | No search term returns every user. Since 2026-10-26, without passwords (finding 1 fixed) |
 | search_term | Search users | 200 | 200 |  |
 | search_case_insensitive | Search users | 200 | 200 |  |
@@ -63,6 +64,7 @@
 | posts_by_user | List a user's posts | 200 | 200 |  |
 | posts_by_user_with_image | List a user's posts | 200 | 200 | Added 2026-10-28: alice's posts include one with an image |
 | posts_by_unknown_user | List a user's posts | 200 | 200 |  |
+| posts_by_user_no_posts | List a user's posts | 200 | 200 | carol never posts: an empty list |
 | timeline | Timeline | 200 | 200 | alice's posts, then posts from the users she follows (bob) |
 | timeline_self_follow | Timeline | 200 | 200 | carol follows alice and herself |
 | like | Like a post | 200 | 200 |  |
@@ -78,6 +80,7 @@
 | post_delete | Delete a post | 200 | 200 |  |
 | post_delete_again | Delete a post | 500 | 500 |  |
 | post_delete_invalid_id | Delete a post | 500 | 500 |  |
+| post_delete_12_char_id | Delete a post | 500 | 500 | A Postman variable missing a brace: 12 characters, so an unknown ID ({}), not an invalid one |
 | keys_create | Create an API key | 201 | 201 |  |
 | keys_create_read_only | Create an API key | 201 | 201 |  |
 | keys_create_bob | Create an API key | 201 | 201 | Scopes are returned in a fixed order: read, write |
@@ -119,6 +122,7 @@
 | key_deleted | API keys | 401 | 401 | A deleted key stops working at once |
 | keys_list_after_delete | List API keys | 200 | 200 | One key left; lastUsedAt is set because the key was used above |
 | keys_list_bob | List API keys | 200 | 200 | Each user sees only their own keys |
+| keys_list_empty | List API keys | 200 | 200 | carol has no keys: an empty list |
 | user_get_no_auth | Get a user | 401 | 401 |  |
 | search_no_auth | Search users | 401 | 401 |  |
 | follow_no_auth | Follow | 401 | 401 |  |
@@ -148,6 +152,12 @@
 | keys_create_expired_token | Create an API key | 403 | 403 |  |
 | keys_list_expired_token | List API keys | 403 | 403 |  |
 | keys_delete_expired_token | Delete an API key | 403 | 403 |  |
+| login_invalid_json | Log in | 400 | 400 | A comment, which JSON doesn't allow |
+| keys_create_invalid_json | Create an API key | 400 | 400 | A value without quotes |
+| follow_invalid_json | Follow | 400 | 400 | Single quotes |
+| unfollow_invalid_json | Unfollow | 400 | 400 | A missing closing brace |
+| post_create_invalid_json | Create a post | 400 | 400 | An ID without quotes, as Postman sends [{{id}}] |
+| like_invalid_json | Like a post | 400 | 400 | A trailing comma |
 | search_special_dot | Search users | 200 | 200 | As a regex, a.i would match alice; escaped, it matches nobody |
 | search_special_paren | Search users | 200 | 200 | An unescaped ( would be an invalid regex and a 500 |
 | register_unicode | Register | 200 | 200 |  |

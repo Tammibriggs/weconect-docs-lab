@@ -25,5 +25,5 @@
       "message": "scopes must be a list of one or both of: read, write"
     }
   },
-  "durationMs": 4
+  "durationMs": 6
 }

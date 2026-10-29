@@ -4,16 +4,17 @@ This file records how the documented endpoints were tested, what the tests found
 
 ## How the tests ran
 
-`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 173 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture.
+`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 183 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture.
 
 | Item | Value |
 |---|---|
-| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28; 21 cases for field coverage added and all 173 re-run later that day, committed as `tests/captures/v1/` |
+| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28; 21 cases for field coverage added and all 173 re-run later that day; 6 cases for invalid JSON added and all 179 re-run on 2026-10-29; 4 cases for 12-character IDs and empty lists added and all 183 re-run later that day, committed as `tests/captures/v1/` |
 | Stack | Node.js 24, Express 4.18.2, Mongoose 5.13.15 (MongoDB driver 3.7.3), MongoDB 6.0.19 |
-| Cases | 173: 172 returned the status predicted from reading the code; 1 confirmed a crash |
-| Spec check | 155 captures pass, 0 fail; 18 skipped: 14 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
+| Cases | 183: 182 returned the status predicted from reading the code; 1 confirmed a crash |
+| Spec check | 165 captures pass, 0 fail; 18 skipped: 14 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
 | Validator check | 3 deliberately wrong captures (wrong type, undocumented status, missing field) were all rejected |
-| Response coverage | 55 of 55 documented responses and 219 of 219 documented fields appear in a capture. With the spec from before 1.1.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
+| Response coverage | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture. With the spec from before 1.1.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
+| Invalid JSON | All 7 endpoints with a body return `400` with Express's HTML error page [`*_invalid_json`]. Until 2026-10-29 the spec documented it only on register: with the spec from before, `test:validate` fails the 6 new captures |
 
 The captures redact access tokens, API keys and encrypted passwords, and replace local paths with `<repo>`. IDs and timestamps change on every run, so each refresh also updates the spec's examples to the new values.
 
@@ -39,13 +40,13 @@ These are behaviours a later version should change. The spec documents them as t
 2. **Fixed: likes could be made on behalf of any user.** The like endpoint used `userId` from the body, not the token. Since 1.1 it ignores `userId` and always uses the caller: `like_on_behalf` sends carol's ID with alice's token, and the like is alice's [`post_get_after_likes`].
 3. **Create a post stores the whole body**, so a client can set fields such as `likes` [`post_create_preset_likes`]. That lets a client make a post look liked by other users, which finding 2 fixed for the like endpoint. Not fixed yet. Since 2026-10-28, the reference no longer mentions it: telling readers about it would invite abuse, and it would make the fix a breaking change.
 4. **Login reveals whether a username exists**: `404` for an unknown user, `400` for a wrong password, with the same message [`login_unknown_user`, `login_wrong_password`].
-5. **Errors expose internals**: raw database errors [`register_duplicate`, `user_get_invalid_id`, `post_delete_invalid_id`] and HTML pages with stack traces and file paths [`register_invalid_json`; a malformed token returned one too, until 1.1.1]. Express hides the stack trace only when `NODE_ENV` is `production`.
+5. **Errors expose internals**: raw database errors [`register_duplicate`, `user_get_invalid_id`, `post_delete_invalid_id`] and HTML pages with stack traces and file paths [`register_invalid_json` and the 6 other `*_invalid_json` cases; a malformed token returned one too, until 1.1.1]. Express hides the stack trace only when `NODE_ENV` is `production`.
 
 ### Crashes and server errors
 
 6. **Unliking a post crashes the server** [`unlike`, `after_unlike`]. The response is sent, then a stray `url` expression ([`api/routes/posts.js:69`](api/routes/posts.js#L69)) throws, the error handler tries to send a second response, and Node exits with `ERR_HTTP_HEADERS_SENT`. The like is removed [`post_get_after_unlike`].
 7. **Fixed in 1.1.1: a malformed token returned `500`**, an HTML page with a stack trace. `jwt.decode()` returns `null` for anything that isn't a JWT, and the middleware read `.exp` from it. Testing in Postman on 2026-10-27 found the same `500` for an API key without its `wck_` prefix, because the API treats any value without the prefix as a token. Since 1.1.1, a value that's neither an API key nor a token returns `401 "Invalid API key"` on the public endpoints [`auth_malformed_token`, `auth_no_scheme`, `key_without_prefix`, `key_without_bearer`] and `403 "Token is invalid"` on the internal ones, like any other bad token [`auth_malformed_token_internal`].
-8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `post_get_invalid_id`, `post_delete_invalid_id`]. Planned for 2.0.0, because changing these statuses can break clients.
+8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `post_get_invalid_id`, `post_delete_invalid_id`]. Planned for 2.0.0, because changing these statuses can break clients. Check IDs as finding 28 describes: Mongoose's own check lets 12-character strings through.
 
 ### Status codes
 
@@ -82,7 +83,11 @@ These are behaviours a later version should change. The spec documents them as t
 
 ### Added 2026-10-28, from testing in Postman
 
-27. **List a user's posts returns an empty list for a user who doesn't exist** [`posts_by_unknown_user`], so a mistyped ID looks like a user with no posts. Get a user returns `404` for the same ID [`user_get_unknown`]. `Post.userId` is a plain string ([`api/models/Post.js:5-8`](api/models/Post.js#L5-L8)), so any value is a valid query, and the route never checks that the user exists ([`api/routes/posts.js:87-94`](api/routes/posts.js#L87-L94)). The spec documents this on the `id` parameter. Planned for 2.0.0, with finding 8: the empty list is documented, so returning `404` instead is a breaking change. Deleting an account doesn't delete its posts ([`api/routes/users.js:75-82`](api/routes/users.js#L75-L82)), so the change would also turn a deleted user's posts into `404` (from reading the code).
+27. **List a user's posts returns an empty list for a user who doesn't exist** [`posts_by_unknown_user`], so a mistyped ID looks like a user with no posts [`posts_by_user_no_posts`]. Get a user returns `404` for the same ID [`user_get_unknown`]. `Post.userId` is a plain string ([`api/models/Post.js:5-8`](api/models/Post.js#L5-L8)), so any value is a valid query, and the route never checks that the user exists ([`api/routes/posts.js:87-94`](api/routes/posts.js#L87-L94)). The spec documents this on the `id` parameter. Planned for 2.0.0, with finding 8: the empty list is documented, so returning `404` instead is a breaking change. Deleting an account doesn't delete its posts ([`api/routes/users.js:75-82`](api/routes/users.js#L75-L82)), so the change would also turn a deleted user's posts into `404` (from reading the code).
+
+### Added 2026-10-29, from testing in Postman
+
+28. **Any 12-character string counts as a valid ID.** Mongoose 5 reads a 12-character string as the 12 bytes of an ObjectId ([`bson` 1.1.6, `objectid.js:33` and `:348`](api/node_modules/bson/lib/bson/objectid.js#L33)). So a Postman variable missing a brace, such as `{{bobPostId}`, is treated as an ID that doesn't exist, not an invalid one. Delete a post returns `500 {}` instead of the database's `CastError` [`post_delete_12_char_id`], and get a user returns `404` [`user_get_12_char_id`]. The API only ever creates IDs of 24 hexadecimal characters, so a 12-character ID is always a client's mistake, and the error points away from it. The spec now explains this in its IDs section. Planned for 2.0.0, with finding 8: when invalid IDs return `400`, check them with `/^[0-9a-f]{24}$/i`, because `mongoose.isValidObjectId()` and `ObjectId.isValid()` both accept 12-character strings.
 
 ### Edge cases that behave correctly
 

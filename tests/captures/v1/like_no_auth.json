@@ -3,7 +3,7 @@
   "group": "Like a post",
   "request": {
     "method": "PUT",
-    "path": "/api/posts/6ae239c662c96e9421dfba67/like",
+    "path": "/api/posts/6ae2eec9c5e49b4d9b31db46/like",
     "headers": {
       "Content-Type": "application/json"
     },
@@ -19,5 +19,5 @@
       "message": "You are not authenticated!"
     }
   },
-  "durationMs": 6
+  "durationMs": 3
 }

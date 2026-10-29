@@ -3,7 +3,7 @@
   "group": "Get a user",
   "request": {
     "method": "GET",
-    "path": "/api/users/6ae239b862c96e9421dfba33/user",
+    "path": "/api/users/6ae2eebbc5e49b4d9b31db11/user",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -19,5 +19,5 @@
       "message": "Your session has expired"
     }
   },
-  "durationMs": 6
+  "durationMs": 5
 }

@@ -3,7 +3,7 @@
   "group": "Get a user",
   "request": {
     "method": "GET",
-    "path": "/api/users/6ae239b862c96e9421dfba33/user",
+    "path": "/api/users/6ae2eebbc5e49b4d9b31db11/user",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }
@@ -20,15 +20,15 @@
         "coverPicture": {},
         "followers": [],
         "followings": [
-          "6ae239b862c96e9421dfba31"
+          "6ae2eebbc5e49b4d9b31db0f"
         ],
         "isAdmin": false,
-        "_id": "6ae239b862c96e9421dfba33",
+        "_id": "6ae2eebbc5e49b4d9b31db11",
         "username": "bob",
-        "createdAt": "2026-10-28T18:06:48.622Z",
+        "createdAt": "2026-10-29T06:59:07.854Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 13
+  "durationMs": 17
 }

@@ -92,6 +92,8 @@ export const cases = [
   { name: "user_get", group: "Get a user", method: "GET", path: "/api/users/{bobId}/user", auth: "alice", expect: 200 },
   { name: "user_get_unknown", group: "Get a user", method: "GET", path: `/api/users/${NO_SUCH_ID}/user`, auth: "alice", expect: 404 },
   { name: "user_get_invalid_id", group: "Get a user", method: "GET", path: "/api/users/abc/user", auth: "alice", expect: 500 },
+  { name: "user_get_12_char_id", group: "Get a user", method: "GET", path: "/api/users/abcdefghijkl/user", auth: "alice", expect: 404,
+    note: "Mongoose reads any 12 characters as an ObjectId, so this is an unknown ID, not an invalid one" },
   { name: "search_all", group: "Search users", method: "GET", path: "/api/users/search", auth: "alice", expect: 200,
     note: "No search term returns every user. Since 2026-10-26, without passwords (finding 1 fixed)" },
   { name: "search_term", group: "Search users", method: "GET", path: "/api/users/search?search=ali", auth: "alice", expect: 200 },
@@ -145,6 +147,8 @@ export const cases = [
   { name: "posts_by_user_with_image", group: "List a user's posts", method: "GET", path: "/api/posts/{aliceId}", auth: "alice",
     expect: 200, note: "Added 2026-10-28: alice's posts include one with an image" },
   { name: "posts_by_unknown_user", group: "List a user's posts", method: "GET", path: "/api/posts/nobody", auth: "alice", expect: 200 },
+  { name: "posts_by_user_no_posts", group: "List a user's posts", method: "GET", path: "/api/posts/{carolId}", auth: "alice", expect: 200,
+    note: "carol never posts: an empty list" },
   { name: "timeline", group: "Timeline", method: "GET", path: "/api/posts/timeline/all", auth: "alice", expect: 200,
     note: "alice's posts, then posts from the users she follows (bob)" },
   { name: "timeline_self_follow", group: "Timeline", method: "GET", path: "/api/posts/timeline/all", auth: "carol", expect: 200,
@@ -176,6 +180,8 @@ export const cases = [
   { name: "post_delete", group: "Delete a post", method: "DELETE", path: "/api/posts/{postA2}", auth: "alice", expect: 200 },
   { name: "post_delete_again", group: "Delete a post", method: "DELETE", path: "/api/posts/{postA2}", auth: "alice", expect: 500 },
   { name: "post_delete_invalid_id", group: "Delete a post", method: "DELETE", path: "/api/posts/abc", auth: "alice", expect: 500 },
+  { name: "post_delete_12_char_id", group: "Delete a post", method: "DELETE", path: "/api/posts/{{bobPostId}", auth: "alice", expect: 500,
+    note: "A Postman variable missing a brace: 12 characters, so an unknown ID ({}), not an invalid one" },
 
   // ─── API keys, added 2026-10-26 ──────────────────────────────────
   // Managing keys is internal and needs an access token from logging in.
@@ -261,6 +267,8 @@ export const cases = [
     note: "One key left; lastUsedAt is set because the key was used above" },
   { name: "keys_list_bob", group: "List API keys", method: "GET", path: "/api/keys", auth: "bob", expect: 200,
     note: "Each user sees only their own keys" },
+  { name: "keys_list_empty", group: "List API keys", method: "GET", path: "/api/keys", auth: "carol", expect: 200,
+    note: "carol has no keys: an empty list" },
 
   // ─── Response coverage, added 2026-10-28 ─────────────────────────
   // One case for each documented response no other case produced, so that
@@ -314,6 +322,22 @@ export const cases = [
     body: { name: "Too late", scopes: ["read"] }, expect: 403 },
   { name: "keys_list_expired_token", group: "List API keys", method: "GET", path: "/api/keys", auth: "expired", expect: 403 },
   { name: "keys_delete_expired_token", group: "Delete an API key", method: "DELETE", path: "/api/keys/{aliceKeyId}", auth: "expired", expect: 403 },
+
+  // A body that isn't valid JSON: express.json() rejects it with 400 and an HTML page before any route runs.
+  // Each body has a mistake that's easy to make in Postman.
+  { name: "login_invalid_json", group: "Log in", method: "POST", path: "/api/auth/login",
+    body: '{"username": "alice" // a comment\n}', expect: 400, note: "A comment, which JSON doesn't allow" },
+  { name: "keys_create_invalid_json", group: "Create an API key", method: "POST", path: "/api/keys", auth: "alice",
+    body: '{"name": "CI", "scopes": [read]}', expect: 400, note: "A value without quotes" },
+  { name: "follow_invalid_json", group: "Follow", method: "PUT", path: "/api/users/follow", auth: "alice",
+    body: "{'userId': 'abc'}", expect: 400, note: "Single quotes" },
+  { name: "unfollow_invalid_json", group: "Unfollow", method: "PUT", path: "/api/users/unfollow", auth: "alice",
+    body: '{"userId": "abc"', expect: 400, note: "A missing closing brace" },
+  { name: "post_create_invalid_json", group: "Create a post", method: "POST", path: "/api/posts", auth: "alice",
+    body: `{"desc": "Hello", "likes": [${NO_SUCH_ID}]}`, expect: 400,
+    note: "An ID without quotes, as Postman sends [{{id}}]" },
+  { name: "like_invalid_json", group: "Like a post", method: "PUT", path: "/api/posts/{postB}/like", auth: "alice",
+    body: '{"userId": "abc",}', expect: 400, note: "A trailing comma" },
 
   // ─── Edge cases, added 2026-10-24 ───────────────────────────────
   // After the main flow, so the users they add don't change earlier results.

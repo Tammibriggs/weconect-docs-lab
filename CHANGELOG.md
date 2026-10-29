@@ -11,6 +11,9 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 - **`bio` and the pictures' `url` and `filename` are explained.** They appear only once a user has saved their profile in the app. **Get a user**'s example now shows a saved profile.
 - **The `500` errors of get a user, follow, and like no longer list `message`**, which they never return. Register's `409` still has it.
 - **Get a user's `404` says when it applies:** the ID is a valid ObjectId, but no user has it. An ID that isn't a valid ObjectId returns `500`.
+- **Empty lists are explained.** List a user's posts, search users, and get the timeline now say when `data` is an empty list. List a user's posts also returns one when no user has the ID.
+- **IDs of 12 characters are explained.** A new IDs section says that the API accepts any 12-character string as an ObjectId, and treats it as an ID that doesn't exist rather than an invalid one.
+- **A body that isn't valid JSON is documented on every endpoint that takes one.** Follow, unfollow, create a post, and like return `400` with Express's HTML error page, as register already documented. The Errors section now gives the status code. The API behaves as before; 6 new test cases show it.
 - **The public reference says to use an API key.** The access tokens the app uses work on the public endpoints, but they expire and aren't supported for other code.
 - Every documented response and response field now has a captured example behind it: 38 new test cases cover the `401` and `403` responses that were documented from shared code, and fields such as `bio`, `expired`, and `img` that no case had returned.
 

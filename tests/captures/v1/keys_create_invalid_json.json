@@ -1,0 +1,22 @@
+{
+  "name": "keys_create_invalid_json",
+  "group": "Create an API key",
+  "note": "A value without quotes",
+  "request": {
+    "method": "POST",
+    "path": "/api/keys",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": "{\"name\": \"CI\", \"scopes\": [read]}"
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "content-type": "text/html; charset=utf-8"
+    },
+    "body": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>SyntaxError: Unexpected token &#39;r&#39;, ...&quot;scopes&quot;: [read]}&quot; is not valid JSON<br> &nbsp; &nbsp;at JSON.parse (&lt;anonymous&gt;)<br> &nbsp; &nbsp;at parse (<repo>/api/node_modules/body-parser/lib/types/json.js:89:19)<br> &nbsp; &nbsp;at <repo>/api/node_modules/body-parser/lib/read.js:128:18<br> &nbsp; &nbsp;at AsyncResource.runInAsyncScope (node:async_hooks:227:14)<br> &nbsp; &nbsp;at invokeCallback (<repo>/api/node_modules/raw-body/index.js:231:16)<br> &nbsp; &nbsp;at done (<repo>/api/node_modules/raw-body/index.js:220:7)<br> &nbsp; &nbsp;at IncomingMessage.onEnd (<repo>/api/node_modules/raw-body/index.js:280:7)<br> &nbsp; &nbsp;at IncomingMessage.emit (node:events:514:28)<br> &nbsp; &nbsp;at endReadableNT (node:internal/streams/readable:1757:12)<br> &nbsp; &nbsp;at process.processTicksAndRejections (node:internal/process/task_queues:90:21)</pre>\n</body>\n</html>\n"
+  },
+  "durationMs": 8
+}

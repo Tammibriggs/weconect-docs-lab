@@ -25,18 +25,18 @@
     "body": {
       "status": "ok",
       "data": {
-        "id": "6ae239cf62c96e9421dfba90",
+        "id": "6ae2eed3c5e49b4d9b31db71",
         "name": "Bob's script",
-        "lastFour": "eD5T",
+        "lastFour": "u0l8",
         "scopes": [
           "read",
           "write"
         ],
-        "createdAt": "2026-10-28T18:07:11.384Z",
+        "createdAt": "2026-10-29T06:59:31.772Z",
         "lastUsedAt": null,
         "key": "<redacted API key>"
       }
     }
   },
-  "durationMs": 5
+  "durationMs": 15
 }

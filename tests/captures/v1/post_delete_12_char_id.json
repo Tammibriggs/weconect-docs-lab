@@ -1,0 +1,20 @@
+{
+  "name": "post_delete_12_char_id",
+  "group": "Delete a post",
+  "note": "A Postman variable missing a brace: 12 characters, so an unknown ID ({}), not an invalid one",
+  "request": {
+    "method": "DELETE",
+    "path": "/api/posts/{{bobPostId}",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {}
+  },
+  "durationMs": 10
+}

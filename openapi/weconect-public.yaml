@@ -55,8 +55,16 @@ info:
 
     - Some `500` responses return the raw database error in an `error` field.
     - **Unfollow a user** returns its messages as plain JSON strings.
-    - A body that isn't valid JSON returns Express's HTML error page. So does
-      a path or method that doesn't exist, with `404`.
+    - A body that isn't valid JSON returns `400` with Express's HTML error
+      page, on every endpoint that takes a body. A path or method that doesn't
+      exist returns the same kind of page, with `404`.
+
+    ## IDs
+
+    IDs are MongoDB ObjectIds, written as 24 hexadecimal characters. Each
+    operation documents what an invalid ID returns. The API also accepts any
+    12-character string as an ObjectId, so a mistyped 12-character ID is
+    treated as an ID that doesn't exist, not as an invalid one.
 
     ## Request bodies
 
@@ -110,9 +118,9 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae239b862c96e9421dfba31
+                  _id: 6ae2eebbc5e49b4d9b31db0f
                   username: alice
-                  createdAt: '2026-10-28T18:06:48.303Z'
+                  createdAt: '2026-10-29T06:59:07.539Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -152,9 +160,9 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae239e562c96e9421dfbadd
+                  _id: 6ae2eeecc5e49b4d9b31dbbf
                   username: erin
-                  createdAt: '2026-10-28T18:07:33.870Z'
+                  createdAt: '2026-10-29T06:59:56.643Z'
                   __v: 0
                   bio: Coffee and code
         '401':
@@ -222,7 +230,7 @@ paths:
           example: ali
       responses:
         '200':
-          description: The matching users, possibly none.
+          description: The matching users. `data` is an empty list if no username contains the term.
           content:
             application/json:
               schema:
@@ -244,10 +252,10 @@ paths:
                   - followers: []
                     followings: []
                     isAdmin: false
-                    _id: 6ae239b862c96e9421dfba31
+                    _id: 6ae2eebbc5e49b4d9b31db0f
                     username: alice
-                    createdAt: '2026-10-28T18:06:48.303Z'
-                    updatedAt: '2026-10-28T18:06:48.303Z'
+                    createdAt: '2026-10-29T06:59:07.539Z'
+                    updatedAt: '2026-10-29T06:59:07.539Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -274,7 +282,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ae239b862c96e9421dfba33
+              userId: 6ae2eebbc5e49b4d9b31db11
       responses:
         '200':
           description: The current user now follows the user.
@@ -286,7 +294,9 @@ paths:
                 status: ok
                 message: user has been followed
         '400':
-          description: '`userId` is missing.'
+          description: |
+            `userId` is missing, or the body isn't valid JSON. For invalid JSON,
+            the response is Express's HTML error page.
           content:
             application/json:
               schema:
@@ -294,6 +304,12 @@ paths:
               example:
                 status: error
                 message: Missing payload property
+            text/html:
+              schema:
+                $ref: '#/components/schemas/HtmlErrorPage'
+              examples:
+                invalidJson:
+                  $ref: '#/components/examples/InvalidJsonPage'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -348,7 +364,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ae239b862c96e9421dfba33
+              userId: 6ae2eebbc5e49b4d9b31db11
       responses:
         '200':
           description: The current user no longer follows the user.
@@ -358,7 +374,9 @@ paths:
                 type: string
               example: user has been unfollowed
         '400':
-          description: '`userId` is missing.'
+          description: |
+            `userId` is missing, or the body isn't valid JSON. For invalid JSON,
+            the response is Express's HTML error page.
           content:
             application/json:
               schema:
@@ -366,6 +384,12 @@ paths:
               example:
                 status: error
                 message: Missing payload property
+            text/html:
+              schema:
+                $ref: '#/components/schemas/HtmlErrorPage'
+              examples:
+                invalidJson:
+                  $ref: '#/components/examples/InvalidJsonPage'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -411,12 +435,12 @@ paths:
               text:
                 summary: Text only
                 value:
-                  userId: 6ae239b862c96e9421dfba31
+                  userId: 6ae2eebbc5e49b4d9b31db0f
                   desc: Hello from Alice
               withImage:
                 summary: With an image
                 value:
-                  userId: 6ae239b862c96e9421dfba31
+                  userId: 6ae2eebbc5e49b4d9b31db0f
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
@@ -433,15 +457,17 @@ paths:
                 data:
                   likes: []
                   comments: []
-                  _id: 6ae239c662c96e9421dfba65
-                  userId: 6ae239b862c96e9421dfba31
+                  _id: 6ae2eec9c5e49b4d9b31db44
+                  userId: 6ae2eebbc5e49b4d9b31db0f
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
                     filename: photo.jpg
-                  createdAt: '2026-10-28T18:07:02.060Z'
-                  updatedAt: '2026-10-28T18:07:02.060Z'
+                  createdAt: '2026-10-29T06:59:21.673Z'
+                  updatedAt: '2026-10-29T06:59:21.673Z'
                   __v: 0
+        '400':
+          $ref: '#/components/responses/InvalidJson'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -496,10 +522,12 @@ paths:
           description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
           schema:
             type: string
-          example: 6ae239b862c96e9421dfba33
+          example: 6ae2eebbc5e49b4d9b31db11
       responses:
         '200':
-          description: The user's posts, possibly none.
+          description: |
+            The user's posts. `data` is an empty list if the user has no posts,
+            and also if no user has this ID.
           content:
             application/json:
               schema:
@@ -509,11 +537,11 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ae239c662c96e9421dfba67
-                    userId: 6ae239b862c96e9421dfba33
+                    _id: 6ae2eec9c5e49b4d9b31db46
+                    userId: 6ae2eebbc5e49b4d9b31db11
                     desc: Hello from Bob
-                    createdAt: '2026-10-28T18:07:02.370Z'
-                    updatedAt: '2026-10-28T18:07:02.370Z'
+                    createdAt: '2026-10-29T06:59:21.982Z'
+                    updatedAt: '2026-10-29T06:59:21.982Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -541,7 +569,7 @@ paths:
           description: The post's ID.
           schema:
             $ref: '#/components/schemas/ObjectId'
-          example: 6ae239c662c96e9421dfba65
+          example: 6ae2eec9c5e49b4d9b31db44
       responses:
         '200':
           description: The post was deleted.
@@ -611,7 +639,9 @@ paths:
         **Scope:** `read`
       responses:
         '200':
-          description: The timeline, possibly empty.
+          description: |
+            The timeline. `data` is an empty list if neither the current user
+            nor anyone they follow has posted.
           content:
             application/json:
               schema:
@@ -621,19 +651,19 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ae239c562c96e9421dfba63
-                    userId: 6ae239b862c96e9421dfba31
+                    _id: 6ae2eec9c5e49b4d9b31db42
+                    userId: 6ae2eebbc5e49b4d9b31db0f
                     desc: Hello from Alice
-                    createdAt: '2026-10-28T18:07:01.747Z'
-                    updatedAt: '2026-10-28T18:07:01.747Z'
+                    createdAt: '2026-10-29T06:59:21.356Z'
+                    updatedAt: '2026-10-29T06:59:21.356Z'
                     __v: 0
                   - likes: []
                     comments: []
-                    _id: 6ae239c662c96e9421dfba67
-                    userId: 6ae239b862c96e9421dfba33
+                    _id: 6ae2eec9c5e49b4d9b31db46
+                    userId: 6ae2eebbc5e49b4d9b31db11
                     desc: Hello from Bob
-                    createdAt: '2026-10-28T18:07:02.370Z'
-                    updatedAt: '2026-10-28T18:07:02.370Z'
+                    createdAt: '2026-10-29T06:59:21.982Z'
+                    updatedAt: '2026-10-29T06:59:21.982Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -674,6 +704,8 @@ paths:
                 $ref: '#/components/schemas/Ok'
               example:
                 status: ok
+        '400':
+          $ref: '#/components/responses/InvalidJson'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -704,7 +736,7 @@ components:
       description: The user's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ae239e562c96e9421dfbadd
+      example: 6ae2eeecc5e49b4d9b31dbbf
     PostId:
       name: postId
       in: path
@@ -712,8 +744,31 @@ components:
       description: The post's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ae239c562c96e9421dfba63
+      example: 6ae2eec9c5e49b4d9b31db42
+  examples:
+    InvalidJsonPage:
+      summary: The body isn't valid JSON
+      value: |
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="utf-8">
+        <title>Error</title>
+        </head>
+        <body>
+        <pre>SyntaxError: Expected double-quoted property name in JSON at position 20 (line 1 column 21)<br> &nbsp; &nbsp;at JSON.parse (&lt;anonymous&gt;)<br> ...</pre>
+        </body>
+        </html>
   responses:
+    InvalidJson:
+      description: The body isn't valid JSON. Express returns its HTML error page.
+      content:
+        text/html:
+          schema:
+            $ref: '#/components/schemas/HtmlErrorPage'
+          examples:
+            invalidJson:
+              $ref: '#/components/examples/InvalidJsonPage'
     Unauthorized:
       description: |
         The `Authorization` header is missing, or doesn't hold a current API
@@ -761,7 +816,10 @@ components:
   schemas:
     ObjectId:
       type: string
-      description: A MongoDB ObjectId, 24 hexadecimal characters.
+      description: |
+        A MongoDB ObjectId, 24 hexadecimal characters. The API also accepts any
+        12-character string as an ObjectId, and treats it as an ID that doesn't
+        exist.
       pattern: ^[0-9a-f]{24}$
     Ok:
       type: object

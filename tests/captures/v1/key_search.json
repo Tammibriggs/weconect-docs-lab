@@ -20,17 +20,17 @@
         {
           "followers": [],
           "followings": [
-            "6ae239b862c96e9421dfba31"
+            "6ae2eebbc5e49b4d9b31db0f"
           ],
           "isAdmin": false,
-          "_id": "6ae239b862c96e9421dfba33",
+          "_id": "6ae2eebbc5e49b4d9b31db11",
           "username": "bob",
-          "createdAt": "2026-10-28T18:06:48.622Z",
-          "updatedAt": "2026-10-28T18:07:08.603Z",
+          "createdAt": "2026-10-29T06:59:07.854Z",
+          "updatedAt": "2026-10-29T06:59:28.624Z",
           "__v": 0
         }
       ]
     }
   },
-  "durationMs": 17
+  "durationMs": 16
 }

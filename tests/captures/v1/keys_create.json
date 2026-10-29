@@ -24,18 +24,18 @@
     "body": {
       "status": "ok",
       "data": {
-        "id": "6ae239ce62c96e9421dfba8c",
+        "id": "6ae2eed3c5e49b4d9b31db6d",
         "name": "My bot",
-        "lastFour": "aLMu",
+        "lastFour": "HdCP",
         "scopes": [
           "read",
           "write"
         ],
-        "createdAt": "2026-10-28T18:07:10.766Z",
+        "createdAt": "2026-10-29T06:59:31.139Z",
         "lastUsedAt": null,
         "key": "<redacted API key>"
       }
     }
   },
-  "durationMs": 8
+  "durationMs": 20
 }

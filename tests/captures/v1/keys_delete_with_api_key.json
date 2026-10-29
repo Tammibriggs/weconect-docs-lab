@@ -4,7 +4,7 @@
   "note": "The key isn't deleted",
   "request": {
     "method": "DELETE",
-    "path": "/api/keys/6ae239ce62c96e9421dfba8c",
+    "path": "/api/keys/6ae2eed3c5e49b4d9b31db6d",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }
@@ -19,5 +19,5 @@
       "message": "API keys can't be used with this endpoint. Use an access token from logging in."
     }
   },
-  "durationMs": 5
+  "durationMs": 6
 }

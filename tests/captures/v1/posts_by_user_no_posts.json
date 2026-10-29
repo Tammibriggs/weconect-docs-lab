@@ -1,0 +1,23 @@
+{
+  "name": "posts_by_user_no_posts",
+  "group": "List a user's posts",
+  "note": "carol never posts: an empty list",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/6ae2eebcc5e49b4d9b31db13",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": []
+    }
+  },
+  "durationMs": 8
+}

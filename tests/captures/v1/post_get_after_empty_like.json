@@ -3,7 +3,7 @@
   "group": "Get a post",
   "request": {
     "method": "GET",
-    "path": "/api/posts/6ae239c662c96e9421dfba67/single",
+    "path": "/api/posts/6ae2eec9c5e49b4d9b31db46/single",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -17,14 +17,14 @@
       "status": "ok",
       "data": {
         "likes": [
-          "6ae239b862c96e9421dfba31"
+          "6ae2eebbc5e49b4d9b31db0f"
         ],
         "comments": [],
-        "_id": "6ae239c662c96e9421dfba67",
-        "userId": "6ae239b862c96e9421dfba33",
+        "_id": "6ae2eec9c5e49b4d9b31db46",
+        "userId": "6ae2eebbc5e49b4d9b31db11",
         "desc": "Hello from Bob",
-        "createdAt": "2026-10-28T18:07:02.370Z",
-        "updatedAt": "2026-10-28T18:07:07.358Z",
+        "createdAt": "2026-10-29T06:59:21.982Z",
+        "updatedAt": "2026-10-29T06:59:27.358Z",
         "__v": 0
       }
     }

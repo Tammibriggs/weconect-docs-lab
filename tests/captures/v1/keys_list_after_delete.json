@@ -18,28 +18,28 @@
       "status": "ok",
       "data": [
         {
-          "id": "6ae239cf62c96e9421dfba92",
+          "id": "6ae2eed4c5e49b4d9b31db73",
           "name": "Poster",
-          "lastFour": "qsvc",
+          "lastFour": "bk-5",
           "scopes": [
             "write"
           ],
-          "createdAt": "2026-10-28T18:07:11.691Z",
+          "createdAt": "2026-10-29T06:59:32.086Z",
           "lastUsedAt": null
         },
         {
-          "id": "6ae239ce62c96e9421dfba8c",
+          "id": "6ae2eed3c5e49b4d9b31db6d",
           "name": "My bot",
-          "lastFour": "aLMu",
+          "lastFour": "HdCP",
           "scopes": [
             "read",
             "write"
           ],
-          "createdAt": "2026-10-28T18:07:10.766Z",
-          "lastUsedAt": "2026-10-28T18:07:19.770Z"
+          "createdAt": "2026-10-29T06:59:31.139Z",
+          "lastUsedAt": "2026-10-29T06:59:40.306Z"
         }
       ]
     }
   },
-  "durationMs": 5
+  "durationMs": 26
 }

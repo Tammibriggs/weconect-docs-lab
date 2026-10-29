@@ -4,13 +4,13 @@
   "note": "Liking a second time removes the like",
   "request": {
     "method": "PUT",
-    "path": "/api/posts/6ae239c562c96e9421dfba63/like",
+    "path": "/api/posts/6ae2eec9c5e49b4d9b31db42/like",
     "headers": {
       "Authorization": "Bearer <redacted JWT>",
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae239b862c96e9421dfba33"
+      "userId": "6ae2eebbc5e49b4d9b31db11"
     }
   },
   "response": {
@@ -22,7 +22,7 @@
       "status": "ok"
     }
   },
-  "durationMs": 13,
+  "durationMs": 11,
   "serverExited": {
     "code": 1,
     "signal": null

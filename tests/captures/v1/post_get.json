@@ -3,7 +3,7 @@
   "group": "Get a post",
   "request": {
     "method": "GET",
-    "path": "/api/posts/6ae239c562c96e9421dfba63/single",
+    "path": "/api/posts/6ae2eec9c5e49b4d9b31db42/single",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -18,14 +18,14 @@
       "data": {
         "likes": [],
         "comments": [],
-        "_id": "6ae239c562c96e9421dfba63",
-        "userId": "6ae239b862c96e9421dfba31",
+        "_id": "6ae2eec9c5e49b4d9b31db42",
+        "userId": "6ae2eebbc5e49b4d9b31db0f",
         "desc": "Hello from Alice",
-        "createdAt": "2026-10-28T18:07:01.747Z",
-        "updatedAt": "2026-10-28T18:07:01.747Z",
+        "createdAt": "2026-10-29T06:59:21.356Z",
+        "updatedAt": "2026-10-29T06:59:21.356Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 6
+  "durationMs": 12
 }

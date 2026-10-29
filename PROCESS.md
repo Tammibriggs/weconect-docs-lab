@@ -22,15 +22,35 @@ Entries are in date order, newest last. Every number names the file or command i
 | Number | Source |
 |---|---|
 | 15 of 26 endpoints in the full spec, 10 of them public | `openapi/weconect-v1.yaml`, `openapi/weconect-public.yaml` |
-| 173 test cases; 172 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
-| 155 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
-| 55 of 55 documented responses and 219 of 219 documented fields appear in a capture (before the coverage cases: 39 responses; 42 fields missing) | `npm run test:coverage` |
-| 27 findings, 4 of them fixed: 3 in 1.1, 1 in 1.1.1 | `TESTING.md` |
+| 183 test cases; 182 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
+| 165 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
+| 57 of 57 documented responses and 219 of 219 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
+| 28 findings, 4 of them fixed: 3 in 1.1, 1 in 1.1.1 | `TESTING.md` |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
 | 5 more API problems found by reading the code while redesigning | `TESTING.md`, "Found by reading the code" |
 | API keys page: 32 of 32 browser checks against the real API | `web/redesign/tools/check-api-keys.mjs` |
+
+## What I found myself
+
+Problems I found by using the app, testing in Postman, or reading the docs next to real responses. Claude Code explained the causes and made most of the changes; each log entry's "Who did what" has the details.
+
+| Date | What I found | How | Outcome |
+|---|---|---|---|
+| 2026-10-25 | The redesigned app looked heavy, and the header covered focus rings | Using the app | Fixed in `web/` |
+| 2026-10-27 | `updatedAt` in the schema of get the current user and get a user, which never return it | Postman | Docs fixed in 1.1.1 (finding 16) |
+| 2026-10-27 | `500` with a stack trace for a value that isn't a key (`Bearer 2434143`) | Postman | API fixed in 1.1.1 (finding 7) |
+| 2026-10-28 | List a user's posts returns `200` and an empty list for an ID that isn't a user | Postman | Finding 27, planned for 2.0.0 |
+| 2026-10-28 | Like returns `500` for a deleted post | Postman | Already finding 8 |
+| 2026-10-28 | The read endpoints showed the `'write'` scope message | My question about scope errors on get the current user; Claude Code then found the example | Docs fixed |
+| 2026-10-28 | `expired` in the `401` schema, which never returns it | Reading the docs next to a response | Docs fixed |
+| 2026-10-28 | `bio` documented but missing from responses | Reading the docs next to a response | Explained, with cases that save a profile |
+| 2026-10-28 | Get a user's `404` didn't say it applies only to valid IDs | Reading the docs | My rewording, moved into the full spec |
+| 2026-10-28 | Create a post's description told readers they could set `likes` | Reading the docs | Sentence removed; finding 3 stays open |
+| 2026-10-29 | An undocumented `400` for a body that isn't valid JSON | Postman | Documented on 6 more endpoints, with cases |
+| 2026-10-29 | "Possibly none" on list a user's posts was vague | Reading the docs | 4 descriptions rewritten |
+| 2026-10-29 | Delete a post returned `500 {}` for `{{bobPostId}`, a variable missing a brace | Postman | Finding 28, planned for 2.0.0 |
 
 ## Log
 
@@ -637,6 +657,77 @@ The repo has no remote yet, so nothing is pushed.
 - **Me:** rewrote the `404` description, questioned the `likes` sentence, and chose to change only the docs for now.
 - **Claude Code:** found the edit was in the generated file, moved it, explained the bug, removed the sentence, ran the checks, and updated `TESTING.md`, `CHANGELOG.md` and this log.
 
+### 2026-10-29: An undocumented `400` for invalid JSON
+
+**What I found in Postman:** testing finding 3, I sent create a post a body with `"likes": [{{bobId}}]` and a `//` comment, and got a `400` the spec doesn't document.
+
+**Why:**
+- My body wasn't valid JSON. Postman pastes a variable's value as it is, so the ID arrived without quotes. It needs `["{{bobId}}"]`. JSON doesn't allow comments either.
+- `express.json()` parses every body before any route runs ([`api/index.js:38`](api/index.js#L38)). When parsing fails, Express replies `400` with its HTML error page, so the same thing happens on every endpoint that takes a body.
+- The spec documented it only on register, which is internal, so the public reference didn't document it anywhere.
+
+**Decision (mine):** document it everywhere, with tests. No API change.
+
+**What changed:**
+- **6 cases**, one for each other endpoint with a body, each with a mistake that's easy to make in Postman: a comment, a value without quotes, single quotes, a missing brace, an ID without quotes, and a trailing comma. All return `400` with the HTML page.
+- **Spec:**
+  - Create a post and like reuse the shared `InvalidJson` response.
+  - Follow, unfollow, log in and create an API key already had a JSON `400`, so their `400` now lists two media types: `application/json` and `text/html`.
+  - The HTML page is one shared example (`components/examples/InvalidJsonPage`), so it's written once.
+  - The Errors section gives the status code.
+
+**Checks:**
+- `npm run test:capture` (port 8810): 179 cases, all as predicted, 1 restart (the unlike crash).
+- `npm run test:validate`: 161 passed, 0 failed, 18 skipped. With the spec from before this change, the 6 new captures fail: 2 because `400` isn't documented, 4 because `text/html` isn't.
+- `npm run test:coverage`: 57 of 57 responses (2 new) and 219 of 219 fields.
+- `npm run lint:spec`: 2 usual warnings each.
+- The spec's example IDs and timestamps were remapped to the new captures (45 replacements, none left unmapped).
+
+**What I learned:**
+- Some errors come from the framework, not from the route's code, so reading a route doesn't show them. Testing does.
+- One status code can have more than one media type. A client that always parses the body as JSON fails on this `400`.
+- Postman variables are pasted as text: a string variable needs quotes around it in a JSON body.
+
+**Who did what**
+- **Me:** found the undocumented `400` in Postman and approved the fix.
+- **Claude Code:** found the cause, wrote the 6 cases, changed the spec, refreshed the captures, ran the checks, and updated `TESTING.md`, `CHANGELOG.md` and this log.
+
+### 2026-10-29, later: Empty lists, and IDs of 12 characters
+
+**What I found:**
+- List a user's posts said "The user's posts, possibly none." What does "none" mean?
+- In Postman, delete a post returned `500 {}` for `{{baseUrl}}/api/posts/{{bobPostId}`. I expected the database error the spec describes for an invalid ID.
+
+**Why:**
+- **"None"** is `{"status": "ok", "data": []}`. List a user's posts returns it for a user with no posts, and also for an ID that isn't a user (finding 27), which the response didn't say. Three other responses had the same wording.
+- **The `{}`:** my variable was missing a brace. Postman replaces only `{{name}}`, so it sent the text `{{bobPostId}`, which is 12 characters. Mongoose 5 converts IDs with the `bson` library (1.1.6), which reads any 12-character string as the 12 bytes of an ObjectId ([`objectid.js:33`](api/node_modules/bson/lib/bson/objectid.js#L33), [`:348`](api/node_modules/bson/lib/bson/objectid.js#L348)). Here that's `7b7b626f62506f737449647d`. No post has it, so `findById` returned `null`, reading `userId` from it threw a `TypeError`, and an error converted to JSON is `{}`: the same path as finding 8.
+- Reproduced first on a throwaway API on port 8820: 12 characters gave `500 {}`; `abc`, 13 characters, or 24 characters that aren't hexadecimal gave the `CastError`. `{{bobPostId}}` with both braces and no variable set is 13 characters, so it gives the `CastError`.
+- **Not a bug in MongoDB or Mongoose:** the library documents it. But the API only ever creates 24-character IDs, so a 12-character one is always a mistake, and the error points away from it.
+
+**Decision (mine):** approved documenting both now, and checking IDs in 2.0.0 with finding 8.
+
+**What changed:**
+- **4 cases:** `user_get_12_char_id` (`404`), `post_delete_12_char_id` (`500 {}`, with my typo as the ID), `posts_by_user_no_posts` and `keys_list_empty` (carol, who has no posts or keys: empty lists).
+- **Spec:** the four `200` descriptions say when `data` is empty. A new IDs section in the overview, and the `ObjectId` schema, explain 12-character IDs.
+- **Finding 28:** when finding 8 is fixed, check IDs with `/^[0-9a-f]{24}$/i`, because `mongoose.isValidObjectId()` and `ObjectId.isValid()` both accept 12-character strings.
+- **A "What I found myself" table**, after Key numbers.
+
+**Checks:**
+- `npm run test:capture` (port 8810): 183 cases, all as predicted, 1 restart (the unlike crash).
+- `npm run test:validate`: 165 passed, 0 failed, 18 skipped.
+- `npm run test:coverage`: 57 of 57 responses and 219 of 219 fields.
+- `npm run lint:spec`: 2 usual warnings each.
+- The spec's example IDs and timestamps were remapped to the new captures (45 replacements, none left unmapped).
+
+**What I learned:**
+- "Valid" depends on who checks. A library can accept more than the API ever creates, so the API should check its own format.
+- An empty list is an answer that needs explaining, especially when it can hide a mistake.
+- A typo in a test can find real behaviour: my missing brace hit a case the tests didn't have.
+
+**Who did what**
+- **Me:** found the vague "possibly none", hit the `500 {}` in Postman, asked whether 12-character IDs need preventing, and approved the changes.
+- **Claude Code:** found and reproduced the cause, wrote the cases and finding 28, updated the spec, refreshed the captures, ran the checks, and updated `TESTING.md`, `CHANGELOG.md` and this log.
+
 ## Post and portfolio ideas
 
 - Testing my own API before documenting it turned up 23 problems, including search leaking every user's encrypted password.
@@ -648,3 +739,4 @@ The repo has no remote yet, so nothing is pushed.
 - My characterization tests caught a regression I'd never have looked for: an `async` middleware that turned a `500` into a server crash.
 - One long word broke every page: auditing my own frontend with headless Chrome and axe, with before and after screenshots (`web/redesign/`).
 - Why "403 means sign out" is wrong for this API, and what that teaches about documenting status codes.
+- A missing brace in a Postman variable found a Mongoose quirk: any 12-character string is a valid ObjectId.

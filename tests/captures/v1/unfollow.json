@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae239b862c96e9421dfba33"
+      "userId": "6ae2eebbc5e49b4d9b31db11"
     }
   },
   "response": {
@@ -19,5 +19,5 @@
     },
     "body": "user has been unfollowed"
   },
-  "durationMs": 22
+  "durationMs": 10
 }

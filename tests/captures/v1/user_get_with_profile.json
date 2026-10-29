@@ -3,7 +3,7 @@
   "group": "Get a user",
   "request": {
     "method": "GET",
-    "path": "/api/users/6ae239e562c96e9421dfbadd/user",
+    "path": "/api/users/6ae2eeecc5e49b4d9b31dbbf/user",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }
@@ -27,13 +27,13 @@
         "followers": [],
         "followings": [],
         "isAdmin": false,
-        "_id": "6ae239e562c96e9421dfbadd",
+        "_id": "6ae2eeecc5e49b4d9b31dbbf",
         "username": "erin",
-        "createdAt": "2026-10-28T18:07:33.870Z",
+        "createdAt": "2026-10-29T06:59:56.643Z",
         "__v": 0,
         "bio": "Coffee and code"
       }
     }
   },
-  "durationMs": 8
+  "durationMs": 13
 }
