@@ -470,7 +470,7 @@ paths:
         '403':
           $ref: '#/components/responses/ReadScopeForbidden'
         '404':
-          description: No user has this ID.
+          description: The ID is a valid ObjectId, but no user has it.
           content:
             application/json:
               schema:
@@ -713,9 +713,6 @@ paths:
       description: |
         Publishes a post as the current user. `userId` must be the current
         user's ID.
-
-        The body is stored as it is, so a client can also set fields such as
-        `likes`.
 
         **Scope:** `write`
       requestBody:

@@ -617,6 +617,26 @@ The repo has no remote yet, so nothing is pushed.
 - **Me:** asked about tokens in the public docs, found `bio` missing from the responses, and approved the fixes.
 - **Claude Code:** scanned the fields, explained the causes, wrote the cases and the field check, updated the spec, refreshed the captures, ran the checks, and updated `TESTING.md`, `CHANGELOG.md`, `README.md`, `CLAUDE.md` and this log.
 
+### 2026-10-28, later: Get a user's `404`, and a security bug in the docs
+
+**Get a user's `404`:** I rewrote its description to say it happens only for a valid ObjectId, because an invalid ID returns `500` [`user_get_unknown`, `user_get_invalid_id`]. I'd edited the public spec, which is generated, so Claude Code moved the change into the full spec and rebuilt. Now: "The ID is a valid ObjectId, but no user has it."
+
+**What I asked:** create a post's description said a client could set fields such as `likes`. Do readers need to know that?
+
+**Answer:** no. It's a mass assignment bug (OWASP API3:2023, Broken Object Property Level Authorization): a client can make a post look liked by other users, the same harm finding 2 fixed for the like endpoint [`post_create_preset_likes`]. Saying it in the reference would invite abuse, and it would make the behaviour part of the contract, so removing it later would be a breaking change. The request schema already lists only `userId`, `desc` and `img`.
+
+**Decision (mine):** change only the description for now. The sentence is removed; finding 3 stays open in `TESTING.md`. The fix (save only those three fields) can ship as a patch later. `CHANGELOG.md` doesn't mention the removal, because a changelog entry would point to the bug too.
+
+**Checks:** `lint:spec` (2 usual warnings each), `test:validate` (155 passed, 0 failed, 18 skipped), `test:coverage` (55 of 55 responses, 219 of 219 fields).
+
+**What I learned:**
+- Documenting a bug and advertising it aren't the same. Known security bugs go in the internal record, not the public reference.
+- Whatever the reference promises becomes a contract, so a bug described as a feature gets harder to fix.
+
+**Who did what**
+- **Me:** rewrote the `404` description, questioned the `likes` sentence, and chose to change only the docs for now.
+- **Claude Code:** found the edit was in the generated file, moved it, explained the bug, removed the sentence, ran the checks, and updated `TESTING.md`, `CHANGELOG.md` and this log.
+
 ## Post and portfolio ideas
 
 - Testing my own API before documenting it turned up 23 problems, including search leaking every user's encrypted password.

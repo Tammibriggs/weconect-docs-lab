@@ -37,7 +37,7 @@ These are behaviours a later version should change. The spec documents them as t
 
 1. **Fixed: search returned every user's encrypted password.** Since 1.1 the results leave the password out [`search_all`, `search_term`, `key_search`]. Passwords are still encrypted with AES rather than hashed ([`api/routes/auth.js:27`](api/routes/auth.js#L27)), so anyone with the server's `PASS_ENC_SECT` can decrypt them.
 2. **Fixed: likes could be made on behalf of any user.** The like endpoint used `userId` from the body, not the token. Since 1.1 it ignores `userId` and always uses the caller: `like_on_behalf` sends carol's ID with alice's token, and the like is alice's [`post_get_after_likes`].
-3. **Create a post stores the whole body**, so a client can set fields such as `likes` [`post_create_preset_likes`].
+3. **Create a post stores the whole body**, so a client can set fields such as `likes` [`post_create_preset_likes`]. That lets a client make a post look liked by other users, which finding 2 fixed for the like endpoint. Not fixed yet. Since 2026-10-28, the reference no longer mentions it: telling readers about it would invite abuse, and it would make the fix a breaking change.
 4. **Login reveals whether a username exists**: `404` for an unknown user, `400` for a wrong password, with the same message [`login_unknown_user`, `login_wrong_password`].
 5. **Errors expose internals**: raw database errors [`register_duplicate`, `user_get_invalid_id`, `post_delete_invalid_id`] and HTML pages with stack traces and file paths [`register_invalid_json`; a malformed token returned one too, until 1.1.1]. Express hides the stack trace only when `NODE_ENV` is `production`.
 
