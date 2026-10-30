@@ -12,8 +12,8 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 |---|---|---|
 | Setup | Choose the project, combine the repos | Done 2026-10-22 |
 | Testing and the spec | Test the API and write its spec; versions 0.1.0 to 0.2.1, unpublished | Done 2026-10-29 |
-| 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Live 2026-10-30 at https://we-conect-docs.netlify.app/; post not published yet |
-| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Not started. `lint:spec` runs locally since 2026-10-26 |
+| 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Done 2026-10-30. Live at https://we-conect-docs.netlify.app/ |
+| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Built 2026-10-30 on the `ci-spec-lint` branch; not on GitHub yet |
 | 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; `test:capture` failing on a difference; a strict check for undocumented fields | Not started. The checks run locally |
 | 4. Quickstart | Against the local API; replaces the overview's "Try it locally" section | Not started |
 | 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
@@ -37,6 +37,8 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
 | 28 findings, 4 of them fixed: 3 in 0.2, 1 in 0.2.1 | `TESTING.md` |
 | 14 pages on the docs site: the overview, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
+| 0 of 165 real responses have a field the spec doesn't list | One-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
+| CI, simulated in a fresh clone: 5 of 5 bad commits failed and 3 of 3 good commits passed; Netlify's `ignore` command was right in 8 of 8 cases | Entry of 2026-10-30, "Spec linting in CI" |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
@@ -62,6 +64,7 @@ Problems I found by using the app, testing in Postman, or reading the docs next 
 | 2026-10-29 | An undocumented `400` for a body that isn't valid JSON | Postman | Documented on 6 more endpoints, with cases |
 | 2026-10-29 | "Possibly none" on list a user's posts was vague | Reading the docs | 4 descriptions rewritten |
 | 2026-10-29 | Delete a post returned `500 {}` for `{{bobPostId}`, a variable missing a brace | Postman | Finding 28, planned for 2.0.0 |
+| 2026-10-30 | Claude Code said `test:validate` checks that everything returned is documented, yet an undocumented field passes it | My question | Claim and code comment corrected; strict check planned for step 3 |
 
 ## Log
 
@@ -783,7 +786,154 @@ The repo has no remote yet, so nothing is pushed.
 - **Me:** chose to publish at 1.0.0 with later versions to learn on, set the order of the steps, corrected the plan twice (conceptual docs exist; quickstart first), and approved the work.
 - **Claude Code:** assessed the timeline, proposed the renumbering and the step details, built the docs site, wrote the overview section, ran the checks, and updated `CHANGELOG.md`, `TESTING.md`, `README.md`, `CLAUDE.md` and this log.
 
-**Not done yet:** the post. I deployed the site to Netlify the same day: https://we-conect-docs.netlify.app/.
+**Done later the same day:** I deployed the site to Netlify (https://we-conect-docs.netlify.app/) and published the post.
+
+### 2026-10-30, later: Spec linting in CI
+
+**Goal:** step 2. Check the spec on every pull request, so a problem shows up before it reaches the published docs.
+
+**What changed:**
+- **`.github/workflows/spec.yml`:** on every pull request and every push to `main`, runs `npm run lint:spec`, then fails if the public spec it just rebuilt differs from the committed one.
+- **`redocly.yaml`:** `recommended` became `recommended-strict`, which makes every warning an error. `info-license` and `no-server-example.com`, the "2 usual warnings", are off until they apply.
+- **`docs/netlify.toml`:** an `ignore` command, so a change to the public spec rebuilds the site.
+- **`README.md`:** the Node.js requirement, and notes on CI and Netlify. `CLAUDE.md`: the workflow and its rules.
+
+**Decisions**
+
+| Decision | Why |
+|---|---|
+| Warnings fail CI | With `recommended`, an example that contradicts its schema is only a warning, and the linter exits 0 |
+| Turn off the 2 rules, rather than keep 2 usual warnings | Warnings that are always there teach you to ignore warnings. The rule is now: no problems at all |
+| Run `npm run lint:spec` in CI, and set the output format with `REDOCLY_CLI_LINT_FORMAT` | The same command fails the same way on my computer, and problems still appear on their lines in the pull request |
+| No path filter on the workflow | A required check that a path filter skips stays "pending" forever, and the job is short |
+| Actions pinned to commit SHAs; `permissions: contents: read`; `npm ci --ignore-scripts` | A tag can be moved to other code; the job only needs to read; install scripts aren't needed, and one would download MongoDB |
+
+**Problems found:**
+- **A spec-only change might never have reached the live site.** [Netlify's docs](https://docs.netlify.com/build/configure-builds/ignore-builds/) say it skips a build when nothing changed in the base directory. Mine is `docs/`, and the spec is in `openapi/`. It hasn't caused harm: today the live spec matches the repo. I haven't seen a skip on this site yet; `307c38f` changed nothing in `docs/`, so Netlify's deploy list should show it skipped.
+- **The usual fix has its own trap.** `git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF` exits 0 when both refs are the same, which [Netlify's docs say](https://docs.netlify.com/build/configure-builds/environment-variables/) happens on a build without a cache, so that build would be skipped too. My command checks for that first.
+- **`README.md` said Node.js 18 or later.** `@redocly/cli` 2.69.0 needs 20.19 or 22.12 and later, and `mongodb-memory-server` 11.3.0 needs 20.19 or later (the `engines` field of each package).
+- **`actionlint` wasn't run.** Claude Code's permission system blocked downloading it. The workflow file was parsed and its steps were run, but only GitHub's first run tests the whole file.
+
+**Checks,** in a fresh clone, running the `run` steps read from the workflow file:
+
+| Commit | Result |
+|---|---|
+| Nothing changed | Passed |
+| A `$ref` to a schema that doesn't exist | Failed: lint |
+| `operationId` removed from get a user | Failed: lint. Passes under `recommended` |
+| An example that doesn't match its schema | Failed: lint. Passes under `recommended` |
+| A public operation edited, public spec not rebuilt | Failed: out of date |
+| The same edit, public spec rebuilt | Passed |
+| The public spec edited by hand | Failed: out of date |
+| An internal endpoint edited, public spec unchanged | Passed |
+
+Netlify's `ignore` command, run with simulated refs: builds for a change to the public spec or `docs/`, a build without a cache, an empty ref, and a commit missing from the clone; skips for a change to only `api/`, `README.md`, or the full spec with the public spec unchanged.
+
+`npm run lint:spec` on the repo: both specs valid, no warnings, and the public spec unchanged.
+
+**What I learned:**
+- CI runs the same commands on a clean machine for every change. A green tick means only that the checks that exist passed: linting says the spec is well formed, not that it's true. Step 3 covers that.
+- A rule's severity decides whether CI fails. Warnings don't fail anything by default.
+- A check has to be seen failing before it can be trusted.
+- A check doesn't block a merge until a branch rule requires it.
+- A file outside the base directory is invisible to Netlify's default check.
+
+**Who did what**
+- **Me:** published the post and chose to start step 2.
+- **Claude Code:** wrote the workflow and the `ignore` command, chose the strict ruleset, found the Netlify and Node.js problems, ran the checks, and updated `README.md`, `CLAUDE.md` and this log.
+
+**Not done yet:** the first run on GitHub, a deploy preview, a pull request that fails on purpose, requiring the check on `main`, and the post (mine). Nothing updates the pinned actions yet; Dependabot can. `try-scalar` is still only on my computer.
+
+### 2026-10-30, later: What `test:validate` and `test:coverage` each catch
+
+**What I asked:** why `test:validate` fails on a missing required field but not a missing optional one; why an undocumented field passes it, if its job is to check that responses are documented; and whether express-openapi-validator and jest-openapi need a separate coverage check.
+
+**Results,** on a scratch copy of the spec, checks and captures:
+
+| Mismatch | `test:validate` | `test:coverage` |
+|---|---|---|
+| The spec lists an optional field the API never returns | Passes | Fails |
+| The spec lists a required field the API never returns | Fails (21 responses) | Fails |
+| The API returns a field the spec doesn't list | Passes | Passes |
+
+**Why they differ:** `required` and optional describe one response, and validate looks at one response at a time. All 6 captures of a created post leave out `img`, which is optional, so each is valid. "Never returned" describes all the responses together, so it needs a check that looks across the captures.
+
+**A correction:** Claude Code described `test:validate` as checking that everything the API returned is documented, and a comment in `tests/coverage.mjs` said much the same. That's true of statuses and content types, not fields. JSON Schema allows fields a schema doesn't name, unless it says otherwise. Comment fixed.
+
+**The strict check, tried in scratch only:** setting `unevaluatedProperties: false` on the schemas at test time.
+- 0 of 165 real responses have a field the spec doesn't list, and a planted field was caught. Nothing guards against one yet; that's step 3.
+- The first attempt wrongly flagged 4 responses, because it also closed the raw database errors the spec leaves free-form (`type: object`, no `properties`).
+- `additionalProperties: false` wouldn't work here: it can't see fields declared in an `allOf` sibling, as in `UserWithUpdatedAt`.
+
+**The libraries,** given the same 7 responses (jest-openapi 0.14.2 and express-openapi-validator 5.6.2):
+
+| Response | jest-openapi | express-openapi-validator |
+|---|---|---|
+| Complete | Passes | `200` |
+| A field the schema doesn't list | Passes | `200` |
+| Optional field missing | Passes | `200` |
+| Required field missing | Fails | `500` |
+| Wrong type | Fails | `500` |
+| Undocumented status | Fails | `500` |
+| A field the schema doesn't list, with `additionalProperties: false` | Fails | `500` |
+
+- Both do the job of `test:validate` and have the same gap. Neither reported the documented field, the `404`, or the path that never occurred. Searching their code and READMEs for "coverage" found only a badge.
+- jest-openapi rejected weConect's spec as invalid: it doesn't support OpenAPI 3.1, and its last release was in May 2022.
+
+**What I learned:**
+- One response can show that a field is wrong, but not that a field never appears. That takes every response.
+- JSON Schema is open by default, so "matches the schema" doesn't mean "everything is documented".
+- Jest's `--coverage` measures lines of code that ran, not fields in a spec.
+
+**Who did what**
+- **Me:** asked the three questions, and noticed that the description of `test:validate` contradicted the gap.
+- **Claude Code:** made the original claim, ran the experiments in a scratch folder, fixed the comment, and updated this log.
+
+### 2026-10-30, later: What "matches its schema" means, and how teams close the gaps
+
+**What I asked:** whether `test:validate` really only checks that required fields are present, since it ignores missing optional fields and extra fields; and how teams get around the limits of validation libraries.
+
+**Result,** one real Get a user response (`key_get_user.json`), changed one way at a time and checked by a scratch copy of `tests/validate.mjs`:
+
+| Change | Result | Rule that decided it |
+|---|---|---|
+| `__v` (optional) removed | Passes | None |
+| `leakedSecret` added | Passes | None: no rule names it |
+| `username` (required) removed | Fails | `required` |
+| `isAdmin: "no"` | Fails | `type` |
+| `_id: "abc"` | Fails | `pattern` |
+| `createdAt: "yesterday"` | Fails | `format` |
+| `status: "okay"` | Fails | `const` |
+| `followers: [1]` | Fails | `type`, on the array's items |
+| `bio: 123` (optional) | Fails | `type` |
+| `profilePicture.url: "nope"` (optional) | Fails | `format` |
+
+- Only 1 of the 8 failures is a missing field. `required` is the only rule about whether a field appears; the others check a field's value when it's there.
+- "Optional" means a field may be absent, not that it goes unchecked.
+- The spec's schemas have 94 `type`, 25 `required`, 12 `const`, 8 `format`, 2 `enum`, and 1 `pattern` (counted across `openapi/weconect-v1.yaml` with a scratch script).
+
+**How teams close the gaps,** from documentation and issue trackers. I found no data on how common each approach is, and I haven't tried these tools.
+
+| Approach | Source | Note |
+|---|---|---|
+| Keep schemas open, on purpose | Zalando guidelines, rules 108 and 111 | "API formats must not declare `additionalProperties` to be false" |
+| Send only the fields you name | FastAPI `response_model` | Filters out undeclared fields, and generates the spec from the same model |
+| Close schemas in tests only | JSON Schema docs; Atlassian's swagger-request-validator | Issue reports show that validator hitting the same `allOf` problem with `additionalProperties` |
+| Compare real traffic with the spec | Optic `capture` | Its repository was archived on 2026-01-12 |
+| Record what consumers use | PactFlow bi-directional contract testing | Compares the consumer's contract with the spec, not the running API |
+| Measure coverage separately | Schemathesis TraceCov; open-api-coverage | TraceCov's page lists status codes, not response fields |
+
+**A risk in this API:** `api/routes/users.js:88` and `:101` remove `password` and `updatedAt` by name and send everything else, so a new field on the User model goes straight into both responses. Finding 1 in `TESTING.md`, search returning encrypted passwords, was this kind of problem. No change made: an allow-list would change `api/`, so it waits for v2.
+
+**Decisions:** step 3 adds the strict test-time check and runs both checks in CI. Skip Optic, because it's archived, and Pact for now, because the public API's clients can't be asked for contracts.
+
+**What I learned:**
+- `test:validate` does check the whole schema. The schema just says less than I assumed: nothing about fields it doesn't name.
+- Validators are built this way on purpose, because open schemas let an API add fields without breaking clients.
+
+**Who did what**
+- **Me:** asked both questions, and proposed the "only checks required fields" description.
+- **Claude Code:** ran the experiment in a scratch folder, read the sources, found the risk in `api/routes/users.js`, and updated this log.
 
 ## Post and portfolio ideas
 
@@ -799,3 +949,7 @@ The repo has no remote yet, so nothing is pushed.
 - A missing brace in a Postman variable found a Mongoose quirk: any 12-character string is a valid ObjectId.
 - Why my first public version is 1.0.0 and my changelog starts at 0.1.0: semantic versioning before and after you publish.
 - My docs theme made up examples, so I hid them: every example in my reference comes from a real response (Docusaurus swizzling).
+- My linter passed an example that contradicted its own schema: why warnings don't fail a build, and what `recommended-strict` changes.
+- Netlify could have skipped my docs when the spec changed: base directories and the `ignore` command.
+- Why a response validator can't tell you a documented field is never returned, and what can: one response versus all of them.
+- A password can leak through a passing contract test: why schemas are open by default, and three ways to close the gap without closing the schema.

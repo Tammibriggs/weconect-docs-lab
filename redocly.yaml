@@ -3,7 +3,15 @@
 #   public  what third-party developers see: internal endpoints, tags, and examples removed
 # Build the public version with: npm run build:spec
 extends:
-  - recommended
+  # recommended, with every warning an error, so CI fails on any new problem
+  - recommended-strict
+
+rules:
+  # The repo has no license yet. Turn this back on when it does.
+  info-license: off
+  # The API runs only on localhost until it's deployed (step 7 in PROCESS.md).
+  # Turn this back on then.
+  no-server-example.com: off
 
 apis:
   full:

@@ -1,9 +1,10 @@
 // Check that everything the spec documents for a response appears in at least
 // one capture: every status, and every field of every JSON response.
-// validate.mjs checks the other direction: that every captured response is
-// documented. Something documented but never captured is either untested or
-// doesn't happen, such as a 500 the API stopped returning, or a field a shared
-// schema lists for responses that never include it.
+// validate.mjs checks the other direction: that every captured status and content
+// type is documented, and that every body matches its schema. A field the schema
+// doesn't list still passes both checks. Something documented but never captured
+// is either untested or doesn't happen, such as a 500 the API stopped returning,
+// or a field a shared schema lists for responses that never include it.
 //
 //   npm run test:coverage                        checks tests/captures/v1
 //   npm run test:coverage -- tests/runs/<run>    checks another run

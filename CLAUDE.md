@@ -14,6 +14,7 @@ weConect is a small social app used to practise API documentation end to end: te
 | `docs/content/reference/` | Reference pages generated from the public spec by `npm run gen` (run by `start` and `build`). Gitignored; never edit |
 | `docs/src/theme/ResponseExamples/` | Theme override that hides the theme's made-up "Example (auto)" tab |
 | `redocly.yaml` | Redocly settings: the `full` and `public` versions and the lint rules |
+| `.github/workflows/spec.yml` | CI: runs `npm run lint:spec` on every pull request and push to `main`, then fails if the committed public spec is out of date |
 | `CHANGELOG.md` | API changes per version |
 | `scripts/api-server.mjs` | Starts the API against an in-memory MongoDB; shared by the tests and `npm run dev` |
 | `scripts/dev.mjs` | `npm run dev`: the API with sample data, for Postman and the frontend |
@@ -38,7 +39,7 @@ These are free and safe to run without asking. They use an in-memory database an
 | `npm run test:capture -- --out tests/captures/v1` | Refreshes the committed captures |
 | `npm run test:validate [folder]` | Checks captures against the spec; exits 1 on any failure |
 | `npm run test:coverage [folder]` | Lists documented responses and response fields that no capture shows; exits 1 if there are any |
-| `npm run lint:spec` | Lints the full spec, rebuilds the public spec, and lints it |
+| `npm run lint:spec` | Lints the full spec, rebuilds the public spec, and lints it. Any warning fails it (`recommended-strict`) |
 | `npm run build:spec` | Rebuilds `openapi/weconect-public.yaml` from the full spec |
 | `cd docs && npm run build` | Regenerates the reference pages and builds the docs site into `docs/build/`; `npm start` previews it at `localhost:3000` |
 
@@ -57,7 +58,8 @@ Any of these accepts `PORT=<port>` to avoid a server already on 8800, such as `n
 - **Update together.** When the API or the spec changes, refresh the captures, then update the spec, `TESTING.md`, `CHANGELOG.md`, and `PROCESS.md`, and run `npm run lint:spec` so the public spec is rebuilt, then `npm run test:validate` and `npm run test:coverage`. Refreshing the captures gives every user and post a new ID, so update the spec's example IDs and timestamps to the new captures too.
 - **The frontend's mock API** (`web/redesign/tools/mock-api.mjs`) reads its own frozen copy of two captures in `web/redesign/tools/fixtures/captures/`, because its IDs are hard-coded. Don't point it back at `tests/captures/v1`.
 - **Versions.** 1.0.0 (2026-10-30) is the first published version; 0.1.0 to 0.2.1 weren't published. From 1.0.0 on, a change to documented behaviour is breaking and needs a major version: the planned breaking fixes (findings 8, 27 and 28, the timeline's order) wait for 2.0.0. Additions are minor versions; fixes to behaviour the docs don't promise are patches.
-- **Docs site.** The reference pages come from `openapi/weconect-public.yaml`, so change the full spec, run `npm run lint:spec`, then `cd docs && npm run build` to check the site still builds. "Send API Request" stays hidden (`hideSendButton`) until the API is deployed.
+- **Docs site.** The reference pages come from `openapi/weconect-public.yaml`, so change the full spec, run `npm run lint:spec`, then `cd docs && npm run build` to check the site still builds. "Send API Request" stays hidden (`hideSendButton`) until the API is deployed. Netlify rebuilds only when `docs/` or the public spec changes, so if the site starts using another file outside `docs/`, add it to the `ignore` command in `docs/netlify.toml`.
+- **CI.** The workflow runs the same commands as a local check, so a failure can be reproduced with `npm run lint:spec`. Pin actions to commit SHAs, with the version in a comment. Two lint rules are off until they apply: `info-license` until the repo has a license, and `no-server-example.com` until the API is deployed.
 - **Ask first** before pushing, deploying, changing `api/` or `web/` behaviour, or anything that costs money or uses an external account.
 - **Commits:** no `Co-Authored-By` trailer.
 - **Writing style:** Google developer documentation style: plain words, second person, sentence-case headings, short sentences.
