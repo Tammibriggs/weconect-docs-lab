@@ -2,6 +2,8 @@
 
 weConect is a small social app: accounts, follows, posts, and a timeline. This repo uses it to practise API documentation end to end, from testing and writing the spec to linting, publishing, and AI integrations.
 
+The docs are live at https://we-conect-docs.netlify.app/.
+
 | Path | What it is |
 |---|---|
 | `api/` | The Express backend (MongoDB, JWT auth, Socket.io for chat) |

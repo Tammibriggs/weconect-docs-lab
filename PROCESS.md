@@ -12,7 +12,7 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 |---|---|---|
 | Setup | Choose the project, combine the repos | Done 2026-10-22 |
 | Testing and the spec | Test the API and write its spec; versions 0.1.0 to 0.2.1, unpublished | Done 2026-10-29 |
-| 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Site built 2026-10-30; not deployed yet |
+| 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Live 2026-10-30 at https://we-conect-docs.netlify.app/; post not published yet |
 | 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Not started. `lint:spec` runs locally since 2026-10-26 |
 | 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; `test:capture` failing on a difference; a strict check for undocumented fields | Not started. The checks run locally |
 | 4. Quickstart | Against the local API; replaces the overview's "Try it locally" section | Not started |
@@ -783,7 +783,7 @@ The repo has no remote yet, so nothing is pushed.
 - **Me:** chose to publish at 1.0.0 with later versions to learn on, set the order of the steps, corrected the plan twice (conceptual docs exist; quickstart first), and approved the work.
 - **Claude Code:** assessed the timeline, proposed the renumbering and the step details, built the docs site, wrote the overview section, ran the checks, and updated `CHANGELOG.md`, `TESTING.md`, `README.md`, `CLAUDE.md` and this log.
 
-**Not done yet:** deploying to Netlify (mine), and the post.
+**Not done yet:** the post. I deployed the site to Netlify the same day: https://we-conect-docs.netlify.app/.
 
 ## Post and portfolio ideas
 
