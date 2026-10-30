@@ -6,15 +6,25 @@ Entries are in date order, newest last. Every number names the file or command i
 
 ## Phases
 
-| Phase | What it covers | Status |
+Since 2026-10-30, each step after the launch adds one thing to the published docs and gets one post. The table replaced the six phases planned on 2026-10-22; the entry of 2026-10-30 explains why.
+
+| Step | What it covers | Status |
 |---|---|---|
-| 0. Setup | Choose the project, combine the repos | Done 2026-10-22 |
-| 1. Foundation | Test v1 and write its spec (done); upgrade dependencies and hash passwords; Docusaurus site; style guide and Vale | In progress |
-| 2. CI | Spec linting, prose linting, link checks, deploy previews, a pull-request workflow; deploy the API (Render, MongoDB Atlas) | Not started |
-| 3. Change management | Change the API and its spec together, changelog with `oasdiff`, deprecation notices, migration guide | Started 2026-10-26: version 1.1.0 with a hand-written changelog and one deprecated field; 1.1.1 (a bug fix) on 2026-10-27; first breaking changes planned for 2.0.0 on 2026-10-28 (findings 8 and 27) |
-| 4. AI readers | `llms.txt`, Markdown versions of pages, a docs MCP server | Not started |
-| 5. AI automation | AutoDoc flags docs affected by each pull request | Not started |
-| 6. Developer experience | SDK and code samples, search, analytics, feedback; AsyncAPI for messaging | Not started |
+| Setup | Choose the project, combine the repos | Done 2026-10-22 |
+| Testing and the spec | Test the API and write its spec; versions 0.1.0 to 0.2.1, unpublished | Done 2026-10-29 |
+| 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Site built 2026-10-30; not deployed yet |
+| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Not started. `lint:spec` runs locally since 2026-10-26 |
+| 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; `test:capture` failing on a difference; a strict check for undocumented fields | Not started. The checks run locally |
+| 4. Quickstart | Against the local API; replaces the overview's "Try it locally" section | Not started |
+| 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
+| 6. Style guide and Vale | Prose linting on every pull request | Not started |
+| 7. Sandbox | Deploy the API (Render, MongoDB Atlas) with sample data; turn "Send API Request" back on; move the quickstart to the sandbox. First: password hashing, the `likes` fix (1.0.1), `NODE_ENV=production`, security updates to dependencies | Not started |
+| 8. Tutorial | For example, a command-line feed reader | Not started |
+| 9. Version 1.1.0 | Suggested people and opt-in pagination; "Added in 1.1" notes | Not started |
+| 10. AI readers | `llms.txt`, Markdown versions of pages, a docs MCP server | Not started |
+| 11. Version 2.0.0 | Findings 8, 27 and 28, the timeline in date order, a default page size, removing like's `userId`, upgrading Express and Mongoose; versioned docs, a migration guide, deprecating v1, `oasdiff` | Not started |
+| 12. AI automation | AutoDoc flags docs affected by each pull request | Not started |
+| 13. Developer experience | Code samples in more languages, SDKs, search, analytics, feedback; AsyncAPI for messaging | Not started |
 | Side project: frontend redesign | Design system, app shell, every page rebuilt; sessions, accessibility and performance fixes in `web/` | Done 2026-10-25, committed 2026-10-26; not yet reviewed by me |
 
 ## Key numbers
@@ -25,7 +35,8 @@ Entries are in date order, newest last. Every number names the file or command i
 | 183 test cases; 182 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
 | 165 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
 | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
-| 28 findings, 4 of them fixed: 3 in 1.1, 1 in 1.1.1 | `TESTING.md` |
+| 28 findings, 4 of them fixed: 3 in 0.2, 1 in 0.2.1 | `TESTING.md` |
+| 14 pages on the docs site: the overview, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
@@ -39,8 +50,8 @@ Problems I found by using the app, testing in Postman, or reading the docs next 
 | Date | What I found | How | Outcome |
 |---|---|---|---|
 | 2026-10-25 | The redesigned app looked heavy, and the header covered focus rings | Using the app | Fixed in `web/` |
-| 2026-10-27 | `updatedAt` in the schema of get the current user and get a user, which never return it | Postman | Docs fixed in 1.1.1 (finding 16) |
-| 2026-10-27 | `500` with a stack trace for a value that isn't a key (`Bearer 2434143`) | Postman | API fixed in 1.1.1 (finding 7) |
+| 2026-10-27 | `updatedAt` in the schema of get the current user and get a user, which never return it | Postman | Docs fixed in 0.2.1 (finding 16) |
+| 2026-10-27 | `500` with a stack trace for a value that isn't a key (`Bearer 2434143`) | Postman | API fixed in 0.2.1 (finding 7) |
 | 2026-10-28 | List a user's posts returns `200` and an empty list for an ID that isn't a user | Postman | Finding 27, planned for 2.0.0 |
 | 2026-10-28 | Like returns `500` for a deleted post | Postman | Already finding 8 |
 | 2026-10-28 | The read endpoints showed the `'write'` scope message | My question about scope errors on get the current user; Claude Code then found the example | Docs fixed |
@@ -728,6 +739,51 @@ The repo has no remote yet, so nothing is pushed.
 - **Me:** found the vague "possibly none", hit the `500 {}` in Postman, asked whether 12-character IDs need preventing, and approved the changes.
 - **Claude Code:** found and reproduced the cause, wrote the cases and finding 28, updated the spec, refreshed the captures, ran the checks, and updated `TESTING.md`, `CHANGELOG.md` and this log.
 
+### 2026-10-30: Version 1.0.0, a docs site, and a plan for the posts
+
+**Planning (2026-10-29 and 2026-10-30):**
+- **The timeline.** I asked whether it was implemented right. An empty feed for a new user is correct: they follow nobody. For feeds that aren't empty, it has four problems: posts aren't in date order (finding 23), following yourself duplicates your posts (finding 19, from reading the code), it runs one query per followed user, and it isn't paginated (finding 22). One `$in` query sorted by date fixes the first three. For new users, suggested people fixes the cause; an Explore feed would leave the timeline empty.
+- **Versions.** Claude Code first planned the breaking fixes as 2.0.0, then agreed with me that unpublished versions can't break anyone. I want later versions to learn docs versioning on, so 1.0.0 documents the API as it is, and the breaking fixes stay planned for 2.0.0.
+- **The posts.** My plan: publish the docs first, then add one thing per post. Claude Code put conceptual docs early; I pointed out the spec's overview already has them. I moved the quickstart before the how-to guides; Claude Code had put it after the sandbox. Claude Code suggested making tomorrow's two post ideas, the project and the live docs, into one post.
+
+**Decisions (mine):** publish 1.0.0 as the API behaves today; renumber the unpublished versions (Claude Code's suggestion); the step order in the Phases table.
+
+**What changed:**
+- **Versions:** 1.0.0, 1.1.0 and 1.1.1 are now 0.1.0, 0.2.0 and 0.2.1, in `CHANGELOG.md`, `TESTING.md`, the spec and `CLAUDE.md`. Older entries in this log keep the old numbers. `CHANGELOG.md` has a 1.0.0 entry dated today, and the spec's `info.version` is 1.0.0.
+- **Spec overview:** a "Try it locally" section (clone the repo, `npm run dev`, use the printed key), and links to `TESTING.md` and `CHANGELOG.md` on GitHub.
+- **`docs/`, a Docusaurus 3.10.2 site** with `docusaurus-plugin-openapi-docs` 5.2.0:
+  - `npm start` and `npm run build` generate the reference pages from `openapi/weconect-public.yaml` first, so the pages can't drift from the spec. The generated pages aren't committed.
+  - "Send API Request" is hidden: the API isn't deployed, and its CORS setting blocks other origins.
+  - A theme override ([`docs/src/theme/ResponseExamples/index.js`](docs/src/theme/ResponseExamples/index.js)) hides the "Example (auto)" tab, which the theme makes up from the schema. The overview says every example comes from a captured response.
+  - Code samples in curl (first), Python and JavaScript, instead of the theme's default of C# first.
+  - The spec is served at `/weconect-public.yaml`, for the overview's **Export** button.
+  - `/` opens the overview: a client-side redirect, plus a server redirect in [`docs/netlify.toml`](docs/netlify.toml) so link previews see the overview.
+
+**Problems:**
+- The first build failed: the generated sidebar exports its list of items, not an object, so `sidebars.js` read `undefined`.
+- npm 12 blocked install scripts for 3 packages, including `postman-code-generators`. The code samples work without them.
+- The request panel still opens on "Example (from schema)", so a request body in a code sample starts as `"userId": "string"` until you pick a real example. The theme hard-codes that tab as the default; changing it means copying a 600-line component. Left for later.
+- `npm audit` reports 33 vulnerabilities in the site's build dependencies. They run when the site builds, not in readers' browsers.
+
+**Checks:**
+- `cd docs && npm run build`: 14 pages (the overview, 3 tag pages, 10 endpoint pages), no warnings. Screenshots in headless Chrome: light, dark and 390 px wide.
+- `npm run lint:spec`: 2 usual warnings each.
+- `npm run test:validate`: 165 passed, 0 failed, 18 skipped. `npm run test:coverage`: 57 of 57 responses and 219 of 219 fields.
+
+**What I learned:**
+- Semantic versioning's `0.x` is for development before a first release: anything can change. 1.0.0 defines the public API, and the rule that a documented change is breaking starts then.
+- Docs versions follow major versions. Within a major version, mark additions inline ("Added in 1.1").
+- Linting says the spec is well formed; contract tests say it's true. Mine are spec-based contract tests run by the API's owner; consumer-driven contract tests (Pact) suit APIs whose clients other teams own.
+- `additionalProperties: false` belongs in the tests, not the published spec: there it tells clients that any new field is breaking.
+- Diátaxis's four kinds of page: reference, explanation, how-to guide, and tutorial. A quickstart that starts with running a server is normal for software you host yourself.
+- A docs site is static, so it can go live before the API does.
+
+**Who did what**
+- **Me:** chose to publish at 1.0.0 with later versions to learn on, set the order of the steps, corrected the plan twice (conceptual docs exist; quickstart first), and approved the work.
+- **Claude Code:** assessed the timeline, proposed the renumbering and the step details, built the docs site, wrote the overview section, ran the checks, and updated `CHANGELOG.md`, `TESTING.md`, `README.md`, `CLAUDE.md` and this log.
+
+**Not done yet:** deploying to Netlify (mine), and the post.
+
 ## Post and portfolio ideas
 
 - Testing my own API before documenting it turned up 23 problems, including search leaking every user's encrypted password.
@@ -740,3 +796,5 @@ The repo has no remote yet, so nothing is pushed.
 - One long word broke every page: auditing my own frontend with headless Chrome and axe, with before and after screenshots (`web/redesign/`).
 - Why "403 means sign out" is wrong for this API, and what that teaches about documenting status codes.
 - A missing brace in a Postman variable found a Mongoose quirk: any 12-character string is a valid ObjectId.
+- Why my first public version is 1.0.0 and my changelog starts at 0.1.0: semantic versioning before and after you publish.
+- My docs theme made up examples, so I hid them: every example in my reference comes from a real response (Docusaurus swizzling).

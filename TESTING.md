@@ -1,6 +1,6 @@
 # weConect API: testing and findings
 
-This file records how the documented endpoints were tested, what the tests found, and what's out of scope. Version 1.1 (2026-10-26) added API keys and fixed findings 1, 2 and 17, and version 1.1.1 (2026-10-27) fixed finding 7; [`CHANGELOG.md`](CHANGELOG.md) lists the changes. Every case is in [`tests/cases.mjs`](tests/cases.mjs), and its request and response are in [`tests/captures/v1/<case>.json`](tests/captures/v1/). Case names appear in brackets below.
+This file records how the documented endpoints were tested, what the tests found, and what's out of scope. Version 0.2 (2026-10-26) added API keys and fixed findings 1, 2 and 17, and version 0.2.1 (2026-10-27) fixed finding 7; [`CHANGELOG.md`](CHANGELOG.md) lists the changes. Every case is in [`tests/cases.mjs`](tests/cases.mjs), and its request and response are in [`tests/captures/v1/<case>.json`](tests/captures/v1/). Case names appear in brackets below.
 
 ## How the tests ran
 
@@ -13,7 +13,7 @@ This file records how the documented endpoints were tested, what the tests found
 | Cases | 183: 182 returned the status predicted from reading the code; 1 confirmed a crash |
 | Spec check | 165 captures pass, 0 fail; 18 skipped: 14 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
 | Validator check | 3 deliberately wrong captures (wrong type, undocumented status, missing field) were all rejected |
-| Response coverage | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture. With the spec from before 1.1.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
+| Response coverage | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture. With the spec from before 0.2.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
 | Invalid JSON | All 7 endpoints with a body return `400` with Express's HTML error page [`*_invalid_json`]. Until 2026-10-29 the spec documented it only on register: with the spec from before, `test:validate` fails the 6 new captures |
 
 The captures redact access tokens, API keys and encrypted passwords, and replace local paths with `<repo>`. IDs and timestamps change on every run, so each refresh also updates the spec's examples to the new values.
@@ -32,20 +32,20 @@ The spec documents 15 endpoints. `npm run build:spec` builds the public version 
 
 ## Findings
 
-These are behaviours a later version should change. The spec documents them as they are. Findings marked **Fixed** were fixed in version 1.1 on 2026-10-26, or in the version they name.
+These are behaviours a later version should change. The spec documents them as they are. Findings marked **Fixed** were fixed in version 0.2 on 2026-10-26, or in the version they name.
 
 ### Security
 
-1. **Fixed: search returned every user's encrypted password.** Since 1.1 the results leave the password out [`search_all`, `search_term`, `key_search`]. Passwords are still encrypted with AES rather than hashed ([`api/routes/auth.js:27`](api/routes/auth.js#L27)), so anyone with the server's `PASS_ENC_SECT` can decrypt them.
-2. **Fixed: likes could be made on behalf of any user.** The like endpoint used `userId` from the body, not the token. Since 1.1 it ignores `userId` and always uses the caller: `like_on_behalf` sends carol's ID with alice's token, and the like is alice's [`post_get_after_likes`].
+1. **Fixed: search returned every user's encrypted password.** Since 0.2 the results leave the password out [`search_all`, `search_term`, `key_search`]. Passwords are still encrypted with AES rather than hashed ([`api/routes/auth.js:27`](api/routes/auth.js#L27)), so anyone with the server's `PASS_ENC_SECT` can decrypt them.
+2. **Fixed: likes could be made on behalf of any user.** The like endpoint used `userId` from the body, not the token. Since 0.2 it ignores `userId` and always uses the caller: `like_on_behalf` sends carol's ID with alice's token, and the like is alice's [`post_get_after_likes`].
 3. **Create a post stores the whole body**, so a client can set fields such as `likes` [`post_create_preset_likes`]. That lets a client make a post look liked by other users, which finding 2 fixed for the like endpoint. Not fixed yet. Since 2026-10-28, the reference no longer mentions it: telling readers about it would invite abuse, and it would make the fix a breaking change.
 4. **Login reveals whether a username exists**: `404` for an unknown user, `400` for a wrong password, with the same message [`login_unknown_user`, `login_wrong_password`].
-5. **Errors expose internals**: raw database errors [`register_duplicate`, `user_get_invalid_id`, `post_delete_invalid_id`] and HTML pages with stack traces and file paths [`register_invalid_json` and the 6 other `*_invalid_json` cases; a malformed token returned one too, until 1.1.1]. Express hides the stack trace only when `NODE_ENV` is `production`.
+5. **Errors expose internals**: raw database errors [`register_duplicate`, `user_get_invalid_id`, `post_delete_invalid_id`] and HTML pages with stack traces and file paths [`register_invalid_json` and the 6 other `*_invalid_json` cases; a malformed token returned one too, until 0.2.1]. Express hides the stack trace only when `NODE_ENV` is `production`.
 
 ### Crashes and server errors
 
 6. **Unliking a post crashes the server** [`unlike`, `after_unlike`]. The response is sent, then a stray `url` expression ([`api/routes/posts.js:69`](api/routes/posts.js#L69)) throws, the error handler tries to send a second response, and Node exits with `ERR_HTTP_HEADERS_SENT`. The like is removed [`post_get_after_unlike`].
-7. **Fixed in 1.1.1: a malformed token returned `500`**, an HTML page with a stack trace. `jwt.decode()` returns `null` for anything that isn't a JWT, and the middleware read `.exp` from it. Testing in Postman on 2026-10-27 found the same `500` for an API key without its `wck_` prefix, because the API treats any value without the prefix as a token. Since 1.1.1, a value that's neither an API key nor a token returns `401 "Invalid API key"` on the public endpoints [`auth_malformed_token`, `auth_no_scheme`, `key_without_prefix`, `key_without_bearer`] and `403 "Token is invalid"` on the internal ones, like any other bad token [`auth_malformed_token_internal`].
+7. **Fixed in 0.2.1: a malformed token returned `500`**, an HTML page with a stack trace. `jwt.decode()` returns `null` for anything that isn't a JWT, and the middleware read `.exp` from it. Testing in Postman on 2026-10-27 found the same `500` for an API key without its `wck_` prefix, because the API treats any value without the prefix as a token. Since 0.2.1, a value that's neither an API key nor a token returns `401 "Invalid API key"` on the public endpoints [`auth_malformed_token`, `auth_no_scheme`, `key_without_prefix`, `key_without_bearer`] and `403 "Token is invalid"` on the internal ones, like any other bad token [`auth_malformed_token_internal`].
 8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `post_get_invalid_id`, `post_delete_invalid_id`]. Planned for 2.0.0, because changing these statuses can break clients. Check IDs as finding 28 describes: Mongoose's own check lets 12-character strings through.
 
 ### Status codes
@@ -61,7 +61,7 @@ These are behaviours a later version should change. The spec documents them as t
 14. **Unfollow returns plain JSON strings** for success and "not following" [`unfollow`, `unfollow_again`], unlike every other endpoint.
 15. **Delete a post's `500` body has no `status` field**: it's `{}` or the raw database error [`post_delete_again`, `post_delete_invalid_id`].
 16. **User fields vary by endpoint**: search leaves out empty `profilePicture` and `coverPicture` and includes `updatedAt` [`search_all`]; get the current user and get a user leave out `updatedAt` [`me`, `user_get`]. The spec documents this with two schemas: `User`, without `updatedAt`, and `UserWithUpdatedAt`, for search and login (since 2026-10-27).
-17. **Fixed: a like without `userId` stored `null`** in `likes`. Since 1.1 it adds the caller's ID [`like_no_body`, `post_get_after_empty_like`].
+17. **Fixed: a like without `userId` stored `null`** in `likes`. Since 0.2 it adds the caller's ID [`like_no_body`, `post_get_after_empty_like`].
 
 ### Validation
 
@@ -127,11 +127,11 @@ Added 2026-10-26, in version 1.1. The keys cases are the `keys_*` and `key_*` ca
 | Every public endpoint returns `401` without an `Authorization` header | `auth_missing` and the 9 `*_no_auth` cases added 2026-10-28 |
 | Keys don't work on internal endpoints (`403`) | `key_on_internal_endpoint` |
 | A wrong key returns `401`; a deleted key stops working at once (`401`) | `key_invalid`, `keys_delete`, `key_deleted` |
-| A key without its `wck_` prefix, or without `Bearer` in front, returns `401` (since 1.1.1; `500` before) | `key_without_prefix`, `key_without_bearer` |
+| A key without its `wck_` prefix, or without `Bearer` in front, returns `401` (since 0.2.1; `500` before) | `key_without_prefix`, `key_without_bearer` |
 | You can't delete another user's key, an unknown key, or an invalid ID (`404` each time) | `keys_delete_other_user`, `keys_delete_unknown`, `keys_delete_invalid_id` |
 | Using a key records `lastUsedAt` | `keys_list_after_delete` |
 
-**A regression caught by the existing cases.** The first version of the key middleware was an `async` function. A malformed token then made `verifyToken` throw inside a promise, which Express 4 doesn't catch, so the server crashed instead of returning `500` [`auth_malformed_token`, `auth_no_scheme`]. The middleware now checks keys asynchronously but leaves the token path synchronous ([`api/routes/verifyToken.js`](api/routes/verifyToken.js)). Since 1.1.1 those two cases return `401` (finding 7), but the token path stays synchronous, so anything else that throws there still becomes a `500`, not a crash.
+**A regression caught by the existing cases.** The first version of the key middleware was an `async` function. A malformed token then made `verifyToken` throw inside a promise, which Express 4 doesn't catch, so the server crashed instead of returning `500` [`auth_malformed_token`, `auth_no_scheme`]. The middleware now checks keys asynchronously but leaves the token path synchronous ([`api/routes/verifyToken.js`](api/routes/verifyToken.js)). Since 0.2.1 those two cases return `401` (finding 7), but the token path stays synchronous, so anything else that throws there still becomes a `500`, not a crash.
 
 **The API keys page** in the app was checked in a browser against the real API by [`web/redesign/tools/check-api-keys.mjs`](web/redesign/tools/check-api-keys.mjs): 32 of 32 checks, including creating, using and deleting a key, axe accessibility checks, focus, and phone layout.
 

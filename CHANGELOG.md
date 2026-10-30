@@ -2,10 +2,15 @@
 
 Changes to the weConect API, newest first. Versions follow [semantic versioning](https://semver.org/): a minor version adds features without breaking existing clients, and a major version can break them. Each change links to its evidence in [`TESTING.md`](TESTING.md).
 
-## Unreleased
+Versions before 1.0.0 weren't published. Semantic versioning reserves `0.x` versions for development before a first release, when anything can change. Until 2026-10-30 they were numbered 1.0.0, 1.1.0, and 1.1.1, so older commits and `PROCESS.md` entries use those numbers.
+
+## 1.0.0: 2026-10-30
+
+The first published version: the public reference for 10 endpoints, on the weConect docs site. The API behaves as it did in 0.2.1.
 
 ### Documentation
 
+- **A new "Try it locally" section** in the overview explains how to run the API on your computer with sample data and an API key, until the API is deployed. The overview now links to `TESTING.md` and `CHANGELOG.md` in the repository.
 - **The `403` for a missing scope now shows the right message.** The read endpoints (get the current user, get a user, search users, list a user's posts, and get the timeline) showed `"This API key doesn't have the 'write' scope"`, which they never return. They now show the `'read'` message, and the authentication errors table lists both. The API behaves as before.
 - **`expired` is documented only where it can appear.** It was in the shared error schema, so every error response showed it, including `401`. It's now only on the `403` responses, in a new `ForbiddenError` schema, and only in the full spec: API keys don't expire, so the public reference doesn't show it.
 - **`bio` and the pictures' `url` and `filename` are explained.** They appear only once a user has saved their profile in the app. **Get a user**'s example now shows a saved profile.
@@ -17,7 +22,7 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 - **The public reference says to use an API key.** The access tokens the app uses work on the public endpoints, but they expire and aren't supported for other code.
 - Every documented response and response field now has a captured example behind it: 38 new test cases cover the `401` and `403` responses that were documented from shared code, and fields such as `bio`, `expired`, and `img` that no case had returned.
 
-## 1.1.1: 2026-10-27
+## 0.2.1: 2026-10-27
 
 ### Fixed
 
@@ -27,7 +32,7 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 
 - **Get the current user** and **Get a user** no longer show `updatedAt` in their response schema, because they never return it (finding 16). **Search users** returns it, so its results now use a new `UserWithUpdatedAt` schema, where `updatedAt` is required. These endpoints behave as before.
 
-## 1.1.0: 2026-10-26
+## 0.2.0: 2026-10-26
 
 ### Added
 
@@ -52,6 +57,6 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 
 Login tokens work on every endpoint as before, so the app's existing features needed no changes. A client that still sends `userId` when liking gets the same response, but the like is now always its own.
 
-## 1.0.0: 2026-10-22
+## 0.1.0: 2026-10-22
 
 The first documented version: 15 endpoints, documented as they behaved, with 23 findings in `TESTING.md`.

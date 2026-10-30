@@ -1,0 +1,34 @@
+{
+  "name": "weconect-docs",
+  "private": true,
+  "description": "The weConect API docs site: Docusaurus, with the reference built from openapi/weconect-public.yaml",
+  "scripts": {
+    "gen": "docusaurus clean-api-docs all && docusaurus gen-api-docs all && mkdir -p static && cp ../openapi/weconect-public.yaml static/",
+    "start": "npm run --silent gen && docusaurus start",
+    "build": "npm run --silent gen && docusaurus build",
+    "serve": "docusaurus serve"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.10.2",
+    "@docusaurus/preset-classic": "3.10.2",
+    "docusaurus-plugin-openapi-docs": "5.2.0",
+    "docusaurus-theme-openapi-docs": "5.2.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 3 chrome version",
+      "last 3 firefox version",
+      "last 5 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0"
+  }
+}

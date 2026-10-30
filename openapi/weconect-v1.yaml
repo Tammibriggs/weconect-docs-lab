@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: weConect API
-  version: 1.1.1
+  version: 1.0.0
   summary: Profiles, follows, posts, and timelines for the weConect social app.
   description: |
     The weConect API lets your code use weConect as you: read profiles and
@@ -9,8 +9,19 @@ info:
 
     This document describes the API as it behaves today, including known
     issues. Every status code and example comes from a captured response.
-    `TESTING.md` in the repository lists the test cases and every known issue,
-    and `CHANGELOG.md` lists the changes in each version.
+    [`TESTING.md`](https://github.com/Tammibriggs/weconect-docs-lab/blob/main/TESTING.md)
+    lists the test cases and every known issue, and
+    [`CHANGELOG.md`](https://github.com/Tammibriggs/weconect-docs-lab/blob/main/CHANGELOG.md)
+    lists the changes in each version.
+
+    ## Try it locally
+
+    The API isn't deployed yet, so you run it on your computer. Clone the
+    [weConect repository](https://github.com/Tammibriggs/weconect-docs-lab)
+    and follow **Try the API locally** in its README. `npm run dev` starts the
+    API at `http://localhost:8800` with sample users and posts, and prints an
+    API key to use with the endpoints below. The data is deleted when you stop
+    the server.
 
     ## Authentication
 
@@ -1402,8 +1413,8 @@ components:
           $ref: '#/components/schemas/ObjectId'
           deprecated: true
           description: |
-            Ignored since version 1.1, which always uses the current user.
-            Version 1.0 used this field as the user who liked the post.
+            Ignored since version 0.2, which always uses the current user.
+            Version 0.1 used this field as the user who liked the post.
 
     User:
       type: object

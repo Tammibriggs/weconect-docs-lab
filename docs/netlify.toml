@@ -1,0 +1,16 @@
+# Netlify settings for the docs site. In Netlify, set the base directory to
+# docs; Netlify then reads this file and runs the build from this folder.
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# The site has no home page yet: open the API overview. force applies the rule
+# even though the build has an index.html at /.
+[[redirects]]
+  from = "/"
+  to = "/reference/weconect-api"
+  status = 302
+  force = true
