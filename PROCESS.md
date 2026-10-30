@@ -761,6 +761,7 @@ The repo has no remote yet, so nothing is pushed.
 
 **Problems:**
 - The first build failed: the generated sidebar exports its list of items, not an object, so `sidebars.js` read `undefined`.
+- The first Netlify build failed: "The docs folder does not exist". Git doesn't track empty folders, and `content/` held only the gitignored `reference/`, so it existed only on my machine. `gen-api-docs` loads the docs plugin, which checks for its folder before anything is generated. Fixed with `docs/content/.gitkeep`, and checked by building a fresh clone.
 - npm 12 blocked install scripts for 3 packages, including `postman-code-generators`. The code samples work without them.
 - The request panel still opens on "Example (from schema)", so a request body in a code sample starts as `"userId": "string"` until you pick a real example. The theme hard-codes that tab as the default; changing it means copying a 600-line component. Left for later.
 - `npm audit` reports 33 vulnerabilities in the site's build dependencies. They run when the site builds, not in readers' browsers.
