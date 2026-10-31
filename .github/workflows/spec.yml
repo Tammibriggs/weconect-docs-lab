@@ -1,0 +1,42 @@
+# Checks the spec on every pull request and every push to main, with the same
+# command you run locally. No path filter: a required check that a path filter
+# skips stays "pending" forever, and the job only takes a few seconds.
+name: Spec
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint the spec
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Pinned to commit SHAs, because a version tag can be moved to other code
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      # --ignore-scripts skips the MongoDB download, which linting doesn't need
+      - run: npm ci --ignore-scripts
+
+      - name: Lint the full spec, rebuild the public spec, and lint that too
+        run: npm run lint:spec
+        env:
+          # Shows each problem on its line in the pull request
+          REDOCLY_CLI_LINT_FORMAT: github-actions
+
+      # lint:spec has just rebuilt the public spec, so a difference means the
+      # committed copy is out of date, or was edited by hand
+      - name: Check that the committed public spec is up to date
+        run: |
+          git diff --exit-code -- openapi/weconect-public.yaml || {
+            echo "::error file=openapi/weconect-public.yaml::Out of date. Run npm run build:spec and commit the result."
+            exit 1
+          }

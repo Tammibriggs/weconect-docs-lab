@@ -12,6 +12,7 @@ The docs are live at https://we-conect-docs.netlify.app/.
 | `openapi/weconect-public.yaml` | The public spec: the 10 endpoints developers call with API keys. Built from the full spec by `npm run build:spec`; don't edit it by hand |
 | `docs/` | The docs site, built with Docusaurus: the overview and reference, generated from the public spec |
 | `redocly.yaml` | Redocly settings: the two versions of the spec and the lint rules |
+| `.github/workflows/spec.yml` | CI: checks the spec on every pull request and every push to `main` |
 | `tests/` | Live test cases, the capture runner, and the spec validator |
 | `scripts/` | `npm run dev`, and the code that starts the API for both the tests and `npm run dev` |
 | `TESTING.md` | What was tested, what was found, and what's out of scope |
@@ -21,7 +22,7 @@ The docs are live at https://we-conect-docs.netlify.app/.
 
 ## Test the API and check the spec
 
-You need Node.js 18 or later. Nothing else: the tests run the API against a temporary in-memory MongoDB with random secrets, so they never touch a real database.
+You need Node.js 20.19 or later. Nothing else: the tests run the API against a temporary in-memory MongoDB with random secrets, so they never touch a real database.
 
 ```bash
 npm install                 # test tooling
@@ -39,9 +40,11 @@ To refresh the committed evidence after an API change, run `npm run test:capture
 
 The tests use port 8800. If something else is using it, such as `npm run start:real`, pick another port: `PORT=8810 npm run test:capture`. `npm run dev` takes `PORT` too.
 
+On every pull request and every push to `main`, GitHub Actions runs `npm run lint:spec` and fails if the committed public spec is out of date. Any lint warning fails the check: `redocly.yaml` extends `recommended-strict`, and turns off the two rules that don't apply yet.
+
 ## Try the API locally
 
-You need Node.js 18 or later. Install the dependencies once:
+You need Node.js 20.19 or later. Install the dependencies once:
 
 ```bash
 npm install                 # the scripts' dependencies, including an in-memory MongoDB
@@ -75,7 +78,7 @@ After you change the full spec, run `npm run build:spec` in the repo root, then 
 
 npm 12 warns that it blocked install scripts for three packages. The site doesn't need them.
 
-To deploy on Netlify, create a site from this repo and set the base directory to `docs`. [`docs/netlify.toml`](docs/netlify.toml) sets the rest.
+To deploy on Netlify, create a site from this repo and set the base directory to `docs`. [`docs/netlify.toml`](docs/netlify.toml) sets the rest. Netlify rebuilds the site only when `docs/` or the public spec changes. If the site starts using another file outside `docs/`, add it to the `ignore` command in that file.
 
 ## Run the app with your own database
 

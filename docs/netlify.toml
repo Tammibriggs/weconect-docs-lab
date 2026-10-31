@@ -3,6 +3,11 @@
 [build]
   command = "npm run build"
   publish = "build"
+  # By default Netlify skips the build if nothing changed in the base directory,
+  # but the site is generated from the public spec, which is outside it. Exit
+  # code 0 skips the build. The refs are the same on a build without a cache,
+  # which must build.
+  ignore = '[ "$CACHED_COMMIT_REF" != "$COMMIT_REF" ] && git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" . ../openapi/weconect-public.yaml'
 
 [build.environment]
   NODE_VERSION = "24"
