@@ -13,7 +13,7 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | Setup | Choose the project, combine the repos | Done 2026-10-22 |
 | Testing and the spec | Test the API and write its spec; versions 0.1.0 to 0.2.1, unpublished | Done 2026-10-29 |
 | 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Done 2026-10-30. Live at https://we-conect-docs.netlify.app/ |
-| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Built 2026-10-30 on the `ci-spec-lint` branch; not on GitHub yet |
+| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Pull request open 2026-10-31; its first CI run and deploy preview passed. Not merged yet |
 | 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; `test:capture` failing on a difference; a strict check for undocumented fields | Not started. The checks run locally |
 | 4. Quickstart | Against the local API; replaces the overview's "Try it locally" section | Not started |
 | 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
@@ -934,6 +934,48 @@ Netlify's `ignore` command, run with simulated refs: builds for a change to the 
 **Who did what**
 - **Me:** asked both questions, and proposed the "only checks required fields" description.
 - **Claude Code:** ran the experiment in a scratch folder, read the sources, found the risk in `api/routes/users.js`, and updated this log.
+
+### 2026-10-31: The first CI run on GitHub
+
+**Result,** from the pull request's checks panel for `6fe2121`:
+
+| Check | Result | Message |
+|---|---|---|
+| Spec / Lint the spec | Passed | Successful in 13s |
+| netlify/we-conect-docs/deploy-preview | Passed | Deploy Preview ready! |
+| Redirect rules | Passed | 1 redirect rule processed |
+| Header rules | Neutral | No header rules processed |
+| Pages changed | Neutral | All files already uploaded |
+
+- This is the first real run of `.github/workflows/spec.yml`. Until now it had only been simulated, because downloading `actionlint` was blocked.
+- The neutral checks did run. `docs/netlify.toml` has no `[[headers]]` and `docs/static/` has no `_headers` file, which fits "No header rules processed". The one `[[redirects]]` rule fits "1 redirect rule processed".
+- "All files already uploaded" is my reading only: the branch changes nothing under `docs/` except `netlify.toml`, so the built site should match what Netlify already has. I found no Netlify documentation of that message.
+
+**The `ignore` command on real commits,** run from `docs/` and from the repo root (0 skips the build):
+
+| Commits | Exit code | Netlify would |
+|---|---|---|
+| `4aeb931` to `307c38f`: only `README.md`, `CLAUDE.md`, `PROCESS.md` | 0 | Skip |
+| `307c38f` to `6fe2121`: changes `docs/netlify.toml` | 1 | Build |
+| The same commit twice | 1 | Build |
+| `4aeb931` to `307c38f`, run from the repo root by mistake | 128 | Build |
+
+**Not checked yet:** that Netlify lists `307c38f` as skipped, and that a pull request changing the public spec gets a deploy preview, which is the real test of the `../` path.
+
+**A correction:** Claude Code's plan for the failing pull request said a spec-only change would get a deploy preview. That's only true if the public spec changes. Tested in a throwaway clone:
+
+| Commit contains | `lint:spec` | `ignore` exit code | Netlify would |
+|---|---|---|---|
+| `/api/auth/register/` with a trailing slash, an internal path | Fails on line 112 (`no-path-trailing-slash`) | 0 | Skip |
+| The same error, plus a wording change to Search users, with the public spec rebuilt | Fails on line 112 | 1 | Build |
+
+Rebuilding after the first edit leaves the public spec unchanged, because that path isn't in it.
+
+**What I learned:** a neutral check ran and finished without a pass or fail result. It isn't a check that was skipped.
+
+**Who did what**
+- **Me:** published the branch, opened the pull request, asked what the neutral checks were, and added the deliberate error for the failing pull request.
+- **Claude Code:** committed the work, ran the `ignore` command on the real commits, compared the check messages with the config, tested the failing pull request in a throwaway clone, and updated this log.
 
 ## Post and portfolio ideas
 
