@@ -101,7 +101,7 @@ tags:
   - name: Posts
     description: Publish, delete, and like posts, and read a user's posts and your timeline.
 paths:
-  /api/users:
+  /api/users/:
     get:
       tags:
         - Users
