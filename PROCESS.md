@@ -13,7 +13,7 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | Setup | Choose the project, combine the repos | Done 2026-10-22 |
 | Testing and the spec | Test the API and write its spec; versions 0.1.0 to 0.2.1, unpublished | Done 2026-10-29 |
 | 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Done 2026-10-30. Live at https://we-conect-docs.netlify.app/ |
-| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Pull request open 2026-10-31; its first CI run and deploy preview passed. Not merged yet |
+| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Merged 2026-10-31 (pull request #1). The failing test (pull request #2) behaved as planned, and a ruleset now requires the check on `main`. Still to do: the post |
 | 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; `test:capture` failing on a difference; a strict check for undocumented fields | Not started. The checks run locally |
 | 4. Quickstart | Against the local API; replaces the overview's "Try it locally" section | Not started |
 | 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
@@ -39,6 +39,7 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | 14 pages on the docs site: the overview, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
 | 0 of 165 real responses have a field the spec doesn't list | One-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
 | CI, simulated in a fresh clone: 5 of 5 bad commits failed and 3 of 3 good commits passed; Netlify's `ignore` command was right in 8 of 8 cases | Entry of 2026-10-30, "Spec linting in CI" |
+| CI on GitHub: Lint the spec failed on the planted error in `8573827`, and Netlify canceled the preview for the log-only commit `86b4bb5` | Entry of 2026-11-01 |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
@@ -976,6 +977,30 @@ Rebuilding after the first edit leaves the public spec unchanged, because that p
 **Who did what**
 - **Me:** published the branch, opened the pull request, asked what the neutral checks were, and added the deliberate error for the failing pull request.
 - **Claude Code:** committed the work, ran the `ignore` command on the real commits, compared the check messages with the config, tested the failing pull request in a throwaway clone, and updated this log.
+
+### 2026-11-01: The pull request that fails on purpose
+
+**Result,** from GitHub's commit statuses and check runs:
+
+| Commit | What it changes | Lint the spec | Netlify |
+|---|---|---|---|
+| `86b4bb5` | Only `PROCESS.md` | Passed | "Deploy Preview canceled." |
+| `8573827` (pull request #2) | `/api/users/` with a trailing slash, in both specs | Failed | "Deploy Preview ready!" and "19 new files uploaded" |
+
+- The error appears on the changed line in the **Files changed** tab: `no-path-trailing-slash`, line 431.
+- The `ignore` command runs correctly on Netlify. The cancel on `86b4bb5` needs `git diff` to exit 0, which a wrong `../` path can't do: running it from the wrong folder exited 128 in the earlier test.
+- The preview was built from the changed spec. `/reference/get-current-user` shows `/api/users/` on the preview and `/api/users` on the live site (`curl`, 2026-11-01).
+- **One limit:** `8573827` is the pull request's first commit, and a build without a cache builds anyway, so the build alone doesn't prove the diff caused it. The next public spec change merged to `main` will show that.
+- **Pages changed** said "All files already uploaded" on `6fe2121` and "19 new files uploaded" here. That fits the earlier reading, but it counts files, not pages.
+- A failing check still leaves **Merge pull request** available until a ruleset requires it. The panel says "Merging can be performed automatically."
+
+**With the ruleset:** after I added `Protect main`, the same pull request marks the check **Required** and the merge button is disabled. GitHub's rules API lists `required_status_checks` (`Lint the spec`), `deletion` and `non_fast_forward` on `main`, and the ruleset as `active`. The panel has no "Merging is blocked" text, which Claude Code had predicted; the disabled button is the evidence. An unauthenticated read of the pull request still returned `mergeable_state: unstable`, not `blocked`, and we don't know why.
+
+**Decision:** drop the check of `307c38f` in Netlify's deploy list. That commit came before the `ignore` command existed, so it could only show Netlify's default behaviour, and `86b4bb5` tests the command itself.
+
+**Who did what**
+- **Me:** merged pull request #1, put the error on the public `/api/users` path instead of adding the wording change Claude Code suggested, rebuilt the public spec, opened pull request #2, added the ruleset, took the screenshots, and suggested combining them.
+- **Claude Code:** read the commit statuses and the ruleset, compared the preview with the live site, made the combined image (`~/Pictures/weconect-post/ci-failure.png`), and updated this log.
 
 ## Post and portfolio ideas
 
