@@ -13,8 +13,8 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | Setup | Choose the project, combine the repos | Done 2026-10-22 |
 | Testing and the spec | Test the API and write its spec; versions 0.1.0 to 0.2.1, unpublished | Done 2026-10-29 |
 | 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Done 2026-10-30. Live at https://we-conect-docs.netlify.app/ |
-| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Pull request open 2026-10-31; its first CI run and deploy preview passed. Not merged yet |
-| 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; `test:capture` failing on a difference; a strict check for undocumented fields | Not started. The checks run locally |
+| 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Merged 2026-10-31 (pull request #1). The failing test (pull request #2) behaved as planned, and a ruleset now requires the check on `main`. The post was drafted on 2026-11-01 |
+| 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; a strict check for undocumented fields | Built 2026-11-01 and narrowed 2026-11-03 on the `contract-tests-ci` branch; not on GitHub yet |
 | 4. Quickstart | Against the local API; replaces the overview's "Try it locally" section | Not started |
 | 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
 | 6. Style guide and Vale | Prose linting on every pull request | Not started |
@@ -37,8 +37,10 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
 | 28 findings, 4 of them fixed: 3 in 0.2, 1 in 0.2.1 | `TESTING.md` |
 | 14 pages on the docs site: the overview, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
-| 0 of 165 real responses have a field the spec doesn't list | One-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
+| 0 of 165 real responses have a field the spec doesn't list | `npm run test:validate`, which checks this since 2026-11-01. Before that, a one-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
+| Contract job, as narrowed, simulated in a fresh clone: an unchanged run passed, 4 of 4 contract breaks failed it, and the API not starting failed it (before narrowing: 4 of 4 unchanged runs passed, 4 of 4 changes to the API failed it) | Entries of 2026-11-03 and 2026-11-01 |
 | CI, simulated in a fresh clone: 5 of 5 bad commits failed and 3 of 3 good commits passed; Netlify's `ignore` command was right in 8 of 8 cases | Entry of 2026-10-30, "Spec linting in CI" |
+| CI on GitHub: Lint the spec failed on the planted error in `8573827`, and Netlify canceled the preview for the log-only commit `86b4bb5` | Entry of 2026-11-01 |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
@@ -215,12 +217,8 @@ Problems I found by using the app, testing in Postman, or reading the docs next 
 - Pull requests rerun the tests automatically, but a failure blocks the merge only if branch protection makes the check required. Breaking-change checks such as `oasdiff` often need an approval rather than failing outright.
 - For weConect, `tests/validate.mjs` already exits with code 1 on any failure, so it can become a required check in phase 2.
 
-### 2026-10-24: Chained tests and validation libraries
+### 2026-10-24: Validation libraries
 
-**What I learned**
-
-- The cases don't need to be chained to produce the spec. Each capture is validated on its own, so independent tests work too, as long as each test sets up its own data. Some behaviours need setup either way, such as following before "already following".
-- Chaining suited v1's characterization testing, and it kept IDs consistent across the spec's examples. Independent tests (setup in `beforeEach` or a helper) suit v2, because one failure doesn't break others and a single test can run alone.
 - `tests/validate.mjs` uses Ajv directly, not express-openapi-validator or jest-openapi. express-openapi-validator runs inside the API and would change v1's behaviour, so it belongs in v2. jest-openapi needs Jest tests, and weConect's tests save captures to disk instead.
 - Gap in `tests/validate.mjs`: it checks responses only (status, content type, and body), not captured requests, query parameters, or headers.
 
@@ -538,8 +536,6 @@ The repo has no remote yet, so nothing is pushed.
 ### 2026-10-28: How API keys are checked, and a wrong scope example
 
 **What I learned by asking:**
-- **Only a hash of each key is stored.** When a key is created, the API stores its SHA-256 hash and returns the key itself once ([`api/routes/keys.js:42-47`](api/routes/keys.js#L42-L47)). On each request it hashes the key it receives and looks for that hash ([`api/routes/verifyToken.js:58`](api/routes/verifyToken.js#L58)). Nothing is hashed twice: SHA-256 always gives the same output for the same input, so a correct key finds its record. A leaked database holds no usable keys, and SHA-256 can't be reversed.
-- **Why SHA-256 and not bcrypt**, which suits passwords: a key is 24 random bytes, far too many combinations to guess, so a fast hash is safe. bcrypt adds a random salt to every hash, so the API couldn't look a key up by its hash; it would have to check every stored key.
 - **A key can be write-only.** The app's page offers read only, and read and write, but the API also accepts `["write"]` alone [`keys_create_write_only`]. Such a key gets `403 "This API key doesn't have the 'read' scope"` on the read endpoints, including get the current user.
 
 **What my question found:** the shared `Forbidden` response, used by the 5 read endpoints and like, shows only the `'write'` message, which can't happen on a read endpoint. The read-scope `403` is captured only on search [`key_write_only_read`], not on get the current user.
@@ -977,6 +973,244 @@ Rebuilding after the first edit leaves the public spec unchanged, because that p
 - **Me:** published the branch, opened the pull request, asked what the neutral checks were, and added the deliberate error for the failing pull request.
 - **Claude Code:** committed the work, ran the `ignore` command on the real commits, compared the check messages with the config, tested the failing pull request in a throwaway clone, and updated this log.
 
+### 2026-11-01: The pull request that fails on purpose
+
+**Result,** from GitHub's commit statuses and check runs:
+
+| Commit | What it changes | Lint the spec | Netlify |
+|---|---|---|---|
+| `86b4bb5` | Only `PROCESS.md` | Passed | "Deploy Preview canceled." |
+| `8573827` (pull request #2) | `/api/users/` with a trailing slash, in both specs | Failed | "Deploy Preview ready!" and "19 new files uploaded" |
+
+- The error appears on the changed line in the **Files changed** tab: `no-path-trailing-slash`, line 431.
+- The `ignore` command runs correctly on Netlify. The cancel on `86b4bb5` needs `git diff` to exit 0, which a wrong `../` path can't do: running it from the wrong folder exited 128 in the earlier test.
+- The preview was built from the changed spec. `/reference/get-current-user` shows `/api/users/` on the preview and `/api/users` on the live site (`curl`, 2026-11-01).
+- **One limit:** `8573827` is the pull request's first commit, and a build without a cache builds anyway, so the build alone doesn't prove the diff caused it. The next public spec change merged to `main` will show that.
+- **Pages changed** said "All files already uploaded" on `6fe2121` and "19 new files uploaded" here. That fits the earlier reading, but it counts files, not pages.
+- A failing check still leaves **Merge pull request** available until a ruleset requires it. The panel says "Merging can be performed automatically."
+
+**With the ruleset:** after I added `Protect main`, the same pull request marks the check **Required** and the merge button is disabled. GitHub's rules API lists `required_status_checks` (`Lint the spec`), `deletion` and `non_fast_forward` on `main`, and the ruleset as `active`. The panel has no "Merging is blocked" text, which Claude Code had predicted; the disabled button is the evidence. An unauthenticated read of the pull request still returned `mergeable_state: unstable`, not `blocked`, and we don't know why.
+
+**Decision:** drop the check of `307c38f` in Netlify's deploy list. That commit came before the `ignore` command existed, so it could only show Netlify's default behaviour, and `86b4bb5` tests the command itself.
+
+**Who did what**
+- **Me:** merged pull request #1, put the error on the public `/api/users` path instead of adding the wording change Claude Code suggested, rebuilt the public spec, opened pull request #2, added the ruleset, took the screenshots, and suggested combining them.
+- **Claude Code:** read the commit statuses and the ruleset, compared the preview with the live site, made the combined image (`~/Pictures/weconect-post/ci-failure.png`), and updated this log.
+
+### 2026-11-01, later: Which spec mistakes break the docs
+
+**Why:** my opening for the step 2 post says linting stops a bad spec from breaking doc generation, and nothing had tested that. The slash in pull request #2 didn't break it.
+
+**Result,** from a throwaway clone of the repo with each mistake in the public spec (`redocly lint`, then `npm run gen` and `npm run build` in `docs/`):
+
+| Mistake | Lint | `gen` | `build` |
+|---|---|---|---|
+| None (control) | Passed | Passed | Passed |
+| A `$ref` to a schema that doesn't exist | Failed | Passed | Failed |
+| Invalid YAML | Failed | Failed | Not reached |
+| `/api/users/` with a trailing slash (pull request #2, on GitHub and Netlify) | Failed | Not run separately | Passed, and the page shows the wrong path |
+
+- The linter caught all three. Only two of them stop the docs from building.
+- `npm run gen` passed with the bad `$ref`, so the failure shows up only at `npm run build`.
+
+**Correction:** Claude Code's draft said "This step taught me that publishing is only part of the job". I already knew that, and the sentence was made up, so I removed it. I also cut the list of things learned as too light, and wrote the post's opening myself.
+
+**Who did what**
+- **Me:** wrote the new opening, chose what to cut, and caught the false sentence.
+- **Claude Code:** ran the test and updated this log.
+
+### 2026-11-01, later: Stronger examples for the post
+
+**Why:** I found the post's examples too weak, an `operationId` on every operation and no trailing slash, and asked for ones that fit its two opening questions.
+
+**Result,** from a throwaway clone with one mistake at a time in the public spec (`redocly lint`, using `recommended-strict`):
+
+| Mistake | Rule that failed | Docs (`npm run gen`, `docusaurus build`) |
+|---|---|---|
+| None (control) | None | Built, 10 reference pages |
+| Two operations share an `operationId` | `operation-operationId-unique` | **Built with no error, but 9 reference pages** |
+| Path parameter renamed, so it no longer matches its definition | `path-parameters-defined` | Built, 10 reference pages |
+| Security scheme that doesn't exist | `security-defined` | Built, 10 reference pages |
+| No success response | `operation-2xx-response` | Not built |
+| No error response | `operation-4xx-response` | Not built |
+| No summary | `operation-summary` | Not built |
+| Tag with no description | `tag-description` | Not built |
+| Example that contradicts its schema | `no-invalid-media-type-examples` | Not built |
+| Operation uses a tag the spec doesn't declare | None: lint passes | Not built |
+
+- The site generates each page's file name from the `operationId`, so two operations sharing one leave one of them without a page. `search-users.api.mdx` was missing in this run. I didn't check which operation's content `get-current-user.api.mdx` ended up with.
+- This is the only mistake tested so far that loses content with no error, so it's the strongest example for the post.
+
+**Who did what**
+- **Me:** rejected the first examples and rewrote the paragraph about the test.
+- **Claude Code:** chose the candidates, ran the test, and updated this log.
+
+### 2026-11-01, later: Contract tests in CI
+
+**What changed** (on the `contract-tests-ci` branch):
+- `tests/capture.mjs` exits 1 if a case doesn't get its expected status. Before, it printed `DIFF` and exited 0, so CI wouldn't have noticed.
+- `tests/validate.mjs` fails on a field the schema doesn't list. The published spec stays open, so the API can still add fields without breaking clients.
+- `.github/workflows/spec.yml` has a second job, **Contract tests**.
+
+**Decisions**
+- **Fresh captures, as well as the committed ones.** The committed captures can't show a change to `api/`, so checking only those would pass whatever the code did.
+- **The strict check goes in `test:validate`, not a new command,** so nobody has to remember to run it.
+- **Ubuntu 24.04 for this job, not `ubuntu-latest`.** MongoDB 6.0's download is the Ubuntu 22.04 build on every newer release, and `ubuntu-latest` can move to a release that build doesn't run on.
+- **The MongoDB download is cached,** so an outage at mongodb.org can't fail a required check.
+
+**Result,** from the job's commands in a fresh clone (`npm ci --ignore-scripts`, Node.js 24.20.0, Ubuntu 22.04):
+
+| Run | `test:capture` | `test:validate` | `test:coverage` |
+|---|---|---|---|
+| Unchanged, MongoDB not cached (77 s) | Passed | Passed | Passed |
+| Unchanged, cached, twice (59 s and 60 s) | Passed | Passed | Passed |
+| Unchanged, with 3 busy processes on one CPU core (65 s) | Passed | Passed | Not run |
+| API: Get a user and Get the current user return `password` | Passed | **Failed:** 9 responses, "has a field the spec doesn't list: password" | Passed |
+| API: the same two stop returning `username` | Passed | **Failed:** 9 responses | **Failed:** 217 of 219 fields |
+| API: search returns `201`, not `200` | **Failed:** 7 cases | **Failed:** 7 responses | **Failed:** 212 of 219 fields |
+| API won't start | **Failed** | Not run | Not run |
+
+- The `password` row is the gap from the entry of 2026-10-30, now closed: that change used to pass all three.
+- Adding a field at every depth of every committed capture gave 251 additions: 215 caught, 24 on responses the spec leaves out, and 12 missed. All 12 are inside the 2 free-form schemas for raw database errors, which are open on purpose.
+- The committed captures still pass: 165 passed, 0 failed, 18 skipped, and 57 of 57 responses and 219 of 219 fields.
+
+**Limits**
+- `test:capture` compares only the status. Other changes show up only if they break a schema, so new wording in a message that the spec doesn't fix as a `const` passes.
+- All of these checks see only what the 183 cases trigger.
+- A field inside a free-form schema isn't checked.
+
+**Not checked yet:** the job on GitHub. I couldn't test Ubuntu 24.04 or the cache here, and `actionlint` is still blocked, so the first real run is the test.
+
+**Who did what**
+- **Me:** asked to move on to this step.
+- **Claude Code:** wrote the changes, ran the simulation and the tests in throwaway clones, and updated this log and the other docs.
+
+### 2026-11-02: What each step of the contract job catches
+
+**Why:** I asked how `test:capture` can fail when its job is to run the cases and store the results, and what makes the two pairs of checks different.
+
+**Result,** from the job's commands in a throwaway clone, with one change at a time:
+
+| Change | `test:capture` | New captures: `test:validate`, `test:coverage` | Committed captures: `test:validate`, `test:coverage` |
+|---|---|---|---|
+| API: the owner check on Delete a post is gone, so anyone can delete any post | **Failed:** 4 cases | Passed, passed | Passed, passed |
+| API only: Delete a post returns an extra field | Passed | **Failed**, passed | Passed, passed |
+| API and spec both add that field, and the committed captures aren't refreshed | Passed | Passed, passed | **Failed, failed** |
+
+- **`test:capture` knows what should happen in one situation.** Bob deleting Alice's post expects `403` (`post_delete_not_owner`) and got `200`. The two checks only know what's documented for the endpoint: `200` and `403` both are, and another case still returns `403`, so they pass. 2 of the 4 differences are knock-on effects, because the post they use had been deleted.
+
+I also rewrote the workflow's comments and step names, because the old ones didn't explain the difference.
+
+**Who did what**
+- **Me:** asked both questions.
+- **Claude Code:** ran the test, rewrote the comments, and updated this log.
+
+### 2026-11-02, later: What `test:capture` compares, and why the captures are committed
+
+**Why:** I asked whether `test:capture` checks that earlier results are still returned, whether its failing means the spec has drifted, and whether the captures need to be on GitHub at all.
+
+**What I learned**
+- `test:capture` compares each status with the case's `expect`, which was predicted from reading the code. It doesn't look at earlier results or at response bodies, and it never reads the spec (`tests/capture.mjs`), so a failure says the API did something unexpected, not that the spec drifted.
+- Checking that earlier results are still returned is a snapshot test, and the project doesn't have one yet.
+- The committed captures are evidence, not a baseline: nothing compares new responses with them.
+
+**Numbers**
+
+| Measure | Result | Source |
+|---|---|---|
+| A new run compared with `tests/captures/v1`, as they are | 171 and 176 of 183 files differ, in two runs | One-off comparison in scratch |
+| The same, with IDs, timestamps, durations and `lastFour` masked | 0 of 183 differ | One-off comparison in scratch |
+| Size of `tests/captures/v1` | 784 KB, 183 captures | `du`, `ls` |
+| Captures that `TESTING.md` cites by name | 109 | `grep` against the folder |
+| `test:validate` and `test:coverage` on the committed captures | About 1.3 s together | Timed locally |
+
+**Why they stay committed for now:** the spec's overview says "Every status code and example comes from a captured response", and `TESTING.md` cites 109 captures by name, so readers can check the evidence without running anything. The cost is that a refresh changes nearly every file, because IDs and timestamps change.
+
+**Who did what**
+- **Me:** asked the questions, including whether the captures should be committed.
+- **Claude Code:** measured the numbers, looked up what teams do, and updated this log.
+
+### 2026-11-02, later: What each contract check can see, and a claim in the overview
+
+**Why:** I asked whether the test in `test:capture` is needed for contract testing, and whether readers of the API docs get any value from "Every status code and example comes from a captured response".
+
+**Result 1,** from a throwaway clone with one API change at a time. The snapshot comparison is a trial script in scratch that compares new captures with `tests/captures/v1`, with IDs, timestamps, durations and `lastFour` masked. It isn't in the repo.
+
+| API change | `expect` in `test:capture` | `test:validate` | `test:coverage` | Snapshot comparison |
+|---|---|---|---|---|
+| None (control) | Passed | Passed | Passed | Passed: 0 of 183 differ |
+| Anyone can delete any post | **Failed** | Passed | Passed | **Failed** |
+| A read-only key can write | **Failed** | Passed | Passed | **Failed** |
+| Delete a post returns `200` but deletes nothing | **Failed** | Passed | Passed | **Failed** |
+| Search ignores the term and returns everyone | Passed | Passed | Passed | **Failed** |
+| A documented error message is reworded | Passed | Passed | Passed | **Failed** |
+
+- Claude Code picked these five changes, so this isn't a catch rate.
+- Each one makes the docs wrong, and `test:validate` and `test:coverage` passed all five. They check the shape of a response, not whether it's right for the situation.
+- The checks form a chain. The snapshot compares the API with the committed captures, `test:validate` and `test:coverage` compare the captures with the spec, and `expect` stops a bug being saved when the captures are refreshed.
+
+**Correction:** the previous entry says a `test:capture` failure means "the API did something unexpected, not that the spec drifted", and Claude Code told me `test:validate` and `test:coverage` are the checks that detect drift. That was too strong. They detect drift in shape only, and a failed `expect` usually means the API and the docs now disagree, though it can't say which is wrong.
+
+**Result 2,** from comparing the spec's 110 examples with the committed captures, in a one-off script:
+
+| Examples | Count |
+|---|---|
+| Identical to a capture of the same operation (and status, for responses) | 78 |
+| Identical to a capture of another operation: shared error examples | 20 |
+| Edited: 7 shortened HTML error pages, 4 with a sample value in place of a redacted secret, 1 timeline trimmed from 5 posts to 2 | 12 |
+
+- The status half of the claim is checked: `test:coverage`, 57 of 57. No script checks the examples (`grep` for "example" in `tests/validate.mjs`, `tests/coverage.mjs` and `tests/spec.mjs` finds nothing).
+- The sentence is about how the docs were made, so it helps someone reviewing the work, not someone calling the API. `README.md` already says the spec was "written from captured responses".
+- This removes one of the reasons in the previous entry for committing the captures. `TESTING.md` still cites them, and a snapshot comparison would need them as its baseline.
+
+**Not decided yet:** adding the snapshot comparison to the job, and removing the sentence from the overview.
+
+**Who did what**
+- **Me:** asked both questions.
+- **Claude Code:** ran the API changes and the comparison, and updated this log.
+
+### 2026-11-03: Narrowing step 3 to contract testing
+
+**Decision:** I didn't see the need for `test:capture` failing on a status difference or for a snapshot test, and I want this step to be only contract testing: does the API match the spec? Neither is in the job. This replaces the plan in the Phases table and the suggestions in the entries of 2026-11-02.
+
+**What changed**
+- `tests/capture.mjs` is back to the committed version. It runs the cases and saves the responses. It still prints `DIFF` for an unexpected status, but exits 0.
+- The **Contract tests** job has three steps: `test:capture`, then `test:validate` and `test:coverage` on those captures.
+- The step that checked the committed captures is gone. They stay in the repo as evidence, and `npm run test:validate` and `npm run test:coverage` still read them locally.
+- The strict check for fields the spec doesn't list stays, in `tests/validate.mjs`.
+- The sentence in the overview hasn't changed. That's still undecided.
+
+**Result,** from the workflow's own `run` steps in a throwaway clone, stopping at the first failure as GitHub does:
+
+| Change | `test:capture` | `test:validate` | `test:coverage` | Job |
+|---|---|---|---|---|
+| None | Passed | Passed | Passed | Passes |
+| API returns a field the spec doesn't list (`password`) | Passed | **Failed** | Not reached | Fails |
+| API stops returning a required field (`username`) | Passed | **Failed** | Not reached | Fails |
+| Search returns an undocumented status (`201`) | Passed | **Failed** | Not reached | Fails |
+| Spec documents a field the API never returns (`nickname`) | Passed | Passed | **Failed** | Fails |
+| API won't start | **Failed** | Not reached | Not reached | Fails |
+| Anyone can delete any post | Passed | Passed | Passed | Passes |
+
+**Known limit:** the last row. The job checks the shape of each response, so a documented status in the wrong situation passes. `DIFF` shows in the step's log, but nothing fails.
+
+**Not tested yet:** Ubuntu 24.04 and `actions/cache`, as in the entry of 2026-11-01. The first run on GitHub is the real test.
+
+**Who did what**
+- **Me:** decided to keep this step to contract testing, and had questioned the committed-captures step on 2026-11-02.
+- **Claude Code:** undid its change to `tests/capture.mjs`, removed the committed-captures step, ran the job, and updated the docs and this log.
+
+### 2026-11-03, later: A rule for what goes in this log
+
+**Decision:** I found this log getting too long, and most questions I ask to understand the code or configuration don't belong in it. From now on, a question is logged only through what it changed, and each entry is about 15 lines (`CLAUDE.md`, "Keeping PROCESS.md up to date").
+
+- Removed: explanations in the entries of 2026-10-24 (on chained tests; now "Validation libraries"), 2026-10-28 ("How API keys are checked") and 2026-11-02 ("What each step of the contract job catches"). Their results and "Who did what" are unchanged, and git history keeps the full text.
+- Kept: the 2026-10-24 entry on how API docs workflows work at companies, which the entry of 2026-10-25 says stays for interviews, and "What `test:capture` compares", which holds numbers and a claim the next entry corrects.
+
+**Who did what**
+- **Me:** decided to stop logging questions about the code and configuration.
+- **Claude Code:** suggested the rule and the cuts, and made them.
+
 ## Post and portfolio ideas
 
 - Testing my own API before documenting it turned up 23 problems, including search leaking every user's encrypted password.
@@ -995,3 +1229,6 @@ Rebuilding after the first edit leaves the public spec unchanged, because that p
 - Netlify could have skipped my docs when the spec changed: base directories and the `ignore` command.
 - Why a response validator can't tell you a documented field is never returned, and what can: one response versus all of them.
 - A password can leak through a passing contract test: why schemas are open by default, and three ways to close the gap without closing the schema.
+- A duplicate `operationId` removed a page from my docs, and the build still passed.
+- Five API changes that made my docs wrong, including anyone being able to delete any post, and my schema checks passed all of them.
+- My API could have started returning passwords and every contract test would still have passed. What that taught me about open schemas, and the check that closes the gap at test time only.

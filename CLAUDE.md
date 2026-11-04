@@ -14,14 +14,14 @@ weConect is a small social app used to practise API documentation end to end: te
 | `docs/content/reference/` | Reference pages generated from the public spec by `npm run gen` (run by `start` and `build`). Gitignored; never edit |
 | `docs/src/theme/ResponseExamples/` | Theme override that hides the theme's made-up "Example (auto)" tab |
 | `redocly.yaml` | Redocly settings: the `full` and `public` versions and the lint rules |
-| `.github/workflows/spec.yml` | CI: runs `npm run lint:spec` on every pull request and push to `main`, then fails if the committed public spec is out of date |
+| `.github/workflows/spec.yml` | CI on every pull request and push to `main`. **Lint the spec:** `npm run lint:spec`, then fails if the committed public spec is out of date. **Contract tests:** `test:capture`, then `test:validate` and `test:coverage` on those captures |
 | `CHANGELOG.md` | API changes per version |
 | `scripts/api-server.mjs` | Starts the API against an in-memory MongoDB; shared by the tests and `npm run dev` |
 | `scripts/dev.mjs` | `npm run dev`: the API with sample data, for Postman and the frontend |
 | `scripts/start.mjs` | `npm run start:real`: the API and the frontend with the user's real settings and database |
 | `tests/cases.mjs` | The live test cases, as data |
 | `tests/capture.mjs` | Runs the cases against the API with an in-memory MongoDB and saves each request and response |
-| `tests/validate.mjs` | Checks a folder of captures against the spec |
+| `tests/validate.mjs` | Checks a folder of captures against the spec, including that no response has a field the spec doesn't list |
 | `tests/coverage.mjs` | Checks that every response and response field the spec documents appears in a capture |
 | `tests/spec.mjs` | Shared by the two checks: loads the spec and the captures, and matches request paths to spec paths |
 | `tests/captures/v1/` | Committed evidence: one request and response per case, plus `report.md` |
@@ -54,12 +54,12 @@ Any of these accepts `PORT=<port>` to avoid a server already on 8800, such as `n
 - **Document the API as it behaves.** Don't correct its behaviour in the spec. Record problems as findings in `TESTING.md`. When the user asks for a fix, change `api/`, then the spec and `CHANGELOG.md`, and mark the finding fixed with its evidence.
 - **Public or internal.** The public endpoints accept API keys (`verifyTokenOrApiKey(scope)` in `api/routes/verifyToken.js`). Endpoints only the app uses accept login tokens only (`verifyToken`) and are marked `x-internal: true` in the spec, along with their tags and any examples about login tokens. A public endpoint lists only `ApiKeyAuth`: Redocly removes an internal security scheme but not references to it, so listing `AccessToken` too would break the public spec.
 - **Express 4 and async middleware.** A rejected promise in middleware crashes the server, while a synchronous throw becomes a `500`. Keep code that can throw synchronous, or catch everything in `async` code.
-- **Claims need evidence.** Every status code, example, and behaviour in the spec traces to a capture. If something wasn't tested, say so. `npm run test:coverage` checks status codes and fields; it can't check the wording of a description, so when a behaviour changes, also search the spec for text about it. A field in a shared schema shows up in every response that uses it, so when a field applies to only some of them, give those their own schema.
+- **Claims need evidence.** Every status code, example, and behaviour in the spec traces to a capture. If something wasn't tested, say so. `npm run test:coverage` checks status codes and fields; it can't check the wording of a description, so when a behaviour changes, also search the spec for text about it. A field in a shared schema shows up in every response that uses it, so when a field applies to only some of them, give those their own schema. `npm run test:validate` fails on a field the spec doesn't list, but not inside a plain `type: object`, so use that only for bodies that really are free-form, such as raw database errors.
 - **Update together.** When the API or the spec changes, refresh the captures, then update the spec, `TESTING.md`, `CHANGELOG.md`, and `PROCESS.md`, and run `npm run lint:spec` so the public spec is rebuilt, then `npm run test:validate` and `npm run test:coverage`. Refreshing the captures gives every user and post a new ID, so update the spec's example IDs and timestamps to the new captures too.
 - **The frontend's mock API** (`web/redesign/tools/mock-api.mjs`) reads its own frozen copy of two captures in `web/redesign/tools/fixtures/captures/`, because its IDs are hard-coded. Don't point it back at `tests/captures/v1`.
 - **Versions.** 1.0.0 (2026-10-30) is the first published version; 0.1.0 to 0.2.1 weren't published. From 1.0.0 on, a change to documented behaviour is breaking and needs a major version: the planned breaking fixes (findings 8, 27 and 28, the timeline's order) wait for 2.0.0. Additions are minor versions; fixes to behaviour the docs don't promise are patches.
 - **Docs site.** The reference pages come from `openapi/weconect-public.yaml`, so change the full spec, run `npm run lint:spec`, then `cd docs && npm run build` to check the site still builds. "Send API Request" stays hidden (`hideSendButton`) until the API is deployed. Netlify rebuilds only when `docs/` or the public spec changes, so if the site starts using another file outside `docs/`, add it to the `ignore` command in `docs/netlify.toml`.
-- **CI.** The workflow runs the same commands as a local check, so a failure can be reproduced with `npm run lint:spec`. Pin actions to commit SHAs, with the version in a comment. Two lint rules are off until they apply: `info-license` until the repo has a license, and `no-server-example.com` until the API is deployed.
+- **CI.** The workflow runs the same commands as a local check, so a failure can be reproduced by running the failed step's command. Pin actions to commit SHAs, with the version in a comment. The contract job stays on Ubuntu 24.04 because the tests download MongoDB's build for Ubuntu 22.04. A ruleset on `main` requires the checks, so every change goes through a pull request. Two lint rules are off until they apply: `info-license` until the repo has a license, and `no-server-example.com` until the API is deployed.
 - **Ask first** before pushing, deploying, changing `api/` or `web/` behaviour, or anything that costs money or uses an external account.
 - **Commits:** no `Co-Authored-By` trailer.
 - **Writing style:** Google developer documentation style: plain words, second person, sentence-case headings, short sentences.
@@ -75,14 +75,15 @@ Any of these accepts `PORT=<port>` to avoid a server already on 8800, such as `n
 - A significant decision is made, such as a tool, a design choice, or a change of plan.
 - A test run, lint, or check produces new numbers or findings.
 - A problem takes real effort to solve, or a claim turns out to be wrong and is corrected.
-- The user learns a concept by asking about it.
 - Before ending a session that included substantial work.
+
+**Don't log** questions the user asks to understand the code, configuration, tools, or how teams work. Answer them in the chat. If the answer changed something, log the change. If it's a good post idea, add one line to the ideas.
 
 **How to update it:**
 
 - Add a dated entry at the end of the Log, in the same format as the existing entries. Update the Phases table and Key numbers.
+- Keep entries to about 15 lines: what changed, the result (one table if there are numbers), and who did what. Leave out explanations of how something works.
 - Keep "Who did what" honest. Separate what the user did from what Claude Code did. Never credit the user with work Claude Code did, or with checks the user hasn't said they did; ask instead.
 - Every number names its source file or command.
-- Don't rewrite old entries. Correct them with a dated note.
+- Don't change the results or "Who did what" in old entries. Correct them with a dated note. Explanations can be removed; git history keeps them.
 - Add a post or portfolio idea when a step produces a good story.
-- Keep entries short: bullets and small tables.

@@ -1,5 +1,6 @@
 // Check a folder of captures against the spec: every captured status must be
-// documented for its operation, and every JSON body must match its schema.
+// documented for its operation, and every JSON body must match its schema and
+// have no field the schema doesn't list.
 //
 //   npm run test:validate                        checks tests/captures/v1
 //   npm run test:validate -- tests/runs/<run>    checks another run
@@ -26,6 +27,27 @@ function deref(node, stack = []) {
   }
   return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, deref(v, stack)]));
 }
+
+// JSON Schema allows any field a schema doesn't name, and the spec stays that way
+// so the API can add fields without breaking clients. Here, at test time only, an
+// unnamed field fails. unevaluatedProperties, unlike additionalProperties, can see
+// the fields in an allOf, so only the outermost schema of a composition gets it. A
+// plain `type: object` stays open: it documents a free-form body, such as a raw
+// database error.
+function closed(schema, inComposition = false) {
+  if (!schema || typeof schema !== "object") return schema;
+  const out = { ...schema };
+  for (const key of ["allOf", "oneOf", "anyOf"]) if (out[key]) out[key] = out[key].map((s) => closed(s, true));
+  if (out.properties) out.properties = Object.fromEntries(Object.entries(out.properties).map(([k, v]) => [k, closed(v)]));
+  if (out.items) out.items = closed(out.items);
+  const namesFields = out.properties || out.allOf || out.oneOf || out.anyOf;
+  if (namesFields && !inComposition && out.additionalProperties === undefined) out.unevaluatedProperties = false;
+  return out;
+}
+
+const describe = (e) => `${e.instancePath || "(body)"} ${e.keyword === "unevaluatedProperties"
+  ? `has a field the spec doesn't list: ${e.params.unevaluatedProperty}`
+  : e.message}`;
 
 const ajv = new Ajv2020({ strict: false, allErrors: true });
 addFormats(ajv);
@@ -54,12 +76,11 @@ for (const cap of readCaptures(DIR)) {
   }
   if (!media.schema) { results.pass.push(label); continue; }
 
-  const validate = ajv.compile(media.schema);
+  const validate = ajv.compile(closed(media.schema));
   if (validate(cap.response.body)) {
     results.pass.push(label);
   } else {
-    const errors = validate.errors.slice(0, 4).map((e) => `${e.instancePath || "(body)"} ${e.message}`).join("; ");
-    results.fail.push(`${label}: ${errors}`);
+    results.fail.push(`${label}: ${validate.errors.slice(0, 4).map(describe).join("; ")}`);
   }
 }
 

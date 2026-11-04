@@ -4,7 +4,7 @@ This file records how the documented endpoints were tested, what the tests found
 
 ## How the tests ran
 
-`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 183 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture.
+`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 183 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), including that it has no field the spec doesn't list, and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture. Since 2026-11-01, GitHub Actions runs all three on every pull request.
 
 | Item | Value |
 |---|---|
@@ -13,6 +13,7 @@ This file records how the documented endpoints were tested, what the tests found
 | Cases | 183: 182 returned the status predicted from reading the code; 1 confirmed a crash |
 | Spec check | 165 captures pass, 0 fail; 18 skipped: 14 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
 | Validator check | 3 deliberately wrong captures (wrong type, undocumented status, missing field) were all rejected |
+| Unlisted fields | An extra field fails `test:validate`, except inside the 2 free-form schemas for raw database errors: the `500` of Delete a post, and the `error` field of `ErrorWithDetail`. Adding a field at every depth of every capture: 215 caught, 12 inside those schemas, 24 on responses the spec leaves out |
 | Response coverage | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture. With the spec from before 0.2.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
 | Invalid JSON | All 7 endpoints with a body return `400` with Express's HTML error page [`*_invalid_json`]. Until 2026-10-29 the spec documented it only on register: with the spec from before, `test:validate` fails the 6 new captures |
 

@@ -12,7 +12,7 @@ The docs are live at https://we-conect-docs.netlify.app/.
 | `openapi/weconect-public.yaml` | The public spec: the 10 endpoints developers call with API keys. Built from the full spec by `npm run build:spec`; don't edit it by hand |
 | `docs/` | The docs site, built with Docusaurus: the overview and reference, generated from the public spec |
 | `redocly.yaml` | Redocly settings: the two versions of the spec and the lint rules |
-| `.github/workflows/spec.yml` | CI: checks the spec on every pull request and every push to `main` |
+| `.github/workflows/spec.yml` | CI: lints the spec and runs the contract tests on every pull request and every push to `main` |
 | `tests/` | Live test cases, the capture runner, and the spec validator |
 | `scripts/` | `npm run dev`, and the code that starts the API for both the tests and `npm run dev` |
 | `TESTING.md` | What was tested, what was found, and what's out of scope |
@@ -36,11 +36,16 @@ npm run build:spec          # rebuild only the public spec
 
 The first `test:capture` downloads MongoDB 6.0 (about 55 MB) to `~/.cache/mongodb-binaries`.
 
+`test:validate` fails if a response has a field the spec doesn't list. A field whose schema is a plain `type: object`, such as a raw database error, can hold anything.
+
 To refresh the committed evidence after an API change, run `npm run test:capture -- --out tests/captures/v1`, review the diff, and update the spec to match.
 
 The tests use port 8800. If something else is using it, such as `npm run start:real`, pick another port: `PORT=8810 npm run test:capture`. `npm run dev` takes `PORT` too.
 
-On every pull request and every push to `main`, GitHub Actions runs `npm run lint:spec` and fails if the committed public spec is out of date. Any lint warning fails the check: `redocly.yaml` extends `recommended-strict`, and turns off the two rules that don't apply yet.
+On every pull request and every push to `main`, GitHub Actions runs two jobs:
+
+- **Lint the spec** runs `npm run lint:spec` and fails if the committed public spec is out of date. Any lint warning fails the check: `redocly.yaml` extends `recommended-strict`, and turns off the two rules that don't apply yet.
+- **Contract tests** runs every case against the API with `test:capture`, then checks those new captures with `test:validate` and `test:coverage`.
 
 ## Try the API locally
 

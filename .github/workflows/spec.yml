@@ -1,6 +1,6 @@
 # Checks the spec on every pull request and every push to main, with the same
-# command you run locally. No path filter: a required check that a path filter
-# skips stays "pending" forever, and the job only takes a few seconds.
+# commands you run locally. No path filter: a required check that a path filter
+# skips stays "pending" forever, and the jobs are short.
 name: Spec
 
 on:
@@ -40,3 +40,36 @@ jobs:
             echo "::error file=openapi/weconect-public.yaml::Out of date. Run npm run build:spec and commit the result."
             exit 1
           }
+
+  contract:
+    name: Contract tests
+    # Pinned because MongoDB 6.0 has no build for newer Ubuntu releases: the tests
+    # download the build for Ubuntu 22.04
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      # --ignore-scripts because test:capture downloads MongoDB itself when it starts
+      - run: npm ci --ignore-scripts
+      - run: npm ci --ignore-scripts
+        working-directory: api
+
+      # Keeps that download between runs, so an outage at mongodb.org can't fail a check
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-${{ hashFiles('scripts/api-server.mjs') }}
+
+      # Calls the API in this pull request and saves each response
+      - name: Run every test case against the API
+        run: npm run test:capture -- --out tests/runs/ci
+
+      # The two contract checks: does the API match the spec, in both directions?
+      - name: Check that every response matches the spec
+        run: npm run test:validate -- tests/runs/ci
+      - name: Check that every documented response and field was returned
+        run: npm run test:coverage -- tests/runs/ci
