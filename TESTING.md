@@ -90,6 +90,10 @@ These are behaviours a later version should change. The spec documents them as t
 
 28. **Any 12-character string counts as a valid ID.** Mongoose 5 reads a 12-character string as the 12 bytes of an ObjectId ([`bson` 1.1.6, `objectid.js:33` and `:348`](api/node_modules/bson/lib/bson/objectid.js#L33)). So a Postman variable missing a brace, such as `{{bobPostId}`, is treated as an ID that doesn't exist, not an invalid one. Delete a post returns `500 {}` instead of the database's `CastError` [`post_delete_12_char_id`], and get a user returns `404` [`user_get_12_char_id`]. The API only ever creates IDs of 24 hexadecimal characters, so a 12-character ID is always a client's mistake, and the error points away from it. The spec now explains this in its IDs section. Planned for 2.0.0, with finding 8: when invalid IDs return `400`, check them with `/^[0-9a-f]{24}$/i`, because `mongoose.isValidObjectId()` and `ObjectId.isValid()` both accept 12-character strings.
 
+### Added 2026-11-04, from a question about headers
+
+29. **The word before the key or token isn't checked.** Both security schemes say `Bearer`, but the API reads the second word of the `Authorization` header and ignores the first ([`api/routes/verifyToken.js:12`](api/routes/verifyToken.js#L12) and [`:19`](api/routes/verifyToken.js#L19)). `Token` in front of an access token works [`auth_other_scheme`], and so do `Token`, `Basic` and `x` in front of an API key (by hand against `npm run dev` on 2026-11-04; no case yet). Only a header with nothing in front fails [`auth_no_scheme`, `key_without_bearer`]. The full spec explains this for access tokens. Until 2026-11-04, the public reference said a key with "no `Bearer` in front" returns `401`; it now says a header that holds only the key does. Like finding 3, the public reference doesn't mention the other words, so requiring `Bearer` later changes nothing the docs promise.
+
 ### Edge cases that behave correctly
 
 - Special characters in a search term match only themselves: `a.i` and `(` both return no users [`search_special_dot`, `search_special_paren`].
@@ -142,6 +146,8 @@ Added 2026-10-26, in version 1.1. The keys cases are the `keys_*` and `key_*` ca
 |---|---|
 | The 8 undocumented endpoints and the Socket.io events | Planned for later phases |
 | Self-follow with posts (finding 19) | Needs a self-follower who has posts |
+| An API key with a word other than `Bearer` in front (finding 29) | Checked by hand only; a case would refresh every capture, so it waits for the next refresh |
+| A request body sent with a `Content-Type` other than `application/json` | Only register is tested, form-encoded [`register_form_encoded`]; every other case sends JSON |
 | Token expiry after the real two days | Simulated instead, with a token whose `exp` has passed [`auth_expired`] |
 | Behaviour with `NODE_ENV=production` | The tests run in development mode, so HTML errors include stack traces |
 | Load, concurrency, and very large lists | Not part of documenting the API |

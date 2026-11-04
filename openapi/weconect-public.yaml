@@ -8,7 +8,7 @@ info:
     timelines, find people, follow them, publish posts, and like posts.
 
     This document describes the API as it behaves today, including known
-    issues. Every status code and example comes from a captured response.
+    issues.
     [`TESTING.md`](https://github.com/Tammibriggs/weconect-docs-lab/blob/main/TESTING.md)
     lists the test cases and every known issue, and
     [`CHANGELOG.md`](https://github.com/Tammibriggs/weconect-docs-lab/blob/main/CHANGELOG.md)
@@ -56,7 +56,7 @@ info:
     | Problem | Status |
     |---|---|
     | No `Authorization` header | `401` with `"You are not authenticated!"` |
-    | The key is wrong or was deleted, doesn't start with `wck_`, or has no `Bearer` in front | `401` with `"Invalid API key"` |
+    | The key is wrong or was deleted, doesn't start with `wck_`, or the header holds only the key, without `Bearer` | `401` with `"Invalid API key"` |
     | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'read' scope"`, or `'write'` |
 
     ## Errors
@@ -783,8 +783,8 @@ components:
     Unauthorized:
       description: |
         The `Authorization` header is missing, or doesn't hold a current API
-        key: the key is wrong or was deleted, doesn't start with `wck_`, or has
-        no `Bearer` in front.
+        key: the key is wrong or was deleted, doesn't start with `wck_`, or the
+        header holds only the key, without `Bearer`.
       content:
         application/json:
           schema:
