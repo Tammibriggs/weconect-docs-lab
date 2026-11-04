@@ -14,7 +14,7 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | Testing and the spec | Test the API and write its spec; versions 0.1.0 to 0.2.1, unpublished | Done 2026-10-29 |
 | 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Done 2026-10-30. Live at https://we-conect-docs.netlify.app/ |
 | 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Merged 2026-10-31 (pull request #1). The failing test (pull request #2) behaved as planned, and a ruleset now requires the check on `main`. The post was drafted on 2026-11-01 |
-| 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; a strict check for undocumented fields | Built 2026-11-01 and narrowed 2026-11-03 on the `contract-tests-ci` branch; not on GitHub yet |
+| 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; a strict check for undocumented fields | Merged 2026-11-04 (pull request #3); the ruleset requires the check on `main`. The post isn't written yet |
 | 4. Quickstart | Against the local API; replaces the overview's "Try it locally" section | Not started |
 | 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
 | 6. Style guide and Vale | Prose linting on every pull request | Not started |
@@ -35,12 +35,13 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | 183 test cases; 182 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
 | 165 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
 | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
-| 28 findings, 4 of them fixed: 3 in 0.2, 1 in 0.2.1 | `TESTING.md` |
+| 29 findings, 4 of them fixed: 3 in 0.2, 1 in 0.2.1 | `TESTING.md` |
 | 14 pages on the docs site: the overview, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
 | 0 of 165 real responses have a field the spec doesn't list | `npm run test:validate`, which checks this since 2026-11-01. Before that, a one-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
 | Contract job, as narrowed, simulated in a fresh clone: an unchanged run passed, 4 of 4 contract breaks failed it, and the API not starting failed it (before narrowing: 4 of 4 unchanged runs passed, 4 of 4 changes to the API failed it) | Entries of 2026-11-03 and 2026-11-01 |
 | CI, simulated in a fresh clone: 5 of 5 bad commits failed and 3 of 3 good commits passed; Netlify's `ignore` command was right in 8 of 8 cases | Entry of 2026-10-30, "Spec linting in CI" |
 | CI on GitHub: Lint the spec failed on the planted error in `8573827`, and Netlify canceled the preview for the log-only commit `86b4bb5` | Entry of 2026-11-01 |
+| Contract tests on GitHub: passed on pull request #3 and on `main`, in 78 s and 75 s on Ubuntu 24.04 | GitHub Actions runs `41783161168` and `41787813085`; entry of 2026-11-04 |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
@@ -1210,6 +1211,41 @@ I also rewrote the workflow's comments and step names, because the old ones didn
 **Who did what**
 - **Me:** decided to stop logging questions about the code and configuration.
 - **Claude Code:** suggested the rule and the cuts, and made them.
+
+### 2026-11-04: Contract tests on GitHub
+
+**Result,** from GitHub's API: the two runs, the commit statuses, the cache list and the rules for `main`.
+
+| Run | Lint the spec | Contract tests | `test:capture` step |
+|---|---|---|---|
+| Pull request #3 (`52eee02`) | Passed, 12 s | Passed, 78 s | 59 s |
+| Push to `main` after the merge (`6d64862`) | Passed, 11 s | Passed, 75 s | 59 s |
+
+- The contract job ran on Ubuntu 24.04, the open question in the entries of 2026-11-01 and 2026-11-03.
+- Each run saved the MongoDB download to the cache (40 MB), once for the pull request and once for `main`. Neither run found a saved copy. Pull requests can use `main`'s cache, so the next one should be the first to.
+- Netlify canceled the preview for pull request #3, as planned.
+- The rules for `main` require both "Lint the spec" and "Contract tests".
+
+**Who did what**
+- **Me:** published the branch, opened pull request #3, merged it, and added "Contract tests" to the ruleset.
+- **Claude Code:** checked the runs, the cache, Netlify's status and the ruleset through GitHub's API.
+
+### 2026-11-04, later: Finding 29, and a wrong sentence in the public reference
+
+**Why:** while answering my question about headers, Claude Code noticed that `auth_other_scheme` (`Token <token>` returns `200`) wasn't a finding.
+
+- An API key works with `Bearer`, `Token`, `Basic` or `x` in front (`200`), and fails only with nothing in front (`401`). Checked by hand against `npm run dev`; no case yet.
+- The public reference said a key with "no `Bearer` in front" returns `401`. It now says a header that holds only the key does. As with finding 3, the other words aren't advertised, so requiring `Bearer` later breaks nothing the docs promise.
+- Added: finding 29 in `TESTING.md`, a documentation entry in `CHANGELOG.md`, and two "Not tested yet" rows: a key with another word in front, and request bodies that aren't JSON.
+- **Correction:** Claude Code told me the spec didn't mention this behaviour, and that every case sends JSON. The full spec explains it for access tokens, and `register_form_encoded` sends a form-encoded body.
+
+**Who did what**
+- **Me:** asked what contract tests check in request and response headers.
+- **Claude Code:** found the gap, checked the API by hand, and made the changes.
+
+### 2026-11-04, later: The overview's sentence about captures
+
+**Decision (mine):** remove "Every status code and example comes from a captured response" from the overview, as Claude Code suggested on 2026-11-02. It describes how the docs were made, which helps someone reviewing the work but not someone calling the API, and `README.md` already says the spec was written from captured responses. The comment in `docs/src/theme/ResponseExamples/index.js` keeps the claim, because it explains to a developer why the made-up examples are hidden.
 
 ## Post and portfolio ideas
 

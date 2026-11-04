@@ -4,6 +4,13 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 
 Versions before 1.0.0 weren't published. Semantic versioning reserves `0.x` versions for development before a first release, when anything can change. Until 2026-10-30 they were numbered 1.0.0, 1.1.0, and 1.1.1, so older commits and `PROCESS.md` entries use those numbers.
 
+## Documentation update: 2026-11-04
+
+The API is unchanged at 1.0.0.
+
+- **The `401` for an API key without `Bearer` is described accurately.** The authentication errors table said a key with no `Bearer` in front returns `401`. That's true only when the header holds nothing but the key (finding 29).
+- **The overview no longer says that every status code and example comes from a captured response.** That describes how the docs were made, which doesn't help you call the API. `TESTING.md` still lists the cases and their captures.
+
 ## 1.0.0: 2026-10-30
 
 The first published version: the public reference for 10 endpoints, on the weConect docs site. The API behaves as it did in 0.2.1.
