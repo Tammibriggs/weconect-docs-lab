@@ -924,6 +924,7 @@ Netlify's `ignore` command, run with simulated refs: builds for a change to the 
 **A risk in this API:** `api/routes/users.js:88` and `:101` remove `password` and `updatedAt` by name and send everything else, so a new field on the User model goes straight into both responses. Finding 1 in `TESTING.md`, search returning encrypted passwords, was this kind of problem. No change made: an allow-list would change `api/`, so it waits for v2.
 
 **Decisions:** step 3 adds the strict test-time check and runs both checks in CI. Skip Optic, because it's archived, and Pact for now, because the public API's clients can't be asked for contracts.
+*(Added 2026-11-05: checking at test time only was Claude Code's recommendation, which I went along with. Its reason, given on 2026-10-29, was that a closed published spec tells clients any new field is a breaking change. My own reason, stated on 2026-11-05: so the published spec doesn't stay closed, promising that no field will ever be added.)*
 
 **What I learned:**
 - `test:validate` does check the whole schema. The schema just says less than I assumed: nothing about fields it doesn't name.
@@ -1295,6 +1296,10 @@ I also rewrote the workflow's comments and step names, because the old ones didn
 **Who did what**
 - **Me:** approved the batch.
 - **Claude Code:** wrote the cases and the remapping script, refreshed the captures, updated the docs, and ran the checks.
+
+### 2026-11-05, later: Reasons for my decisions
+
+**Decision (mine):** Claude Code asks for the reason behind each of my decisions and records it with the decision (`CLAUDE.md`, "Keeping PROCESS.md up to date"), so I can remember why I made it and rethink it if the reason doesn't hold. The first one recorded is the test-time check, in the entry of 2026-10-30.
 
 ## Post and portfolio ideas
 

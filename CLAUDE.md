@@ -84,6 +84,7 @@ Any of these accepts `PORT=<port>` to avoid a server already on 8800, such as `n
 
 - Add a dated entry at the end of the Log, in the same format as the existing entries. Update the Phases table and Key numbers.
 - Keep entries to about 15 lines: what changed, the result (one table if there are numbers), and who did what. Leave out explanations of how something works.
+- Record the user's reason with each of their decisions, as **Decision (mine):** followed by the reason, in their words where possible. If they haven't given one, ask before logging the decision. If a reason seems weak or rests on something untrue, say so, so they can rethink it.
 - Keep "Who did what" honest. Separate what the user did from what Claude Code did. Never credit the user with work Claude Code did, or with checks the user hasn't said they did; ask instead.
 - Every number names its source file or command.
 - Don't change the results or "Who did what" in old entries. Correct them with a dated note. Explanations can be removed; git history keeps them.
