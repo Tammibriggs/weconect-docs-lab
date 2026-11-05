@@ -3,7 +3,7 @@
   "group": "List a user's posts",
   "request": {
     "method": "GET",
-    "path": "/api/posts/6ae2eebbc5e49b4d9b31db11",
+    "path": "/api/posts/6aebf455812a1235fe991e52",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -19,5 +19,5 @@
       "message": "Your session has expired"
     }
   },
-  "durationMs": 3
+  "durationMs": 6
 }

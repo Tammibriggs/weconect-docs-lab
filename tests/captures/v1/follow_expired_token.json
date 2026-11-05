@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae2eebbc5e49b4d9b31db11"
+      "userId": "6aebf455812a1235fe991e52"
     }
   },
   "response": {
@@ -23,5 +23,5 @@
       "message": "Your session has expired"
     }
   },
-  "durationMs": 7
+  "durationMs": 8
 }

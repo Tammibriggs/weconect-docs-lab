@@ -41,6 +41,7 @@ These are free and safe to run without asking. They use an in-memory database an
 | `npm run test:coverage [folder]` | Lists documented responses and response fields that no capture shows; exits 1 if there are any |
 | `npm run lint:spec` | Lints the full spec, rebuilds the public spec, and lints it. Any warning fails it (`recommended-strict`) |
 | `npm run build:spec` | Rebuilds `openapi/weconect-public.yaml` from the full spec |
+| `uvx schemathesis run openapi/weconect-public.yaml --url http://localhost:8800 -H "Authorization: Bearer <key>" --workers 1 --continue-on-failure --exclude-checks unsupported_method` | Sends generated requests to `npm run dev`, using the key it prints. By hand only, not in CI; the README lists the failures to expect |
 | `cd docs && npm run build` | Regenerates the reference pages and builds the docs site into `docs/build/`; `npm start` previews it at `localhost:3000` |
 
 Any of these accepts `PORT=<port>` to avoid a server already on 8800, such as `npm run start:real`.

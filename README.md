@@ -42,6 +42,21 @@ To refresh the committed evidence after an API change, run `npm run test:capture
 
 The tests use port 8800. If something else is using it, such as `npm run start:real`, pick another port: `PORT=8810 npm run test:capture`. `npm run dev` takes `PORT` too.
 
+### Generated requests
+
+The cases check what someone thought to test. To look for problems nobody thought of, run [Schemathesis](https://schemathesis.readthedocs.io/) by hand, for example after an API change. It sends hundreds of requests generated from the public spec. It needs [uv](https://docs.astral.sh/uv/) for `uvx`, and it isn't part of CI.
+
+1. Start the API with `npm run dev`, and copy the API key it prints for alice.
+2. In another terminal, run:
+
+   ```bash
+   uvx schemathesis run openapi/weconect-public.yaml --url http://localhost:8800 \
+     -H "Authorization: Bearer wck_YOUR_API_KEY" \
+     --workers 1 --continue-on-failure --exclude-checks unsupported_method
+   ```
+
+Expect server errors on the operations whose `500` is documented (`TESTING.md`, finding 8), and "Network Error" or "Server Unavailable" when unliking crashes the API (finding 6). `npm run dev` restarts it. Anything else is new: check it, then add a case for it.
+
 On every pull request and every push to `main`, GitHub Actions runs two jobs:
 
 - **Lint the spec** runs `npm run lint:spec` and fails if the committed public spec is out of date. Any lint warning fails the check: `redocly.yaml` extends `recommended-strict`, and turns off the two rules that don't apply yet.

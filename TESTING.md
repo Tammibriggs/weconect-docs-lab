@@ -4,20 +4,26 @@ This file records how the documented endpoints were tested, what the tests found
 
 ## How the tests ran
 
-`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 183 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), including that it has no field the spec doesn't list, and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture. Since 2026-11-01, GitHub Actions runs all three on every pull request.
+`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 188 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), including that it has no field the spec doesn't list, and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture. Since 2026-11-01, GitHub Actions runs all three on every pull request.
 
 | Item | Value |
 |---|---|
-| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28; 21 cases for field coverage added and all 173 re-run later that day; 6 cases for invalid JSON added and all 179 re-run on 2026-10-29; 4 cases for 12-character IDs and empty lists added and all 183 re-run later that day, committed as `tests/captures/v1/` |
+| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28; 21 cases for field coverage added and all 173 re-run later that day; 6 cases for invalid JSON added and all 179 re-run on 2026-10-29; 4 cases for 12-character IDs and empty lists added and all 183 re-run later that day; 5 cases for IDs and the scheme word added and all 188 re-run on 2026-11-05, committed as `tests/captures/v1/` |
 | Stack | Node.js 24, Express 4.18.2, Mongoose 5.13.15 (MongoDB driver 3.7.3), MongoDB 6.0.19 |
-| Cases | 183: 182 returned the status predicted from reading the code; 1 confirmed a crash |
-| Spec check | 165 captures pass, 0 fail; 18 skipped: 14 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
+| Cases | 188: 187 returned the status predicted from reading the code; 1 confirmed a crash |
+| Spec check | 170 captures pass, 0 fail; 18 skipped: 14 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
 | Validator check | 3 deliberately wrong captures (wrong type, undocumented status, missing field) were all rejected |
-| Unlisted fields | An extra field fails `test:validate`, except inside the 2 free-form schemas for raw database errors: the `500` of Delete a post, and the `error` field of `ErrorWithDetail`. Adding a field at every depth of every capture: 215 caught, 12 inside those schemas, 24 on responses the spec leaves out |
-| Response coverage | 57 of 57 documented responses and 219 of 219 documented fields appear in a capture. With the spec from before 0.2.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
+| Unlisted fields | An extra field fails `test:validate`, except inside the 2 free-form schemas for raw database errors: the `500` of Delete a post, and the `error` field of `ErrorWithDetail`. Adding a field at every depth of every capture, on the 183 captures of 2026-11-01: 215 caught, 12 inside those schemas, 24 on responses the spec leaves out |
+| Response coverage | 58 of 58 documented responses and 221 of 221 documented fields appear in a capture. With the spec from before 0.2.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
 | Invalid JSON | All 7 endpoints with a body return `400` with Express's HTML error page [`*_invalid_json`]. Until 2026-10-29 the spec documented it only on register: with the spec from before, `test:validate` fails the 6 new captures |
 
 The captures redact access tokens, API keys and encrypted passwords, and replace local paths with `<repo>`. IDs and timestamps change on every run, so each refresh also updates the spec's examples to the new values.
+
+### Generated requests
+
+On 2026-11-04, [Schemathesis](https://schemathesis.readthedocs.io/) 4.33 ran 757 test cases generated from the public spec against `npm run dev`. It found one response the spec didn't document: unfollow's `500` for an unknown ID (finding 8). Its other failures were already known: the documented `500`s (finding 8), `404` instead of `405` for an unsupported method (finding 26), and the unlike crash (finding 6). Its responses also showed that like's `500` description left out invalid IDs. The cases for both were added on 2026-11-05.
+
+Schemathesis isn't part of CI. It checks that responses match the spec, but not that every documented response happens, and it accepts fields the spec doesn't list. The [README](README.md) shows how to run it by hand.
 
 ## Scope
 
@@ -47,7 +53,7 @@ These are behaviours a later version should change. The spec documents them as t
 
 6. **Unliking a post crashes the server** [`unlike`, `after_unlike`]. The response is sent, then a stray `url` expression ([`api/routes/posts.js:69`](api/routes/posts.js#L69)) throws, the error handler tries to send a second response, and Node exits with `ERR_HTTP_HEADERS_SENT`. The like is removed [`post_get_after_unlike`].
 7. **Fixed in 0.2.1: a malformed token returned `500`**, an HTML page with a stack trace. `jwt.decode()` returns `null` for anything that isn't a JWT, and the middleware read `.exp` from it. Testing in Postman on 2026-10-27 found the same `500` for an API key without its `wck_` prefix, because the API treats any value without the prefix as a token. Since 0.2.1, a value that's neither an API key nor a token returns `401 "Invalid API key"` on the public endpoints [`auth_malformed_token`, `auth_no_scheme`, `key_without_prefix`, `key_without_bearer`] and `403 "Token is invalid"` on the internal ones, like any other bad token [`auth_malformed_token_internal`].
-8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `post_get_invalid_id`, `post_delete_invalid_id`]. Planned for 2.0.0, because changing these statuses can break clients. Check IDs as finding 28 describes: Mongoose's own check lets 12-character strings through.
+8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `unfollow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `unfollow_invalid_id`, `like_invalid_id`, `post_get_invalid_id`, `post_delete_invalid_id`]. Until 2026-11-05, no case sent unfollow an unknown or invalid ID, so the spec didn't document its `500`; a Schemathesis run found it. Planned for 2.0.0, because changing these statuses can break clients. Check IDs as finding 28 describes: Mongoose's own check lets 12-character strings through.
 
 ### Status codes
 
@@ -92,7 +98,7 @@ These are behaviours a later version should change. The spec documents them as t
 
 ### Added 2026-11-04, from a question about headers
 
-29. **The word before the key or token isn't checked.** Both security schemes say `Bearer`, but the API reads the second word of the `Authorization` header and ignores the first ([`api/routes/verifyToken.js:12`](api/routes/verifyToken.js#L12) and [`:19`](api/routes/verifyToken.js#L19)). `Token` in front of an access token works [`auth_other_scheme`], and so do `Token`, `Basic` and `x` in front of an API key (by hand against `npm run dev` on 2026-11-04; no case yet). Only a header with nothing in front fails [`auth_no_scheme`, `key_without_bearer`]. The full spec explains this for access tokens. Until 2026-11-04, the public reference said a key with "no `Bearer` in front" returns `401`; it now says a header that holds only the key does. Like finding 3, the public reference doesn't mention the other words, so requiring `Bearer` later changes nothing the docs promise.
+29. **The word before the key or token isn't checked.** Both security schemes say `Bearer`, but the API reads the second word of the `Authorization` header and ignores the first ([`api/routes/verifyToken.js:12`](api/routes/verifyToken.js#L12) and [`:19`](api/routes/verifyToken.js#L19)). `Token` in front of an access token works [`auth_other_scheme`], and so does `Token` in front of an API key [`key_other_scheme`]. `Basic` and `x` worked too, by hand against `npm run dev` on 2026-11-04. Only a header with nothing in front fails [`auth_no_scheme`, `key_without_bearer`]. The full spec explains this for access tokens. Until 2026-11-04, the public reference said a key with "no `Bearer` in front" returns `401`; it now says a header that holds only the key does. Like finding 3, the public reference doesn't mention the other words, so requiring `Bearer` later changes nothing the docs promise.
 
 ### Edge cases that behave correctly
 
@@ -146,7 +152,6 @@ Added 2026-10-26, in version 1.1. The keys cases are the `keys_*` and `key_*` ca
 |---|---|
 | The 8 undocumented endpoints and the Socket.io events | Planned for later phases |
 | Self-follow with posts (finding 19) | Needs a self-follower who has posts |
-| An API key with a word other than `Bearer` in front (finding 29) | Checked by hand only; a case would refresh every capture, so it waits for the next refresh |
 | A request body sent with a `Content-Type` other than `application/json` | Only register is tested, form-encoded [`register_form_encoded`]; every other case sends JSON |
 | Token expiry after the real two days | Simulated instead, with a token whose `exp` has passed [`auth_expired`] |
 | Behaviour with `NODE_ENV=production` | The tests run in development mode, so HTML errors include stack traces |

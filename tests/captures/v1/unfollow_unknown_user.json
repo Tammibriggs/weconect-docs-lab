@@ -1,0 +1,27 @@
+{
+  "name": "unfollow_unknown_user",
+  "group": "Unfollow",
+  "note": "Found by Schemathesis",
+  "request": {
+    "method": "PUT",
+    "path": "/api/users/unfollow",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "userId": "000000000000000000000000"
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "error": {}
+    }
+  },
+  "durationMs": 12
+}

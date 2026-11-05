@@ -4,7 +4,7 @@
   "note": "bob can't delete alice's key",
   "request": {
     "method": "DELETE",
-    "path": "/api/keys/6ae2eed3c5e49b4d9b31db6f",
+    "path": "/api/keys/6aebf46d812a1235fe991eb0",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -19,5 +19,5 @@
       "message": "API key not found"
     }
   },
-  "durationMs": 13
+  "durationMs": 18
 }

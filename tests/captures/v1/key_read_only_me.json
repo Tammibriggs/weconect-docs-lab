@@ -19,17 +19,17 @@
         "profilePicture": {},
         "coverPicture": {},
         "followers": [
-          "6ae2eebcc5e49b4d9b31db13",
-          "6ae2eebbc5e49b4d9b31db11"
+          "6aebf456812a1235fe991e54",
+          "6aebf455812a1235fe991e52"
         ],
         "followings": [],
         "isAdmin": false,
-        "_id": "6ae2eebbc5e49b4d9b31db0f",
+        "_id": "6aebf455812a1235fe991e50",
         "username": "alice",
-        "createdAt": "2026-10-29T06:59:07.539Z",
+        "createdAt": "2026-11-05T03:13:25.561Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 24
+  "durationMs": 15
 }

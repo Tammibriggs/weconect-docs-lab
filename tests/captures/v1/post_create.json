@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae2eebbc5e49b4d9b31db0f",
+      "userId": "6aebf455812a1235fe991e50",
       "desc": "Hello from Alice"
     }
   },
@@ -23,14 +23,14 @@
       "data": {
         "likes": [],
         "comments": [],
-        "_id": "6ae2eec9c5e49b4d9b31db42",
-        "userId": "6ae2eebbc5e49b4d9b31db0f",
+        "_id": "6aebf463812a1235fe991e83",
+        "userId": "6aebf455812a1235fe991e50",
         "desc": "Hello from Alice",
-        "createdAt": "2026-10-29T06:59:21.356Z",
-        "updatedAt": "2026-10-29T06:59:21.356Z",
+        "createdAt": "2026-11-05T03:13:39.623Z",
+        "updatedAt": "2026-11-05T03:13:39.623Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 12
+  "durationMs": 17
 }

@@ -129,9 +129,9 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae2eebbc5e49b4d9b31db0f
+                  _id: 6aebf455812a1235fe991e50
                   username: alice
-                  createdAt: '2026-10-29T06:59:07.539Z'
+                  createdAt: '2026-11-05T03:13:25.561Z'
                   __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -171,9 +171,9 @@ paths:
                   followers: []
                   followings: []
                   isAdmin: false
-                  _id: 6ae2eeecc5e49b4d9b31dbbf
+                  _id: 6aebf487812a1235fe991f00
                   username: erin
-                  createdAt: '2026-10-29T06:59:56.643Z'
+                  createdAt: '2026-11-05T03:14:15.115Z'
                   __v: 0
                   bio: Coffee and code
         '401':
@@ -263,10 +263,10 @@ paths:
                   - followers: []
                     followings: []
                     isAdmin: false
-                    _id: 6ae2eebbc5e49b4d9b31db0f
+                    _id: 6aebf455812a1235fe991e50
                     username: alice
-                    createdAt: '2026-10-29T06:59:07.539Z'
-                    updatedAt: '2026-10-29T06:59:07.539Z'
+                    createdAt: '2026-11-05T03:13:25.561Z'
+                    updatedAt: '2026-11-05T03:13:25.561Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -293,7 +293,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ae2eebbc5e49b4d9b31db11
+              userId: 6aebf455812a1235fe991e52
       responses:
         '200':
           description: The current user now follows the user.
@@ -375,7 +375,7 @@ paths:
             schema:
               $ref: '#/components/schemas/UserIdRequest'
             example:
-              userId: 6ae2eebbc5e49b4d9b31db11
+              userId: 6aebf455812a1235fe991e52
       responses:
         '200':
           description: The current user no longer follows the user.
@@ -422,6 +422,17 @@ paths:
                   value:
                     status: error
                     message: This API key doesn't have the 'write' scope
+        '500':
+          description: |
+            No user has this ID (the error is `{}`), or `userId` isn't a valid
+            ObjectId (the error is the raw database error).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorWithDetail'
+              example:
+                status: error
+                error: {}
   /api/posts:
     post:
       tags:
@@ -446,12 +457,12 @@ paths:
               text:
                 summary: Text only
                 value:
-                  userId: 6ae2eebbc5e49b4d9b31db0f
+                  userId: 6aebf455812a1235fe991e50
                   desc: Hello from Alice
               withImage:
                 summary: With an image
                 value:
-                  userId: 6ae2eebbc5e49b4d9b31db0f
+                  userId: 6aebf455812a1235fe991e50
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
@@ -468,14 +479,14 @@ paths:
                 data:
                   likes: []
                   comments: []
-                  _id: 6ae2eec9c5e49b4d9b31db44
-                  userId: 6ae2eebbc5e49b4d9b31db0f
+                  _id: 6aebf463812a1235fe991e85
+                  userId: 6aebf455812a1235fe991e50
                   desc: A photo
                   img:
                     url: https://example.com/photo.jpg
                     filename: photo.jpg
-                  createdAt: '2026-10-29T06:59:21.673Z'
-                  updatedAt: '2026-10-29T06:59:21.673Z'
+                  createdAt: '2026-11-05T03:13:39.943Z'
+                  updatedAt: '2026-11-05T03:13:39.943Z'
                   __v: 0
         '400':
           $ref: '#/components/responses/InvalidJson'
@@ -533,7 +544,7 @@ paths:
           description: The user's ID. Any string is accepted; an unknown ID returns an empty list.
           schema:
             type: string
-          example: 6ae2eebbc5e49b4d9b31db11
+          example: 6aebf455812a1235fe991e52
       responses:
         '200':
           description: |
@@ -548,11 +559,11 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ae2eec9c5e49b4d9b31db46
-                    userId: 6ae2eebbc5e49b4d9b31db11
+                    _id: 6aebf464812a1235fe991e87
+                    userId: 6aebf455812a1235fe991e52
                     desc: Hello from Bob
-                    createdAt: '2026-10-29T06:59:21.982Z'
-                    updatedAt: '2026-10-29T06:59:21.982Z'
+                    createdAt: '2026-11-05T03:13:40.257Z'
+                    updatedAt: '2026-11-05T03:13:40.257Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -580,7 +591,7 @@ paths:
           description: The post's ID.
           schema:
             $ref: '#/components/schemas/ObjectId'
-          example: 6ae2eec9c5e49b4d9b31db44
+          example: 6aebf463812a1235fe991e85
       responses:
         '200':
           description: The post was deleted.
@@ -662,19 +673,19 @@ paths:
                 data:
                   - likes: []
                     comments: []
-                    _id: 6ae2eec9c5e49b4d9b31db42
-                    userId: 6ae2eebbc5e49b4d9b31db0f
+                    _id: 6aebf463812a1235fe991e83
+                    userId: 6aebf455812a1235fe991e50
                     desc: Hello from Alice
-                    createdAt: '2026-10-29T06:59:21.356Z'
-                    updatedAt: '2026-10-29T06:59:21.356Z'
+                    createdAt: '2026-11-05T03:13:39.623Z'
+                    updatedAt: '2026-11-05T03:13:39.623Z'
                     __v: 0
                   - likes: []
                     comments: []
-                    _id: 6ae2eec9c5e49b4d9b31db46
-                    userId: 6ae2eebbc5e49b4d9b31db11
+                    _id: 6aebf464812a1235fe991e87
+                    userId: 6aebf455812a1235fe991e52
                     desc: Hello from Bob
-                    createdAt: '2026-10-29T06:59:21.982Z'
-                    updatedAt: '2026-10-29T06:59:21.982Z'
+                    createdAt: '2026-11-05T03:13:40.257Z'
+                    updatedAt: '2026-11-05T03:13:40.257Z'
                     __v: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -722,7 +733,9 @@ paths:
         '403':
           $ref: '#/components/responses/WriteScopeForbidden'
         '500':
-          description: No post has this ID. The body includes the raw error, which is `{}`.
+          description: |
+            No post has this ID (the error is `{}`), or `postId` isn't a valid
+            ObjectId (the error is the raw database error).
           content:
             application/json:
               schema:
@@ -747,7 +760,7 @@ components:
       description: The user's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ae2eeecc5e49b4d9b31dbbf
+      example: 6aebf487812a1235fe991f00
     PostId:
       name: postId
       in: path
@@ -755,7 +768,7 @@ components:
       description: The post's ID, as returned in `_id`.
       schema:
         $ref: '#/components/schemas/ObjectId'
-      example: 6ae2eec9c5e49b4d9b31db42
+      example: 6aebf463812a1235fe991e83
   examples:
     InvalidJsonPage:
       summary: The body isn't valid JSON

@@ -23,17 +23,17 @@
     "body": {
       "status": "ok",
       "data": {
-        "id": "6ae2eed3c5e49b4d9b31db6f",
+        "id": "6aebf46d812a1235fe991eb0",
         "name": "Dashboard",
-        "lastFour": "7_cx",
+        "lastFour": "4GR3",
         "scopes": [
           "read"
         ],
-        "createdAt": "2026-10-29T06:59:31.457Z",
+        "createdAt": "2026-11-05T03:13:49.787Z",
         "lastUsedAt": null,
         "key": "<redacted API key>"
       }
     }
   },
-  "durationMs": 13
+  "durationMs": 18
 }
