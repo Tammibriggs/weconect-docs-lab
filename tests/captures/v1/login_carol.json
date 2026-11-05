@@ -25,14 +25,14 @@
         "followers": [],
         "followings": [],
         "isAdmin": false,
-        "_id": "6ae2eebcc5e49b4d9b31db13",
+        "_id": "6aebf456812a1235fe991e54",
         "username": "carol",
-        "createdAt": "2026-10-29T06:59:08.167Z",
-        "updatedAt": "2026-10-29T06:59:08.167Z",
+        "createdAt": "2026-11-05T03:13:26.218Z",
+        "updatedAt": "2026-11-05T03:13:26.218Z",
         "__v": 0,
         "accessToken": "<redacted JWT>"
       }
     }
   },
-  "durationMs": 13
+  "durationMs": 27
 }

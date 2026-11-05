@@ -27,13 +27,13 @@
         "followers": [],
         "followings": [],
         "isAdmin": false,
-        "_id": "6ae2eeecc5e49b4d9b31dbbf",
+        "_id": "6aebf487812a1235fe991f00",
         "username": "erin",
-        "createdAt": "2026-10-29T06:59:56.643Z",
+        "createdAt": "2026-11-05T03:14:15.115Z",
         "__v": 0,
         "bio": "Coffee and code"
       }
     }
   },
-  "durationMs": 10
+  "durationMs": 7
 }

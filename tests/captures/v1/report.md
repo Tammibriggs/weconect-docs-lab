@@ -1,6 +1,6 @@
-# Capture run 2026-10-29T06-59-05
+# Capture run 2026-11-05T03-13-23
 
-183 cases, 183 as expected, 0 different, 1 server restart(s).
+188 cases, 188 as expected, 0 different, 1 server restart(s).
 
 | Case | Group | Expected | Got | Note |
 |---|---|---|---|---|
@@ -184,6 +184,11 @@
 | login_with_profile | Log in | 200 | 200 |  |
 | profile_update_long_bio | Update the current user | 200 | 200 | The model's 50-character limit isn't enforced (finding 18) |
 | me_after_long_bio | Current user | 200 | 200 | The 60-character bio was saved |
+| unfollow_unknown_user | Unfollow | 500 | 500 | Found by Schemathesis |
+| unfollow_invalid_id | Unfollow | 500 | 500 |  |
+| like_invalid_id | Like a post | 500 | 500 |  |
+| posts_by_no_such_id | List a user's posts | 200 | 200 | A valid ID that matches no user; posts_by_unknown_user covers an invalid one |
+| key_other_scheme | API keys | 200 | 200 | The scheme word isn't checked (finding 29) |
 | unlike | Like a post | 200 | 200 (server exited) | Liking a second time removes the like |
 | after_unlike | Like a post | ECONNREFUSED | ECONNREFUSED (server exited) | Unlike sends 200, then the server crashes (ERR_HTTP_HEADERS_SENT), so this request is refused |
 | post_get_after_unlike | Get a post | 200 | 200 | After a restart, if one was needed: was the like removed? |

@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "body": {
-      "userId": "6ae2eebbc5e49b4d9b31db0f",
+      "userId": "6aebf455812a1235fe991e50",
       "desc": "Posted with an API key"
     }
   },
@@ -23,14 +23,14 @@
       "data": {
         "likes": [],
         "comments": [],
-        "_id": "6ae2eed8c5e49b4d9b31db8a",
-        "userId": "6ae2eebbc5e49b4d9b31db0f",
+        "_id": "6aebf472812a1235fe991ecb",
+        "userId": "6aebf455812a1235fe991e50",
         "desc": "Posted with an API key",
-        "createdAt": "2026-10-29T06:59:36.524Z",
-        "updatedAt": "2026-10-29T06:59:36.524Z",
+        "createdAt": "2026-11-05T03:13:54.924Z",
+        "updatedAt": "2026-11-05T03:13:54.924Z",
         "__v": 0
       }
     }
   },
-  "durationMs": 8
+  "durationMs": 29
 }

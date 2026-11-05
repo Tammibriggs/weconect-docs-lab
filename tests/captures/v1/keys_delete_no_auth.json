@@ -3,7 +3,7 @@
   "group": "Delete an API key",
   "request": {
     "method": "DELETE",
-    "path": "/api/keys/6ae2eed3c5e49b4d9b31db6d",
+    "path": "/api/keys/6aebf46d812a1235fe991eae",
     "headers": {}
   },
   "response": {
@@ -16,5 +16,5 @@
       "message": "You are not authenticated!"
     }
   },
-  "durationMs": 5
+  "durationMs": 8
 }

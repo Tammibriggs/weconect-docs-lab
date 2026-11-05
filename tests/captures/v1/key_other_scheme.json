@@ -1,0 +1,36 @@
+{
+  "name": "key_other_scheme",
+  "group": "API keys",
+  "note": "The scheme word isn't checked (finding 29)",
+  "request": {
+    "method": "GET",
+    "path": "/api/users",
+    "headers": {
+      "Authorization": "Token <redacted API key>"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "ok",
+      "data": {
+        "profilePicture": {},
+        "coverPicture": {},
+        "followers": [
+          "6aebf456812a1235fe991e54",
+          "6aebf455812a1235fe991e52"
+        ],
+        "followings": [],
+        "isAdmin": false,
+        "_id": "6aebf455812a1235fe991e50",
+        "username": "alice",
+        "createdAt": "2026-11-05T03:13:25.561Z",
+        "__v": 0
+      }
+    }
+  },
+  "durationMs": 17
+}

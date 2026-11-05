@@ -4,6 +4,13 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 
 Versions before 1.0.0 weren't published. Semantic versioning reserves `0.x` versions for development before a first release, when anything can change. Until 2026-10-30 they were numbered 1.0.0, 1.1.0, and 1.1.1, so older commits and `PROCESS.md` entries use those numbers.
 
+## Documentation update: 2026-11-05
+
+The API is unchanged at 1.0.0.
+
+- **Unfollow a user documents its `500`.** It returns `500` when no user has the ID, or when the ID isn't a valid ObjectId, as follow does (finding 8). The spec didn't list it; 2 new test cases show it.
+- **Like or unlike a post's `500` covers invalid IDs.** It said the error is always `{}`. For an ID that isn't a valid ObjectId, the error is the raw database error; a new test case shows it.
+
 ## Documentation update: 2026-11-04
 
 The API is unchanged at 1.0.0.

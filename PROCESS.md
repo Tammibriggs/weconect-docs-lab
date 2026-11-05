@@ -32,16 +32,17 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | Number | Source |
 |---|---|
 | 15 of 26 endpoints in the full spec, 10 of them public | `openapi/weconect-v1.yaml`, `openapi/weconect-public.yaml` |
-| 183 test cases; 182 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
-| 165 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
-| 57 of 57 documented responses and 219 of 219 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
+| 188 test cases; 187 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
+| 170 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
+| 58 of 58 documented responses and 221 of 221 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
 | 29 findings, 4 of them fixed: 3 in 0.2, 1 in 0.2.1 | `TESTING.md` |
 | 14 pages on the docs site: the overview, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
-| 0 of 165 real responses have a field the spec doesn't list | `npm run test:validate`, which checks this since 2026-11-01. Before that, a one-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
+| 0 of 170 real responses have a field the spec doesn't list | `npm run test:validate`, which checks this since 2026-11-01. Before that, a one-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
 | Contract job, as narrowed, simulated in a fresh clone: an unchanged run passed, 4 of 4 contract breaks failed it, and the API not starting failed it (before narrowing: 4 of 4 unchanged runs passed, 4 of 4 changes to the API failed it) | Entries of 2026-11-03 and 2026-11-01 |
 | CI, simulated in a fresh clone: 5 of 5 bad commits failed and 3 of 3 good commits passed; Netlify's `ignore` command was right in 8 of 8 cases | Entry of 2026-10-30, "Spec linting in CI" |
 | CI on GitHub: Lint the spec failed on the planted error in `8573827`, and Netlify canceled the preview for the log-only commit `86b4bb5` | Entry of 2026-11-01 |
 | Contract tests on GitHub: passed on pull request #3 and on `main`, in 78 s and 75 s on Ubuntu 24.04 | GitHub Actions runs `41783161168` and `41787813085`; entry of 2026-11-04 |
+| Schemathesis, by hand: 757 generated test cases found 1 response the spec didn't document; the other failures were known findings | Entry of 2026-11-04, "Schemathesis, run by hand" |
 | Backend history kept (2 commits); the frontend's 9 commits squashed into 1 | `git log`; entry of 2026-10-26 |
 | Frontend audit: 0 axe failures, 0 overflowing pages, 0 focus stops without focus (before: 3, 14, 8) | `web/redesign/{before,after}/audit-summary.json` |
 | First JavaScript download 217 kB → 136 kB gzipped | `npm run build` in an isolated copy of `web/`, before and after |
@@ -1247,6 +1248,54 @@ I also rewrote the workflow's comments and step names, because the old ones didn
 
 **Decision (mine):** remove "Every status code and example comes from a captured response" from the overview, as Claude Code suggested on 2026-11-02. It describes how the docs were made, which helps someone reviewing the work but not someone calling the API, and `README.md` already says the spec was written from captured responses. The comment in `docs/src/theme/ResponseExamples/index.js` keeps the claim, because it explains to a developer why the made-up examples are hidden.
 
+### 2026-11-04, later: Pull request #4 on GitHub
+
+**Result,** from GitHub's API:
+- Both checks passed. The contract job took 71 s and used `main`'s cache for the first time: that cache was last used during the run, and no cache was saved for the pull request. `test:capture` still took 57 s, so the cases take the time, not the download.
+- I force-pushed to drop an unpublished commit. Netlify built the preview for the first push (`b14ff40`) and canceled it for `e5c7388`, correctly: `docs/` and the public spec were the same in both.
+
+**Who did what**
+- **Me:** published the branch, force-pushed, and merged pull request #4.
+- **Claude Code:** checked the runs, the cache and Netlify's statuses.
+
+### 2026-11-04, later: Schemathesis, run by hand
+
+**Result,** from Schemathesis 4.33 against `npm run dev` and the public spec, with alice's read-and-write key:
+
+| Run | Test cases | Failures |
+|---|---|---|
+| Defaults | 423 | 5 server errors, 1 undocumented status, 6 wrong responses to an undeclared method |
+| Continuing past failures, `405` check off | 757 | The same 5 server errors and the undocumented status |
+
+- **New:** unfollow returned `500` for an unknown ID, a status the spec didn't document. No case had sent it one.
+- **Known:** the 4 documented `500`s (finding 8), `404` instead of `405` (finding 26), and connection errors from the unlike crash (finding 6).
+- Reading its responses, Claude Code also found that like's `500` description left out invalid IDs.
+- What it tested, from its per-request record: authentication (20 requests without a key, all `401`), invalid requests and response schemas. Its rule for accepting valid requests counts `403` as accepted, so it proves little here, and it returned only 33 of the 39 documented public responses: the 6 scope `403`s need a key with one scope.
+
+**Decision (mine):** keep Schemathesis out of CI, and run it by hand after API changes. One gap doesn't justify the exceptions CI would need, and a rule for the cases (an unknown-ID and an invalid-ID case for every operation that takes an ID) closes this kind of gap. Revisit at 2.0.0, when most of the documented `500`s go.
+
+**Who did what**
+- **Me:** asked what it tested and whether it could replace the scripts, and made the decision.
+- **Claude Code:** ran it and analysed the results.
+
+### 2026-11-05: An unknown-ID and an invalid-ID case for every operation that takes an ID
+
+**What changed**
+- 5 cases: unfollow with an unknown and an invalid ID, like with an invalid ID, list a user's posts with a valid ID that matches no user, and an API key with `Token` in front (finding 29).
+- The spec documents unfollow's `500`, and like's `500` covers invalid IDs. `TESTING.md` has them in finding 8, and `CHANGELOG.md` has a documentation entry.
+- The README shows how to run Schemathesis by hand, and `.gitignore` ignores its cache.
+
+**Result**
+- `npm run test:capture`: 188 cases, all as expected, 1 restart (the unlike crash).
+- Before the spec change, `test:validate` failed both unfollow captures: "status 500 isn't documented".
+- The remapping changed 45 values in the spec (18 distinct IDs, timestamps and key endings), with no conflicts. Every ID, timestamp and key ending left in the spec appears in a new capture.
+- After: `test:validate` 170 passed, 0 failed; `test:coverage` 58 of 58 responses and 221 of 221 fields.
+- The README's Schemathesis command, run as written: 670 test cases, and only the failures the README says to expect.
+
+**Who did what**
+- **Me:** approved the batch.
+- **Claude Code:** wrote the cases and the remapping script, refreshed the captures, updated the docs, and ran the checks.
+
 ## Post and portfolio ideas
 
 - Testing my own API before documenting it turned up 23 problems, including search leaking every user's encrypted password.
@@ -1268,3 +1317,4 @@ I also rewrote the workflow's comments and step names, because the old ones didn
 - A duplicate `operationId` removed a page from my docs, and the build still passed.
 - Five API changes that made my docs wrong, including anyone being able to delete any post, and my schema checks passed all of them.
 - My API could have started returning passwords and every contract test would still have passed. What that taught me about open schemas, and the check that closes the gap at test time only.
+- A fuzzer found an undocumented `500` that my 183 hand-written cases missed, in 15 seconds, and I still kept it out of CI: what each kind of test can and can't see.

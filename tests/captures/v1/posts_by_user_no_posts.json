@@ -4,7 +4,7 @@
   "note": "carol never posts: an empty list",
   "request": {
     "method": "GET",
-    "path": "/api/posts/6ae2eebcc5e49b4d9b31db13",
+    "path": "/api/posts/6aebf456812a1235fe991e54",
     "headers": {
       "Authorization": "Bearer <redacted JWT>"
     }
@@ -19,5 +19,5 @@
       "data": []
     }
   },
-  "durationMs": 8
+  "durationMs": 13
 }

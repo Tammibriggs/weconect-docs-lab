@@ -3,7 +3,7 @@
   "group": "List a user's posts",
   "request": {
     "method": "GET",
-    "path": "/api/posts/6ae2eebbc5e49b4d9b31db11",
+    "path": "/api/posts/6aebf455812a1235fe991e52",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }
@@ -18,18 +18,18 @@
       "data": [
         {
           "likes": [
-            "6ae2eebbc5e49b4d9b31db0f"
+            "6aebf455812a1235fe991e50"
           ],
           "comments": [],
-          "_id": "6ae2eec9c5e49b4d9b31db46",
-          "userId": "6ae2eebbc5e49b4d9b31db11",
+          "_id": "6aebf464812a1235fe991e87",
+          "userId": "6aebf455812a1235fe991e52",
           "desc": "Hello from Bob",
-          "createdAt": "2026-10-29T06:59:21.982Z",
-          "updatedAt": "2026-10-29T06:59:27.358Z",
+          "createdAt": "2026-11-05T03:13:40.257Z",
+          "updatedAt": "2026-11-05T03:13:45.666Z",
           "__v": 0
         }
       ]
     }
   },
-  "durationMs": 19
+  "durationMs": 35
 }

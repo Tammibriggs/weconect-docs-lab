@@ -418,6 +418,21 @@ export const cases = [
   { name: "me_after_long_bio", group: "Current user", method: "GET", path: "/api/users", auth: "erin", expect: 200,
     note: "The 60-character bio was saved" },
 
+  // ─── IDs and the scheme word, added 2026-11-05 ──────────────────
+  // A Schemathesis run on 2026-11-04 found unfollow's 500, which no case had
+  // shown. Every documented operation that takes an ID now has an unknown-ID
+  // and an invalid-ID case.
+  { name: "unfollow_unknown_user", group: "Unfollow", method: "PUT", path: "/api/users/unfollow", auth: "alice",
+    body: { userId: NO_SUCH_ID }, expect: 500, note: "Found by Schemathesis" },
+  { name: "unfollow_invalid_id", group: "Unfollow", method: "PUT", path: "/api/users/unfollow", auth: "alice",
+    body: { userId: "abc" }, expect: 500 },
+  { name: "like_invalid_id", group: "Like a post", method: "PUT", path: "/api/posts/abc/like", auth: "bob",
+    body: { userId: "{bobId}" }, expect: 500 },
+  { name: "posts_by_no_such_id", group: "List a user's posts", method: "GET", path: `/api/posts/${NO_SUCH_ID}`,
+    auth: "alice", expect: 200, note: "A valid ID that matches no user; posts_by_unknown_user covers an invalid one" },
+  { name: "key_other_scheme", group: "API keys", method: "GET", path: "/api/users",
+    auth: { raw: "Token {aliceKey}" }, expect: 200, note: "The scheme word isn't checked (finding 29)" },
+
   // ─── Unlike: last, because the code suggests it crashes the server ──
   { name: "unlike", group: "Like a post", method: "PUT", path: "/api/posts/{postA}/like", auth: "bob",
     body: { userId: "{bobId}" }, expect: 200, note: "Liking a second time removes the like" },

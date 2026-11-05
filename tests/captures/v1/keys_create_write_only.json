@@ -23,17 +23,17 @@
     "body": {
       "status": "ok",
       "data": {
-        "id": "6ae2eed4c5e49b4d9b31db73",
+        "id": "6aebf46e812a1235fe991eb4",
         "name": "Poster",
-        "lastFour": "bk-5",
+        "lastFour": "4Wt_",
         "scopes": [
           "write"
         ],
-        "createdAt": "2026-10-29T06:59:32.086Z",
+        "createdAt": "2026-11-05T03:13:50.415Z",
         "lastUsedAt": null,
         "key": "<redacted API key>"
       }
     }
   },
-  "durationMs": 9
+  "durationMs": 8
 }

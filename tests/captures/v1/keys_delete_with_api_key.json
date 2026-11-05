@@ -4,7 +4,7 @@
   "note": "The key isn't deleted",
   "request": {
     "method": "DELETE",
-    "path": "/api/keys/6ae2eed3c5e49b4d9b31db6d",
+    "path": "/api/keys/6aebf46d812a1235fe991eae",
     "headers": {
       "Authorization": "Bearer <redacted API key>"
     }

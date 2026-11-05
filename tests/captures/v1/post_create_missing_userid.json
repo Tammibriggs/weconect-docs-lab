@@ -22,5 +22,5 @@
       "message": "user id is required"
     }
   },
-  "durationMs": 4
+  "durationMs": 10
 }
