@@ -4,6 +4,12 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 
 Versions before 1.0.0 weren't published. Semantic versioning reserves `0.x` versions for development before a first release, when anything can change. Until 2026-10-30 they were numbered 1.0.0, 1.1.0, and 1.1.1, so older commits and `PROCESS.md` entries use those numbers.
 
+## Fix to an undocumented endpoint: 2026-11-20
+
+The public API is unchanged at 1.0.0.
+
+- **Get a single post returns `404` and `400`.** `GET /api/posts/{postId}/single` accepts only the app's login tokens and isn't in the reference. For an unknown post, it returned `200` with `data: null` (finding 12); it now returns `404`. For an invalid ID, including any 12-character string, it returned `500` (findings 8 and 28); it now returns `400`. 3 test cases show it.
+
 ## Documentation update: 2026-11-05
 
 The API is unchanged at 1.0.0.

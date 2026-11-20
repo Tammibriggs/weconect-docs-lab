@@ -1,6 +1,7 @@
 {
   "name": "post_get_unknown",
   "group": "Get a post",
+  "note": "Fixed 2026-11-20: was 200 with data: null (finding 12)",
   "request": {
     "method": "GET",
     "path": "/api/posts/000000000000000000000000/single",
@@ -9,14 +10,14 @@
     }
   },
   "response": {
-    "status": 200,
+    "status": 404,
     "headers": {
       "content-type": "application/json; charset=utf-8"
     },
     "body": {
-      "status": "ok",
-      "data": null
+      "status": "error",
+      "message": "Post not found"
     }
   },
-  "durationMs": 12
+  "durationMs": 5
 }
