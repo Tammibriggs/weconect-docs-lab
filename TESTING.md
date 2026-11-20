@@ -4,14 +4,14 @@ This file records how the documented endpoints were tested, what the tests found
 
 ## How the tests ran
 
-`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 188 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), including that it has no field the spec doesn't list, and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture. Since 2026-11-01, GitHub Actions runs all three on every pull request.
+`npm run test:capture` starts the API from `api/` against a temporary in-memory MongoDB with random secrets, runs 189 cases in order, and saves each request and response. `npm run test:validate` then checks every captured response against the full spec, [`openapi/weconect-v1.yaml`](openapi/weconect-v1.yaml), including that it has no field the spec doesn't list, and `npm run test:coverage` checks the other direction: that every response and every response field the spec documents appears in a capture. Since 2026-11-01, GitHub Actions runs all three on every pull request.
 
 | Item | Value |
 |---|---|
-| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28; 21 cases for field coverage added and all 173 re-run later that day; 6 cases for invalid JSON added and all 179 re-run on 2026-10-29; 4 cases for 12-character IDs and empty lists added and all 183 re-run later that day; 5 cases for IDs and the scheme word added and all 188 re-run on 2026-11-05, committed as `tests/captures/v1/` |
+| Runs | 75 cases on 2026-10-22; 19 edge cases added and all 94 re-run on 2026-10-24; 38 cases for API keys added and all 132 re-run on 2026-10-26; 3 cases for values that are neither a key nor a token added and all 135 re-run on 2026-10-27; 17 cases for response coverage added and all 152 re-run on 2026-10-28; 21 cases for field coverage added and all 173 re-run later that day; 6 cases for invalid JSON added and all 179 re-run on 2026-10-29; 4 cases for 12-character IDs and empty lists added and all 183 re-run later that day; 5 cases for IDs and the scheme word added and all 188 re-run on 2026-11-05, committed as `tests/captures/v1/`; after the fix to get a post, 1 case added and all 189 re-run on 2026-11-20, with only get a post's 3 changed captures replaced |
 | Stack | Node.js 24, Express 4.18.2, Mongoose 5.13.15 (MongoDB driver 3.7.3), MongoDB 6.0.19 |
-| Cases | 188: 187 returned the status predicted from reading the code; 1 confirmed a crash |
-| Spec check | 170 captures pass, 0 fail; 18 skipped: 14 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
+| Cases | 189: 188 returned the status predicted from reading the code; 1 confirmed a crash |
+| Spec check | 170 captures pass, 0 fail; 19 skipped: 15 on endpoints the spec leaves out (see Scope), plus a refused connection, a CORS preflight, an unknown route and an unsupported method |
 | Validator check | 3 deliberately wrong captures (wrong type, undocumented status, missing field) were all rejected |
 | Unlisted fields | An extra field fails `test:validate`, except inside the 2 free-form schemas for raw database errors: the `500` of Delete a post, and the `error` field of `ErrorWithDetail`. Adding a field at every depth of every capture, on the 183 captures of 2026-11-01: 215 caught, 12 inside those schemas, 24 on responses the spec leaves out |
 | Response coverage | 58 of 58 documented responses and 221 of 221 documented fields appear in a capture. With the spec from before 0.2.1, the check lists the two `500` responses that version removed. Before the field cases, 42 fields had no capture |
@@ -39,7 +39,7 @@ The spec documents 15 endpoints. `npm run build:spec` builds the public version 
 
 ## Findings
 
-These are behaviours a later version should change. The spec documents them as they are. Findings marked **Fixed** were fixed in version 0.2 on 2026-10-26, or in the version they name.
+These are behaviours a later version should change. The spec documents them as they are. Findings marked **Fixed** were fixed in version 0.2 on 2026-10-26, or in the version or on the date they name.
 
 ### Security
 
@@ -53,14 +53,14 @@ These are behaviours a later version should change. The spec documents them as t
 
 6. **Unliking a post crashes the server** [`unlike`, `after_unlike`]. The response is sent, then a stray `url` expression ([`api/routes/posts.js:69`](api/routes/posts.js#L69)) throws, the error handler tries to send a second response, and Node exits with `ERR_HTTP_HEADERS_SENT`. The like is removed [`post_get_after_unlike`].
 7. **Fixed in 0.2.1: a malformed token returned `500`**, an HTML page with a stack trace. `jwt.decode()` returns `null` for anything that isn't a JWT, and the middleware read `.exp` from it. Testing in Postman on 2026-10-27 found the same `500` for an API key without its `wck_` prefix, because the API treats any value without the prefix as a token. Since 0.2.1, a value that's neither an API key nor a token returns `401 "Invalid API key"` on the public endpoints [`auth_malformed_token`, `auth_no_scheme`, `key_without_prefix`, `key_without_bearer`] and `403 "Token is invalid"` on the internal ones, like any other bad token [`auth_malformed_token_internal`].
-8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `unfollow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `unfollow_invalid_id`, `like_invalid_id`, `post_get_invalid_id`, `post_delete_invalid_id`]. Until 2026-11-05, no case sent unfollow an unknown or invalid ID, so the spec didn't document its `500`; a Schemathesis run found it. Planned for 2.0.0, because changing these statuses can break clients. Check IDs as finding 28 describes: Mongoose's own check lets 12-character strings through.
+8. **Unknown IDs return `500`** instead of `404` [`follow_unknown_user`, `unfollow_unknown_user`, `like_unknown_post`, `post_delete_again`], and invalid ObjectIds return `500` instead of `400` [`user_get_invalid_id`, `follow_invalid_id`, `unfollow_invalid_id`, `like_invalid_id`, `post_delete_invalid_id`]. Get a post, which isn't documented, was fixed on 2026-11-20: it returns `404` for an unknown ID (finding 12) and `400` for an invalid one [`post_get_invalid_id`, `post_get_12_char_id`]. Until 2026-11-05, no case sent unfollow an unknown or invalid ID, so the spec didn't document its `500`; a Schemathesis run found it. Planned for 2.0.0, because changing these statuses can break clients. Check IDs as finding 28 describes: Mongoose's own check lets 12-character strings through.
 
 ### Status codes
 
 9. **Validation errors use `401`** on register [`register_missing_username` and 4 more] **and `403`** on create a post [`post_create_missing_userid`, `post_create_bad_image`]. They should be `400`.
 10. **Invalid and expired tokens return `403`** [`auth_bad_signature`, `auth_expired`]. `401` is the usual status for authentication failures.
 11. **"Already following" and "not following" return `403`** [`follow_again`, `unfollow_again`]. `409` fits a conflict like this better.
-12. **Getting an unknown post returns `200` with `data: null`** [`post_get_unknown`] instead of `404`.
+12. **Fixed on 2026-11-20: getting an unknown post returned `200` with `data: null`** instead of `404`. It now returns `404` [`post_get_unknown`]. Get a post isn't documented, so no version changed.
 13. **Register and create a post return `200`**, not `201 Created`.
 
 ### Response shapes
@@ -94,7 +94,7 @@ These are behaviours a later version should change. The spec documents them as t
 
 ### Added 2026-10-29, from testing in Postman
 
-28. **Any 12-character string counts as a valid ID.** Mongoose 5 reads a 12-character string as the 12 bytes of an ObjectId ([`bson` 1.1.6, `objectid.js:33` and `:348`](api/node_modules/bson/lib/bson/objectid.js#L33)). So a Postman variable missing a brace, such as `{{bobPostId}`, is treated as an ID that doesn't exist, not an invalid one. Delete a post returns `500 {}` instead of the database's `CastError` [`post_delete_12_char_id`], and get a user returns `404` [`user_get_12_char_id`]. The API only ever creates IDs of 24 hexadecimal characters, so a 12-character ID is always a client's mistake, and the error points away from it. The spec now explains this in its IDs section. Planned for 2.0.0, with finding 8: when invalid IDs return `400`, check them with `/^[0-9a-f]{24}$/i`, because `mongoose.isValidObjectId()` and `ObjectId.isValid()` both accept 12-character strings.
+28. **Any 12-character string counts as a valid ID.** Mongoose 5 reads a 12-character string as the 12 bytes of an ObjectId ([`bson` 1.1.6, `objectid.js:33` and `:348`](api/node_modules/bson/lib/bson/objectid.js#L33)). So a Postman variable missing a brace, such as `{{bobPostId}`, is treated as an ID that doesn't exist, not an invalid one. Delete a post returns `500 {}` instead of the database's `CastError` [`post_delete_12_char_id`], and get a user returns `404` [`user_get_12_char_id`]. The API only ever creates IDs of 24 hexadecimal characters, so a 12-character ID is always a client's mistake, and the error points away from it. The spec now explains this in its IDs section. Planned for 2.0.0, with finding 8: when invalid IDs return `400`, check them with `/^[0-9a-f]{24}$/i`, because `mongoose.isValidObjectId()` and `ObjectId.isValid()` both accept 12-character strings. Get a post has checked IDs this way since 2026-11-20 [`post_get_12_char_id`].
 
 ### Added 2026-11-04, from a question about headers
 

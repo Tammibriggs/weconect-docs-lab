@@ -1,6 +1,7 @@
 {
   "name": "post_get_invalid_id",
   "group": "Get a post",
+  "note": "Fixed 2026-11-20: was 500 (finding 8)",
   "request": {
     "method": "GET",
     "path": "/api/posts/abc/single",
@@ -9,23 +10,14 @@
     }
   },
   "response": {
-    "status": 500,
+    "status": 400,
     "headers": {
       "content-type": "application/json; charset=utf-8"
     },
     "body": {
       "status": "error",
-      "error": {
-        "stringValue": "\"abc\"",
-        "valueType": "string",
-        "kind": "ObjectId",
-        "value": "abc",
-        "path": "_id",
-        "reason": {},
-        "name": "CastError",
-        "message": "Cast to ObjectId failed for value \"abc\" (type string) at path \"_id\" for model \"Post\""
-      }
+      "message": "Invalid post ID"
     }
   },
-  "durationMs": 10
+  "durationMs": 4
 }

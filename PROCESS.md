@@ -14,15 +14,15 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | Testing and the spec | Test the API and write its spec; versions 0.1.0 to 0.2.1, unpublished | Done 2026-10-29 |
 | 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Done 2026-10-30. Live at https://we-conect-docs.netlify.app/ |
 | 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Merged 2026-10-31 (pull request #1). The failing test (pull request #2) behaved as planned, and a ruleset now requires the check on `main`. The post was drafted on 2026-11-01 |
-| 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; a strict check for undocumented fields | Merged 2026-11-04 (pull request #3); the ruleset requires the check on `main`. The post isn't written yet |
-| 4. Quickstart | Against the local API; replaces the overview's "Try it locally" section | Not started |
+| 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; a strict check for undocumented fields | Merged 2026-11-04 (pull request #3); the ruleset requires the check on `main`. The post was drafted on 2026-11-05 |
+| 4. Quickstart | Its own page, curl only, tested with Doc Detective; against the local API; replaces the overview's "Try it locally" section | Started 2026-11-20: the reader, the purpose and the steps are decided |
 | 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
 | 6. Style guide and Vale | Prose linting on every pull request | Not started |
 | 7. Sandbox | Deploy the API (Render, MongoDB Atlas) with sample data; turn "Send API Request" back on; move the quickstart to the sandbox. First: password hashing, the `likes` fix (1.0.1), `NODE_ENV=production`, security updates to dependencies | Not started |
 | 8. Tutorial | For example, a command-line feed reader | Not started |
-| 9. Version 1.1.0 | Suggested people and opt-in pagination; "Added in 1.1" notes | Not started |
+| 9. Version 1.1.0 | Opt-in pagination and an `after` filter on the timeline and a user's posts; deprecating like; "Added in 1.1" and "Deprecated in 1.1" notes | Not started |
 | 10. AI readers | `llms.txt`, Markdown versions of pages, a docs MCP server | Not started |
-| 11. Version 2.0.0 | Findings 8, 27 and 28, the timeline in date order, a default page size, removing like's `userId`, upgrading Express and Mongoose; versioned docs, a migration guide, deprecating v1, `oasdiff` | Not started |
+| 11. Version 2.0.0 | Findings 8, 27 and 28, the timeline in date order, a default page size, removing like from the public API and making Get a single post public, upgrading Express and Mongoose; versioned docs, a migration guide, deprecating v1, `oasdiff` | Not started |
 | 12. AI automation | AutoDoc flags docs affected by each pull request | Not started |
 | 13. Developer experience | Code samples in more languages, SDKs, search, analytics, feedback; AsyncAPI for messaging | Not started |
 | Side project: frontend redesign | Design system, app shell, every page rebuilt; sessions, accessibility and performance fixes in `web/` | Done 2026-10-25, committed 2026-10-26; not yet reviewed by me |
@@ -32,10 +32,10 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | Number | Source |
 |---|---|
 | 15 of 26 endpoints in the full spec, 10 of them public | `openapi/weconect-v1.yaml`, `openapi/weconect-public.yaml` |
-| 188 test cases; 187 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
+| 189 test cases; 188 returned the predicted status, 1 confirmed a crash | `tests/captures/v1/report.md` |
 | 170 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
 | 58 of 58 documented responses and 221 of 221 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
-| 29 findings, 4 of them fixed: 3 in 0.2, 1 in 0.2.1 | `TESTING.md` |
+| 29 findings, 5 of them fixed: 3 in 0.2, 1 in 0.2.1, 1 on 2026-11-20 in an undocumented endpoint | `TESTING.md` |
 | 14 pages on the docs site: the overview, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
 | 0 of 170 real responses have a field the spec doesn't list | `npm run test:validate`, which checks this since 2026-11-01. Before that, a one-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
 | Contract job, as narrowed, simulated in a fresh clone: an unchanged run passed, 4 of 4 contract breaks failed it, and the API not starting failed it (before narrowing: 4 of 4 unchanged runs passed, 4 of 4 changes to the API failed it) | Entries of 2026-11-03 and 2026-11-01 |
@@ -443,7 +443,7 @@ Problems I found by using the app, testing in Postman, or reading the docs next 
 
 ### 2026-10-26, later: Delete a post becomes the 10th public endpoint
 
-**Decision (mine):** exactly 10 public endpoints, so Delete a post is public again. I asked whether to leave the gap for the WebSocket events instead; they won't fill it, because Socket.io events aren't REST endpoints and belong in a separate AsyncAPI document. This updates the earlier entry, which listed 9 public endpoints and 4 left out of the spec.
+**Decision (mine):** exactly 10 public endpoints, so Delete a post is public again. I asked whether to leave the gap for the WebSocket events instead; they won't fill it, because Socket.io events aren't REST endpoints and belong in a separate AsyncAPI document. This updates the earlier entry, which listed 9 public endpoints and 4 left out of the spec. *(Added 2026-11-20: still 10, now with a reason, and with Get a single post taking like's place; see the entry of 2026-11-20.)*
 
 - **API:** delete a post now accepts an API key with the `write` scope (`api/routes/posts.js`). Part of 1.1.0, which wasn't committed yet.
 - **Spec:** the path is `/api/posts/{id}` again, shared by List a user's posts (a user ID) and Delete a post (a post ID), because OpenAPI treats `{userId}` and `{postId}` at the same position as the same path. Each operation's description says which ID it takes (finding 20).
@@ -1300,6 +1300,47 @@ I also rewrote the workflow's comments and step names, because the old ones didn
 ### 2026-11-05, later: Reasons for my decisions
 
 **Decision (mine):** Claude Code asks for the reason behind each of my decisions and records it with the decision (`CLAUDE.md`, "Keeping PROCESS.md up to date"), so I can remember why I made it and rethink it if the reason doesn't hold. The first one recorded is the test-time check, in the entry of 2026-10-30.
+
+### 2026-11-20: Who the docs are for, the quickstart's plan, and the public endpoints
+
+Decisions made between 2026-11-05 and today, before building step 4.
+
+| Decision (mine) | My reason |
+|---|---|
+| The docs are for developers who already know how APIs work (intermediate level). `CLAUDE.md` lists what they know and don't | "I just felt that is the appropriate skill level for developers wanting to integrate with the API." |
+| The reader is a developer automating their own account: "your code uses weConect as you", as the overview says | I asked whether that's realistic. Mastodon and Reddit offer the same kind of personal API, so I confirmed it |
+| The quickstart has its own page | "It makes more sense to me. I feel it's the standard for a quickstart to have its own page." GitHub's REST docs do the same |
+| Doc Detective tests it; a script if it can't | I want "the one that don't drift and ensure the quickstart always works". It runs the steps on the page itself |
+| curl only for now | Other languages come when I generate an SDK from the spec |
+| Steps: get the key from `npm run dev`, get the current user, publish a post, see it on the timeline | My idea was get the key, publish, and get the post. Create a post needs your user ID, which an API key can only get from Get the current user, and Get a single post isn't public |
+| Public endpoints need a strong use for that reader | "I don't want to add endpoints more than I can manage." |
+| Deprecate like, and remove it from the public API in 2.0.0; the app keeps it | Liking from a script has little use for that reader. Removing a documented endpoint is breaking, so it's deprecated first, as Claude Code suggested |
+| Like is deprecated in step 9's 1.1.0, not in a release of its own | I left it to Claude Code: "whichever is best in the context of learning". Its reason: one minor release then teaches both an addition and a deprecation, and like's whole life shows across the planned versions, deprecated in 1.1 and removed in 2.0. A release now would hold only the deprecation and get no post |
+| Exactly 10 public endpoints: Get a single post becomes public in like's place. Plus an `after` filter in step 9, which adds no endpoint | "I will prefer that whole number," and Get a single post "might be useful for people who want to build a system to know how a particular post is doing." I first chose 9 the same day |
+| Get a single post goes public in 2.0.0, when like is removed. Claude Code suggested 1.1.0 | "To keep the endpoints at 10." |
+| Step 9 drops suggested people | Its use for that reader is weak, as Claude Code said, "and to prevent the endpoints from exceeding 10" |
+
+**Who did what**
+- **Me:** made the decisions above.
+- **Claude Code:** researched the options, suggested the purpose, the steps and the deprecation, and recorded the decisions.
+
+### 2026-11-20, later: Get a single post returns `404` and `400`
+
+**Decision (mine):** fix it now, although it goes public only in 2.0.0, where breaking fixes are allowed anyway: "Can't think of a reason why it shouldn't be done now if it can." Claude Code noted that nothing calls it, and that step 11 has less to do.
+
+**What changed**
+- `api/routes/posts.js`: an unknown post returns `404 "Post not found"`, not `200` with `data: null` (finding 12). An invalid ID returns `400 "Invalid post ID"`, not `500` (finding 8).
+- The route checks IDs with `/^[0-9a-f]{24}$/i`. A first version used `ObjectId.isValid()`, as `keys.js` does, but finding 28 says that accepts any 12-character string, so a new case, `post_get_12_char_id`, covers it.
+- 2 cases expect the new statuses. Only the 3 changed captures and the report were replaced, so the other 186 kept their IDs and the spec's examples needed no remapping. The spec doesn't list this endpoint, so it didn't change.
+- `TESTING.md` marks finding 12 fixed and updates findings 8 and 28; `CHANGELOG.md` has an entry.
+
+**Result**
+- `npm run test:capture`: 189 cases, all as expected, 1 restart (the unlike crash). The other 186 returned the same statuses as the committed captures.
+- `test:validate` 170 passed, 0 failed, 19 skipped; `test:coverage` 58 of 58 responses and 221 of 221 fields; `lint:spec` passes.
+
+**Who did what**
+- **Me:** approved the fix.
+- **Claude Code:** suggested it, made it, added the case, ran the checks, and updated the docs.
 
 ## Post and portfolio ideas
 

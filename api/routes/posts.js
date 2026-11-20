@@ -75,8 +75,14 @@ router.put("/:postId/like", verifyTokenOrApiKey("write"), async (req, res) => {
 
 //get a post
 router.get("/:postId/single", verifyToken, async (req, res) => {
+  // The API only creates IDs of 24 hex characters. Mongoose's own check also
+  // accepts any 12-character string (finding 28), so check the format here.
+  if (!/^[0-9a-f]{24}$/i.test(req.params.postId)) {
+    return res.status(400).json({status: 'error', message: 'Invalid post ID'});
+  }
   try {
     const post = await Post.findById(req.params.postId);
+    if (!post) return res.status(404).json({status: 'error', message: 'Post not found'});
     res.status(200).json({status: 'ok', data: post});
   } catch (err) {
     res.status(500).json({status: 'error', error: err});

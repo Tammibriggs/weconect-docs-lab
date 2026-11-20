@@ -1,6 +1,8 @@
-# Capture run 2026-11-05T03-13-23
+# Capture run 2026-11-20T10-37-23
 
-188 cases, 188 as expected, 0 different, 1 server restart(s).
+189 cases, 189 as expected, 0 different, 1 server restart(s).
+
+Only the 3 Get a post cases changed in this run (`post_get_unknown`, `post_get_invalid_id`, `post_get_12_char_id`), so only their captures were replaced. The other 186 captures are from run 2026-11-05T03-13-23, which returned the same statuses, so the spec's example IDs still match them.
 
 | Case | Group | Expected | Got | Note |
 |---|---|---|---|---|
@@ -59,8 +61,9 @@
 | post_create_long_desc | Create a post | 200 | 200 | The model says max 500; is it enforced? |
 | post_create_preset_likes | Create a post | 200 | 200 | Can the client set fields it shouldn't, such as likes? |
 | post_get | Get a post | 200 | 200 |  |
-| post_get_unknown | Get a post | 200 | 200 |  |
-| post_get_invalid_id | Get a post | 500 | 500 |  |
+| post_get_unknown | Get a post | 404 | 404 | Fixed 2026-11-20: was 200 with data: null (finding 12) |
+| post_get_invalid_id | Get a post | 400 | 400 | Fixed 2026-11-20: was 500 (finding 8) |
+| post_get_12_char_id | Get a post | 400 | 400 | Added 2026-11-20: a 12-character ID is invalid too (finding 28) |
 | posts_by_user | List a user's posts | 200 | 200 |  |
 | posts_by_user_with_image | List a user's posts | 200 | 200 | Added 2026-10-28: alice's posts include one with an image |
 | posts_by_unknown_user | List a user's posts | 200 | 200 |  |

@@ -1,0 +1,23 @@
+{
+  "name": "post_get_12_char_id",
+  "group": "Get a post",
+  "note": "Added 2026-11-20: a 12-character ID is invalid too (finding 28)",
+  "request": {
+    "method": "GET",
+    "path": "/api/posts/abcdefghijkl/single",
+    "headers": {
+      "Authorization": "Bearer <redacted JWT>"
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "body": {
+      "status": "error",
+      "message": "Invalid post ID"
+    }
+  },
+  "durationMs": 7
+}
