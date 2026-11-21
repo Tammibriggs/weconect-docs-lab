@@ -16,12 +16,10 @@ info:
 
     ## Try it locally
 
-    The API isn't deployed yet, so you run it on your computer. Clone the
-    [weConect repository](https://github.com/Tammibriggs/weconect-docs-lab)
-    and follow **Try the API locally** in its README. `npm run dev` starts the
-    API at `http://localhost:8800` with sample users and posts, and prints an
-    API key to use with the endpoints below. The data is deleted when you stop
-    the server.
+    The API isn't deployed yet, so you run it on your computer, with sample
+    data. The [quickstart](/quickstart)
+    shows you how, then walks you through your first calls: checking your API
+    key, publishing a post, and reading your timeline.
 
     ## Authentication
 

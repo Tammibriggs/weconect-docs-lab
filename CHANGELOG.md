@@ -4,6 +4,13 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 
 Versions before 1.0.0 weren't published. Semantic versioning reserves `0.x` versions for development before a first release, when anything can change. Until 2026-10-30 they were numbered 1.0.0, 1.1.0, and 1.1.1, so older commits and `PROCESS.md` entries use those numbers.
 
+## Documentation update: 2026-11-20, later
+
+The API is unchanged at 1.0.0.
+
+- **A quickstart page.** It shows how to run the API on your computer, then use curl to check your API key, publish a post, and read your timeline. A test runs its commands on every pull request, so the page fails the build if the API stops working the way it says.
+- **The overview's "Try it locally" section links to the quickstart,** instead of the repository's README.
+
 ## Fix to an undocumented endpoint: 2026-11-20
 
 The public API is unchanged at 1.0.0.
