@@ -15,7 +15,7 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Done 2026-10-30. Live at https://we-conect-docs.netlify.app/ |
 | 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Merged 2026-10-31 (pull request #1). The failing test (pull request #2) behaved as planned, and a ruleset now requires the check on `main`. The post was drafted on 2026-11-01 |
 | 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; a strict check for undocumented fields | Merged 2026-11-04 (pull request #3); the ruleset requires the check on `main`. The post was drafted on 2026-11-05 |
-| 4. Quickstart | Its own page, curl only, tested with Doc Detective; against the local API; replaces the overview's "Try it locally" section | Started 2026-11-20: the reader, the purpose and the steps are decided |
+| 4. Quickstart | Its own page, curl only, tested with Doc Detective; against the local API; replaces the overview's "Try it locally" section | Built 2026-11-20 on the `quickstart` branch: the page, and its Doc Detective test in CI. Not merged yet; the post isn't written |
 | 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
 | 6. Style guide and Vale | Prose linting on every pull request | Not started |
 | 7. Sandbox | Deploy the API (Render, MongoDB Atlas) with sample data; turn "Send API Request" back on; move the quickstart to the sandbox. First: password hashing, the `likes` fix (1.0.1), `NODE_ENV=production`, security updates to dependencies | Not started |
@@ -36,7 +36,8 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | 170 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
 | 58 of 58 documented responses and 221 of 221 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
 | 29 findings, 5 of them fixed: 3 in 0.2, 1 in 0.2.1, 1 on 2026-11-20 in an undocumented endpoint | `TESTING.md` |
-| 14 pages on the docs site: the overview, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
+| 15 pages on the docs site: the overview, the quickstart, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
+| Quickstart test: 8 of 8 steps pass; it caught 2 deliberate breaks and missed 1, which led to the `${NAME}` rule | `npm run test:quickstart`; entry of 2026-11-20, "The quickstart page" |
 | 0 of 170 real responses have a field the spec doesn't list | `npm run test:validate`, which checks this since 2026-11-01. Before that, a one-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
 | Contract job, as narrowed, simulated in a fresh clone: an unchanged run passed, 4 of 4 contract breaks failed it, and the API not starting failed it (before narrowing: 4 of 4 unchanged runs passed, 4 of 4 changes to the API failed it) | Entries of 2026-11-03 and 2026-11-01 |
 | CI, simulated in a fresh clone: 5 of 5 bad commits failed and 3 of 3 good commits passed; Netlify's `ignore` command was right in 8 of 8 cases | Entry of 2026-10-30, "Spec linting in CI" |
@@ -1342,6 +1343,55 @@ Decisions made between 2026-11-05 and today, before building step 4.
 - **Me:** approved the fix.
 - **Claude Code:** suggested it, made it, added the case, ran the checks, and updated the docs.
 
+### 2026-11-20, later: The quickstart page and its Doc Detective test
+
+**What changed**
+- `docs/content/quickstart.md`, after the overview in the sidebar: start the API, save the key, get the current user, publish a post, see it on the timeline. The examples come from a passing run. The overview's "Try it locally" now links to it.
+- `tests/docs/`: Doc Detective 5.3.1 in its own package, so readers' `npm install` doesn't download it. One rule runs each `bash` block as written; hidden steps in HTML comments start the API, read the key from its output, and check each response. `npm run test:quickstart`, and a third CI job, **Quickstart test**.
+
+**Result**
+
+| Check | Result |
+|---|---|
+| `npm run test:quickstart` | 8 of 8 steps, about 5 seconds, no processes left running |
+| Deliberate breaks, in a throwaway worktree | Timeline order (API): caught. Single quotes with `${NAME}` (page): caught, with the API's real `403`. Single quotes with `$NAME`: passed, so the page uses `${NAME}` |
+| `cd docs && npm run build` | 15 pages; the hidden steps don't appear on the page; checked at 1280 px and 390 px |
+
+**Problems**
+- A background step returns no output, so the test pipes `npm run dev` through `tee` to a log and reads the key from it.
+- `npm --prefix tests/docs` dropped nvm's Node from `PATH`, so `npm run dev` ran on the system's Node 12 and failed. The script `cd`s into the folder instead.
+- Doc Detective 5.4 and later need Node 24.22.1; this machine has 24.20.0, so 5.3.1 is pinned.
+- I found that the overview's link opened the live site, where the quickstart doesn't exist until it's deployed. It's now relative (`/quickstart`), so it works locally, on deploy previews and on the live site, and the build checks it.
+
+**Who did what**
+- **Me:** chose the page, the tool, curl only, the reader and the steps (entry above).
+- **Claude Code:** read Doc Detective's schemas and code to design the test, wrote the page and the test, ran the breaks and checks, and updated the docs.
+
+*(Added 2026-11-21: I read the quickstart and followed its steps in a terminal. Two changes came from that: the prerequisites now say why the shell matters, and the note that the API returns compact JSON was cut, since this audience expects formatted examples.)*
+
+### 2026-11-21: The overview's sections in the sidebar
+
+| Decision (mine) | My reason |
+|---|---|
+| The overview's main sections, Authentication, Errors and IDs, appear in the sidebar under Introduction | "Readers can easily know where the authentication information is and will see a familiar pattern." Stripe's API reference is one example of that pattern |
+| Sidebar entries link to headings on the overview, not to separate pages | As Claude Code recommended: the text stays in the spec, so the downloaded spec keeps it, and it's three sidebar entries |
+| Keep IDs | As Claude Code suggested: the 12-character rule is a weConect quirk that misleads readers. I hit it in Postman (finding 28) |
+| Fold Request bodies into Errors, and Browser requests into Authentication | As Claude Code suggested: this audience knows their basics, so each keeps only its weConect-specific point. Stripe's Authentication section also warns against keys in client-side code |
+| Authentication errors become part of Errors | As Claude Code suggested: a reader with a `401` looks in Errors. Stripe lists its `401` and `403` there |
+| An "Endpoints" heading above Users, Follows and Posts in the sidebar | "For clearer separation" between the pages you read first and the endpoint reference. Claude Code added that step 5's guides and step 8's tutorial will need it too |
+| The heading says "Endpoints", not "Reference" or "Core Resources" | "As it's clearer." Stripe's "Core Resources" sits beside other groups, such as Payment Methods, and weConect has only one group |
+
+**What changed:** the spec's overview, `docs/sidebars.js`, `onBrokenAnchors: 'throw'` in `docs/docusaurus.config.js`, and the heading's style in `docs/src/css/custom.css`.
+
+**Result**
+- `npm run lint:spec` passes, and `cd docs && npm run build` passes with the stricter anchor check, so the site had no other broken anchors.
+- With the IDs link pointing to `#idz`, the build fails, listing the broken anchor on every page.
+- Screenshots at 1280 px in light and dark mode. The heading's top margin needed two classes to beat Infima's `.menu__list-item:not(:first-child)` rule.
+
+**Who did what**
+- **Me:** asked for the sidebar and the Endpoints heading, questioned four of the overview's sections, and made the decisions.
+- **Claude Code:** checked Stripe's Authentication and Errors sections, suggested the changes, made them, and ran the checks.
+
 ## Post and portfolio ideas
 
 - Testing my own API before documenting it turned up 23 problems, including search leaking every user's encrypted password.
@@ -1364,3 +1414,4 @@ Decisions made between 2026-11-05 and today, before building step 4.
 - Five API changes that made my docs wrong, including anyone being able to delete any post, and my schema checks passed all of them.
 - My API could have started returning passwords and every contract test would still have passed. What that taught me about open schemas, and the check that closes the gap at test time only.
 - A fuzzer found an undocumented `500` that my 183 hand-written cases missed, in 15 seconds, and I still kept it out of CI: what each kind of test can and can't see.
+- My docs test passed while my quickstart was broken: Doc Detective fills in `$VARIABLES` itself, so a quoting mistake every reader would hit never reached the shell. One character pair, `${}`, fixed it.

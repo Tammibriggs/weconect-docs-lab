@@ -25,6 +25,17 @@ On 2026-11-04, [Schemathesis](https://schemathesis.readthedocs.io/) 4.33 ran 757
 
 Schemathesis isn't part of CI. It checks that responses match the spec, but not that every documented response happens, and it accepts fields the spec doesn't list. The [README](README.md) shows how to run it by hand.
 
+### The quickstart
+
+Since 2026-11-20, `npm run test:quickstart` runs the docs' [quickstart](docs/content/quickstart.md) with Doc Detective 5.3.1: it starts the API with `npm run dev`, runs the page's 3 curl commands as written, and checks what each returns. GitHub Actions runs it on every pull request.
+
+| Run | Result |
+|---|---|
+| The page as written | 8 of 8 steps pass, in about 5 seconds |
+| The timeline lists followed users' posts first (an API change) | Fails at the timeline check |
+| The post's body in single quotes, with `${WECONECT_USER_ID}` (a page mistake) | Fails at the post check: the API returns `403 "you can only post to your account"`, as it would for a reader |
+| The same mistake with `$WECONECT_USER_ID` | Passes: Doc Detective replaces `$NAME` itself before the shell runs, so the page writes variables as `${NAME}` |
+
 ## Scope
 
 The spec documents 15 endpoints. `npm run build:spec` builds the public version from it, without the ones marked `x-internal: true`.

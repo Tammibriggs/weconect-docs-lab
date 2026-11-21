@@ -73,3 +73,37 @@ jobs:
         run: npm run test:validate -- tests/runs/ci
       - name: Check that every documented response and field was returned
         run: npm run test:coverage -- tests/runs/ci
+
+  quickstart:
+    name: Quickstart test
+    # Pinned for the same reason as the contract tests: npm run dev downloads
+    # MongoDB's build for Ubuntu 22.04
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      # --ignore-scripts: npm run dev downloads MongoDB itself, and Doc Detective's
+      # install script downloads browsers that this test doesn't use
+      - name: Install the scripts' dependencies
+        run: npm ci --ignore-scripts
+      - name: Install the API's dependencies
+        run: npm ci --ignore-scripts
+        working-directory: api
+      # npm ci installs what tests/docs/package-lock.json lists: Doc Detective 5.3.1
+      - name: Install Doc Detective
+        run: npm ci --ignore-scripts
+        working-directory: tests/docs
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-${{ hashFiles('scripts/api-server.mjs') }}
+
+      # Starts the API with npm run dev, then runs the page's curl commands and
+      # checks what each returns
+      - name: Run the quickstart's commands against the API
+        run: npm run test:quickstart

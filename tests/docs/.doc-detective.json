@@ -1,0 +1,27 @@
+{
+  "input": "../../docs/content/quickstart.md",
+  "outputDir": "../runs/docs",
+  "telemetry": { "send": false },
+  "autoUpdate": false,
+  "detectSteps": true,
+  "fileTypes": [
+    {
+      "name": "markdown-bash",
+      "extensions": ["md"],
+      "inlineStatements": { "in": ["comment"] },
+      "markup": [
+        {
+          "name": "runBashBlock",
+          "codeBlock": { "language": ["bash"], "metaExcludes": "testIgnore" },
+          "captures": ["content"],
+          "actions": [
+            {
+              "runShell": { "command": "$1" },
+              "variables": { "QUICKSTART_OUTPUT": "$$stdio.stdout" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

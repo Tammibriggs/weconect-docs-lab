@@ -10,10 +10,10 @@ The docs are live at https://we-conect-docs.netlify.app/.
 | `web/` | The React frontend |
 | `openapi/weconect-v1.yaml` | The full OpenAPI 3.1 spec: 15 endpoints, written from captured responses. Endpoints only the app uses are marked `x-internal: true` |
 | `openapi/weconect-public.yaml` | The public spec: the 10 endpoints developers call with API keys. Built from the full spec by `npm run build:spec`; don't edit it by hand |
-| `docs/` | The docs site, built with Docusaurus: the overview and reference, generated from the public spec |
+| `docs/` | The docs site, built with Docusaurus: the overview and reference, generated from the public spec, and the quickstart |
 | `redocly.yaml` | Redocly settings: the two versions of the spec and the lint rules |
-| `.github/workflows/spec.yml` | CI: lints the spec and runs the contract tests on every pull request and every push to `main` |
-| `tests/` | Live test cases, the capture runner, and the spec validator |
+| `.github/workflows/spec.yml` | CI: lints the spec, runs the contract tests, and tests the quickstart on every pull request and every push to `main` |
+| `tests/` | Live test cases, the capture runner, the spec validator, and the quickstart test (`tests/docs/`) |
 | `scripts/` | `npm run dev`, and the code that starts the API for both the tests and `npm run dev` |
 | `TESTING.md` | What was tested, what was found, and what's out of scope |
 | `CHANGELOG.md` | Changes to the API in each version |
@@ -57,10 +57,22 @@ The cases check what someone thought to test. To look for problems nobody though
 
 Expect server errors on the operations whose `500` is documented (`TESTING.md`, finding 8), and "Network Error" or "Server Unavailable" when unliking crashes the API (finding 6). `npm run dev` restarts it. Anything else is new: check it, then add a case for it.
 
-On every pull request and every push to `main`, GitHub Actions runs two jobs:
+### The quickstart
+
+[Doc Detective](https://doc-detective.com/) checks that the docs' [quickstart](docs/content/quickstart.md) still works. It starts the API with `npm run dev`, runs each `bash` block on the page, and checks what each one returns. Doc Detective has its own folder, `tests/docs/`, so that `npm install` in the root doesn't download it.
+
+```bash
+(cd tests/docs && npm ci --ignore-scripts)   # once; --ignore-scripts skips browser downloads the test doesn't need
+npm run test:quickstart
+```
+
+It uses port 8800, so stop `npm run dev` first. Each run's report goes to `tests/runs/docs/`.
+
+On every pull request and every push to `main`, GitHub Actions runs three jobs:
 
 - **Lint the spec** runs `npm run lint:spec` and fails if the committed public spec is out of date. Any lint warning fails the check: `redocly.yaml` extends `recommended-strict`, and turns off the two rules that don't apply yet.
 - **Contract tests** runs every case against the API with `test:capture`, then checks those new captures with `test:validate` and `test:coverage`.
+- **Quickstart test** runs `npm run test:quickstart`.
 
 ## Try the API locally
 

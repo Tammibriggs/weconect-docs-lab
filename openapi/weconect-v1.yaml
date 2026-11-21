@@ -16,12 +16,10 @@ info:
 
     ## Try it locally
 
-    The API isn't deployed yet, so you run it on your computer. Clone the
-    [weConect repository](https://github.com/Tammibriggs/weconect-docs-lab)
-    and follow **Try the API locally** in its README. `npm run dev` starts the
-    API at `http://localhost:8800` with sample users and posts, and prints an
-    API key to use with the endpoints below. The data is deleted when you stop
-    the server.
+    The API isn't deployed yet, so you run it on your computer, with sample
+    data. The [quickstart](/quickstart)
+    shows you how, then walks you through your first calls: checking your API
+    key, publishing a post, and reading your timeline.
 
     ## Authentication
 
@@ -40,6 +38,10 @@ info:
     you sign in aren't supported for other code: they expire, and they can
     change without notice.
 
+    Use your key from your server or scripts, never in a web page, where
+    anyone could read it. Browsers can't call the API from other websites
+    anyway: it accepts browser requests only from the weConect app.
+
     ### Scopes
 
     Each key has one or both of these scopes:
@@ -49,15 +51,9 @@ info:
     | `read` | Get the current user, get a user, search users, list a user's posts, and get the timeline |
     | `write` | Follow and unfollow users, create and delete your posts, and like or unlike posts |
 
-    Each endpoint lists the scope it needs.
-
-    ### Authentication errors
-
-    | Problem | Status |
-    |---|---|
-    | No `Authorization` header | `401` with `"You are not authenticated!"` |
-    | The key is wrong or was deleted, doesn't start with `wck_`, or the header holds only the key, without `Bearer` | `401` with `"Invalid API key"` |
-    | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'read' scope"`, or `'write'` |
+    Each endpoint lists the scope it needs. A key without it gets `403`;
+    [Authentication errors](#authentication-errors) lists every error a key
+    can cause.
 
     ## Errors
 
@@ -70,26 +66,24 @@ info:
       page, on every endpoint that takes a body. A path or method that doesn't
       exist returns the same kind of page, with `404`.
 
+    A request body that isn't JSON, such as a form-encoded one, is ignored, so
+    the API returns the error for a missing field. Send bodies as JSON, with
+    `Content-Type: application/json`.
+
+    ### Authentication errors
+
+    | Problem | Status |
+    |---|---|
+    | No `Authorization` header | `401` with `"You are not authenticated!"` |
+    | The key is wrong or was deleted, doesn't start with `wck_`, or the header holds only the key, without `Bearer` | `401` with `"Invalid API key"` |
+    | The key doesn't have the scope the endpoint needs | `403` with `"This API key doesn't have the 'read' scope"`, or `'write'` |
+
     ## IDs
 
     IDs are MongoDB ObjectIds, written as 24 hexadecimal characters. Each
     operation documents what an invalid ID returns. The API also accepts any
     12-character string as an ObjectId, so a mistyped 12-character ID is
     treated as an ID that doesn't exist, not as an invalid one.
-
-    ## Request bodies
-
-    Send request bodies as JSON, with `Content-Type: application/json`. The
-    API doesn't parse other formats, such as form-encoded bodies, so it
-    treats their fields as missing.
-
-    ## Browser requests
-
-    Browsers can call the API only from the weConect app's own origin, set in
-    the server's `ALLOWED_HOST` variable. A preflight request from any other
-    origin gets `204` with no CORS headers, so the browser blocks the call.
-    Call the API from your server or scripts instead; requests that don't come
-    from a browser aren't affected.
 servers:
   - url: http://localhost:8800
     description: Local development server. The API isn't deployed yet.
