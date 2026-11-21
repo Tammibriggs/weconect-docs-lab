@@ -1367,6 +1367,31 @@ Decisions made between 2026-11-05 and today, before building step 4.
 - **Me:** chose the page, the tool, curl only, the reader and the steps (entry above).
 - **Claude Code:** read Doc Detective's schemas and code to design the test, wrote the page and the test, ran the breaks and checks, and updated the docs.
 
+*(Added 2026-11-21: I read the quickstart and followed its steps in a terminal. Two changes came from that: the prerequisites now say why the shell matters, and the note that the API returns compact JSON was cut, since this audience expects formatted examples.)*
+
+### 2026-11-21: The overview's sections in the sidebar
+
+| Decision (mine) | My reason |
+|---|---|
+| The overview's main sections, Authentication, Errors and IDs, appear in the sidebar under Introduction | "Readers can easily know where the authentication information is and will see a familiar pattern." Stripe's API reference is one example of that pattern |
+| Sidebar entries link to headings on the overview, not to separate pages | As Claude Code recommended: the text stays in the spec, so the downloaded spec keeps it, and it's three sidebar entries |
+| Keep IDs | As Claude Code suggested: the 12-character rule is a weConect quirk that misleads readers. I hit it in Postman (finding 28) |
+| Fold Request bodies into Errors, and Browser requests into Authentication | As Claude Code suggested: this audience knows their basics, so each keeps only its weConect-specific point. Stripe's Authentication section also warns against keys in client-side code |
+| Authentication errors become part of Errors | As Claude Code suggested: a reader with a `401` looks in Errors. Stripe lists its `401` and `403` there |
+| An "Endpoints" heading above Users, Follows and Posts in the sidebar | "For clearer separation" between the pages you read first and the endpoint reference. Claude Code added that step 5's guides and step 8's tutorial will need it too |
+| The heading says "Endpoints", not "Reference" or "Core Resources" | "As it's clearer." Stripe's "Core Resources" sits beside other groups, such as Payment Methods, and weConect has only one group |
+
+**What changed:** the spec's overview, `docs/sidebars.js`, `onBrokenAnchors: 'throw'` in `docs/docusaurus.config.js`, and the heading's style in `docs/src/css/custom.css`.
+
+**Result**
+- `npm run lint:spec` passes, and `cd docs && npm run build` passes with the stricter anchor check, so the site had no other broken anchors.
+- With the IDs link pointing to `#idz`, the build fails, listing the broken anchor on every page.
+- Screenshots at 1280 px in light and dark mode. The heading's top margin needed two classes to beat Infima's `.menu__list-item:not(:first-child)` rule.
+
+**Who did what**
+- **Me:** asked for the sidebar and the Endpoints heading, questioned four of the overview's sections, and made the decisions.
+- **Claude Code:** checked Stripe's Authentication and Errors sections, suggested the changes, made them, and ran the checks.
+
 ## Post and portfolio ideas
 
 - Testing my own API before documenting it turned up 23 problems, including search leaking every user's encrypted password.

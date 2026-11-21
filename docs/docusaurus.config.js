@@ -14,6 +14,8 @@ export default {
   url: process.env.URL || 'http://localhost:3000',
   baseUrl: '/',
   onBrokenLinks: 'throw',
+  // The sidebar links to headings on the overview, so a renamed heading fails the build
+  onBrokenAnchors: 'throw',
   markdown: { hooks: { onBrokenMarkdownLinks: 'throw' } },
   i18n: { defaultLocale: 'en', locales: ['en'] },
 

@@ -4,6 +4,15 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 
 Versions before 1.0.0 weren't published. Semantic versioning reserves `0.x` versions for development before a first release, when anything can change. Until 2026-10-30 they were numbered 1.0.0, 1.1.0, and 1.1.1, so older commits and `PROCESS.md` entries use those numbers.
 
+## Documentation update: 2026-11-21
+
+The API is unchanged at 1.0.0.
+
+- **The sidebar lists the overview's main sections,** Authentication, Errors, and IDs, under Introduction.
+- **An Endpoints heading in the sidebar** separates Users, Follows, and Posts from the pages above them.
+- **Authentication errors are part of Errors,** where you look when a request fails. Authentication links to them.
+- **"Request bodies" and "Browser requests" are no longer sections.** Errors now says that a body that isn't JSON is ignored, so you get the error for a missing field. Authentication says to use your key from a server or script, never in a web page.
+
 ## Documentation update: 2026-11-20, later
 
 The API is unchanged at 1.0.0.

@@ -18,3 +18,15 @@
   --ifm-color-primary-lighter: #bfdbfe;
   --ifm-color-primary-lightest: #dbeafe;
 }
+
+/* Headings in the sidebar, such as "Endpoints" (sidebars.js). The emphasis
+   colour adjusts to dark mode on its own. Two classes, so the margin beats
+   Infima's `.menu__list-item:not(:first-child)`. */
+.menu__list-item.sidebar-section-label {
+  margin-top: 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-600);
+}
