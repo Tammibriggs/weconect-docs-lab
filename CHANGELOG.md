@@ -4,6 +4,14 @@ Changes to the weConect API, newest first. Versions follow [semantic versioning]
 
 Versions before 1.0.0 weren't published. Semantic versioning reserves `0.x` versions for development before a first release, when anything can change. Until 2026-10-30 they were numbered 1.0.0, 1.1.0, and 1.1.1, so older commits and `PROCESS.md` entries use those numbers.
 
+## Documentation update: 2026-11-22
+
+The API is unchanged at 1.0.0.
+
+- **Two how-to guides:** [Find people and follow them](https://we-conect-docs.netlify.app/guides/find-people-and-follow-them) and [Show a feed with author names](https://we-conect-docs.netlify.app/guides/show-a-feed-with-author-names). Each one shows the requests step by step, in Node.js code you can copy one step at a time, and a test runs that code on every pull request.
+- **A Guides heading in the sidebar,** between the quickstart and Endpoints.
+- **The sample data has a third user, carol,** with a post, whom alice doesn't follow, so the follow guide has someone to follow. `npm run dev` lists her, and so does the quickstart's example of what it prints. The quickstart now links to the guides.
+
 ## Documentation update: 2026-11-21
 
 The API is unchanged at 1.0.0.

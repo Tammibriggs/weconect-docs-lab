@@ -2,9 +2,9 @@
 // the overview, then one category per tag. The overview's main sections are
 // listed under it as links to its headings, so readers can find authentication
 // and errors from any page. If you rename one of those headings in the spec,
-// change its link here; the build fails on a broken anchor. The quickstart,
-// which is written by hand, goes between the overview and the categories, and
-// an "Endpoints" heading separates the categories from the pages above them.
+// change its link here; the build fails on a broken anchor. The pages written
+// by hand, the quickstart and the guides, go between the overview and the
+// categories. "Guides" and "Endpoints" headings separate the groups.
 import reference from './content/reference/sidebar';
 
 const [overview, ...tags] = reference;
@@ -13,6 +13,14 @@ const section = (label, anchor) => ({
   type: 'link',
   label,
   href: `/reference/weconect-api#${anchor}`,
+});
+
+// Styled by .sidebar-section-label in src/css/custom.css
+const heading = (value) => ({
+  type: 'html',
+  value,
+  className: 'sidebar-section-label',
+  defaultStyle: true,
 });
 
 export default {
@@ -29,13 +37,11 @@ export default {
       ],
     },
     'quickstart',
-    // A plain heading, not a category, so the tags stay one level deep
-    {
-      type: 'html',
-      value: 'Endpoints',
-      className: 'sidebar-section-label',
-      defaultStyle: true,
-    },
+    // Plain headings, not categories, so the pages under them stay one level deep
+    heading('Guides'),
+    'guides/find-people-and-follow-them',
+    'guides/show-a-feed-with-author-names',
+    heading('Endpoints'),
     ...tags,
   ],
 };

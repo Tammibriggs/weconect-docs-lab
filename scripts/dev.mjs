@@ -12,6 +12,7 @@ import { ApiServer, BASE, isPortInUse, startMongo } from "./api-server.mjs";
 const SAMPLE_USERS = [
   { username: "alice", password: "secret1" },
   { username: "bob", password: "secret2" },
+  { username: "carol", password: "secret3" },
 ];
 
 async function call(method, path, body, token) {
@@ -31,9 +32,11 @@ async function seed() {
     const { data } = await call("POST", "/api/auth/login", { username, password });
     users[username] = { id: data._id, token: data.accessToken };
   }
-  const { alice, bob } = users;
+  const { alice, bob, carol } = users;
   await call("POST", "/api/posts", { userId: alice.id, desc: "Hello from Alice" }, alice.token);
   await call("POST", "/api/posts", { userId: bob.id, desc: "Hello from Bob" }, bob.token);
+  await call("POST", "/api/posts", { userId: carol.id, desc: "Hello from Carol" }, carol.token);
+  // alice follows bob but not carol, so the guide "Find people and follow them" has someone to follow
   await call("PUT", "/api/users/follow", { userId: bob.id }, alice.token);
   // An API key for the public endpoints, created the way the app's API keys page does
   const { data: key } = await call("POST", "/api/keys", { name: "npm run dev", scopes: ["read", "write"] }, alice.token);
@@ -72,7 +75,7 @@ if (!process.argv.includes("--empty")) {
   const users = await seed();
   lines.push(
     "",
-    "Sample data: alice and bob each have a post, and alice follows bob.",
+    "Sample data: alice, bob, and carol each have a post, and alice follows bob.",
     ...SAMPLE_USERS.map(({ username, password }) => `  ${username.padEnd(6)} password ${password}`),
     "",
     "alice's API key (read and write), for the public endpoints, for example in Postman:",

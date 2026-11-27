@@ -7,7 +7,7 @@ description: Run the weConect API on your computer, then use curl to check your 
 The quickstart is tested: tests/docs/ runs every bash block below with Doc Detective,
 except blocks marked testIgnore, and the hidden steps in comments check what they return.
 Write variables as ${NAME}, not $NAME: Doc Detective replaces $NAME itself, so a quoting
-mistake on the page would still pass. See CLAUDE.md, "Quickstart".
+mistake on the page would still pass. See CLAUDE.md, "Docs tests".
 -->
 
 <!-- test
@@ -53,15 +53,21 @@ The first run downloads MongoDB 6.0, which is about 55 MB. When the API is ready
 ```text
 The API is running at http://localhost:8800
 
-Sample data: alice and bob each have a post, and alice follows bob.
+Sample data: alice, bob, and carol each have a post, and alice follows bob.
   alice  password secret1
   bob    password secret2
+  carol  password secret3
 
 alice's API key (read and write), for the public endpoints, for example in Postman:
   wck_EXAMPLE_KEY
 ```
 
 The API runs at `http://localhost:8800` until you press Ctrl+C. Its database is in memory, so the data is deleted when you stop it, and you get a new key each time you start it. Leave it running, and open a second terminal for the next steps.
+
+<!-- step
+description: Stop the API if an earlier page's test left it running, so this page starts with fresh sample data
+closeSurface: api
+-->
 
 <!-- step
 description: Start the API the way the page does, and keep its output to read the key from
@@ -139,7 +145,7 @@ Replace `YOUR_USER_ID` with the `_id` value from your response.
 <!-- step
 description: Check that the key works, and save the user ID, as a reader would
 runShell:
-  command: printf '%s' "${QUICKSTART_OUTPUT}"
+  command: printf '%s' "${DOCS_OUTPUT}"
   stdio: '/"username":"alice"/'
 variables:
   WECONECT_USER_ID: extract($$stdio.stdout, '"_id":"([0-9a-f]{24})"')
@@ -179,7 +185,7 @@ The `userId` in the request must be your own user ID. Without it, the API return
 <!-- step
 description: Check that the post was created
 runShell:
-  command: printf '%s' "${QUICKSTART_OUTPUT}"
+  command: printf '%s' "${DOCS_OUTPUT}"
   stdio: '/^\{"status":"ok","data":\{.*"desc":"My first post from the API"/'
 -->
 
@@ -235,7 +241,7 @@ Your new post comes first. The timeline lists your posts, newest first, and then
 <!-- step
 description: Check that the new post comes first and bob's post comes after it
 runShell:
-  command: printf '%s' "${QUICKSTART_OUTPUT}"
+  command: printf '%s' "${DOCS_OUTPUT}"
   stdio: '/^\{"status":"ok","data":\[\{[^}]*"desc":"My first post from the API"[\s\S]*"desc":"Hello from Bob"/'
 -->
 
@@ -243,6 +249,6 @@ runShell:
 
 ## Next steps
 
-- To stop the API, press Ctrl+C in the first terminal. Its data is deleted.
+- Follow a guide: [Find people and follow them](/guides/find-people-and-follow-them) or [Show a feed with author names](/guides/show-a-feed-with-author-names).
 - Read about [authentication](/reference/weconect-api#authentication): how to create your own keys in the weConect app, and what each scope allows.
 - See every field and error in the reference: [Get the current user](/reference/get-current-user), [Create a post](/reference/create-post), and [Get the timeline](/reference/get-timeline).

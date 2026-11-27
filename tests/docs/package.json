@@ -1,7 +1,7 @@
 {
   "name": "weconect-docs-tests",
   "private": true,
-  "description": "Runs the quickstart's commands with Doc Detective. Kept apart from the root package so readers who run npm install there don't download it",
+  "description": "Runs the docs' commands, in the quickstart and the guides, with Doc Detective. Kept apart from the root package so readers who run npm install there don't download it",
   "scripts": {
     "test": "doc-detective run --config .doc-detective.json"
   },
