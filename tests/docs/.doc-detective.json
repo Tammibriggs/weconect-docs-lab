@@ -1,12 +1,13 @@
 {
-  "input": "../../docs/content/quickstart.md",
+  "input": ["../../docs/content/quickstart.md", "../../docs/content/guides"],
   "outputDir": "../runs/docs",
+  "relativePathBase": "cwd",
   "telemetry": { "send": false },
   "autoUpdate": false,
   "detectSteps": true,
   "fileTypes": [
     {
-      "name": "markdown-bash",
+      "name": "markdown-docs",
       "extensions": ["md"],
       "inlineStatements": { "in": ["comment"] },
       "markup": [
@@ -16,8 +17,21 @@
           "captures": ["content"],
           "actions": [
             {
-              "runShell": { "command": "$1" },
-              "variables": { "QUICKSTART_OUTPUT": "$$stdio.stdout" }
+              "runShell": { "command": "$1", "workingDirectory": "../runs/docs" },
+              "variables": { "DOCS_OUTPUT": "$$stdio.stdout" }
+            }
+          ]
+        },
+        {
+          "name": "addJavaScriptBlock",
+          "codeBlock": { "language": ["javascript", "js"], "metaExcludes": "testIgnore" },
+          "captures": ["content"],
+          "actions": [
+            {
+              "runShell": {
+                "command": "[ -n \"${DOCS_FILE}\" ] || { echo 'A page with tested javascript blocks needs a hidden step that sets DOCS_FILE'; exit 1; }\ncat >> \"${DOCS_FILE}\" <<'DOCS_EOF'\n$1\n\nDOCS_EOF",
+                "workingDirectory": "../runs/docs"
+              }
             }
           ]
         }

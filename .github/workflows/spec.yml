@@ -74,8 +74,8 @@ jobs:
       - name: Check that every documented response and field was returned
         run: npm run test:coverage -- tests/runs/ci
 
-  quickstart:
-    name: Quickstart test
+  docs:
+    name: Docs test
     # Pinned for the same reason as the contract tests: npm run dev downloads
     # MongoDB's build for Ubuntu 22.04
     runs-on: ubuntu-24.04
@@ -103,7 +103,7 @@ jobs:
           path: ~/.cache/mongodb-binaries
           key: mongodb-${{ hashFiles('scripts/api-server.mjs') }}
 
-      # Starts the API with npm run dev, then runs the page's curl commands and
-      # checks what each returns
-      - name: Run the quickstart's commands against the API
-        run: npm run test:quickstart
+      # For each page (the quickstart and the guides): starts the API with
+      # npm run dev, runs the page's commands as written, and checks the output
+      - name: Run the docs' commands against the API
+        run: npm run test:docs

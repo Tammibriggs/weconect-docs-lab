@@ -25,16 +25,22 @@ On 2026-11-04, [Schemathesis](https://schemathesis.readthedocs.io/) 4.33 ran 757
 
 Schemathesis isn't part of CI. It checks that responses match the spec, but not that every documented response happens, and it accepts fields the spec doesn't list. The [README](README.md) shows how to run it by hand.
 
-### The quickstart
+### The docs' commands
 
-Since 2026-11-20, `npm run test:quickstart` runs the docs' [quickstart](docs/content/quickstart.md) with Doc Detective 5.3.1: it starts the API with `npm run dev`, runs the page's 3 curl commands as written, and checks what each returns. GitHub Actions runs it on every pull request.
+Doc Detective 5.3.1 runs the commands on the docs' pages: the [quickstart](docs/content/quickstart.md) since 2026-11-20, and the two [guides](docs/content/guides/) since 2026-11-22. For each page, `npm run test:docs` (called `test:quickstart` until 2026-11-22) starts a fresh API with `npm run dev`, runs the page's `bash` blocks as written, adds its `javascript` blocks, in order, to the file the page names, and checks the output. GitHub Actions runs it on every pull request.
 
 | Run | Result |
 |---|---|
-| The page as written | 8 of 8 steps pass, in about 5 seconds |
+| The quickstart as written | 8 of 8 steps pass, in about 5 seconds |
 | The timeline lists followed users' posts first (an API change) | Fails at the timeline check |
 | The post's body in single quotes, with `${WECONECT_USER_ID}` (a page mistake) | Fails at the post check: the API returns `403 "you can only post to your account"`, as it would for a reader |
 | The same mistake with `$WECONECT_USER_ID` | Passes: Doc Detective replaces `$NAME` itself before the shell runs, so the page writes variables as `${NAME}` |
+| The quickstart and both guides as written (2026-11-22) | 23 of 23 steps pass, in about 15 seconds, with nothing left running |
+| The guides split into steps, each block added to one file (2026-11-23) | 30 of 30 steps pass, in about 8 seconds, with nothing left running |
+| The follow guide's code sends `{ id }` instead of `{ userId }` (a page mistake; run again 2026-11-23) | Fails: the API returns `400 "Missing payload property"`, and the code exits with that error |
+| The feed guide's code doesn't sort the posts (a page mistake; run again 2026-11-23) | Fails at the output check: alice's post comes before bob's newer one |
+| A guide without the hidden step that names its file (2026-11-23) | Fails at the first `javascript` block, with the message "A page with tested javascript blocks needs a hidden step that sets DOCS_FILE" |
+| The guides start the API with `before` in their test comment | The setup never ran: Doc Detective 5.3.1 applies `before` and `after` only to tests in YAML or JSON files. The guides passed only because the quickstart's API was still running, which the feed guide's output showed. Each page now starts its own API in hidden steps |
 
 ## Scope
 

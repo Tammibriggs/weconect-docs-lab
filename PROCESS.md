@@ -15,8 +15,8 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | 1. Launch | Docusaurus site with the overview and reference, published as version 1.0.0; a post about the project and the live docs | Done 2026-10-30. Live at https://we-conect-docs.netlify.app/ |
 | 2. Spec linting in CI | `lint:spec`, and a check that the public spec was rebuilt, on every pull request; deploy previews | Merged 2026-10-31 (pull request #1). The failing test (pull request #2) behaved as planned, and a ruleset now requires the check on `main`. The post was drafted on 2026-11-01 |
 | 3. Contract testing in CI | `test:capture`, `test:validate` and `test:coverage` on every pull request; a strict check for undocumented fields | Merged 2026-11-04 (pull request #3); the ruleset requires the check on `main`. The post was drafted on 2026-11-05 |
-| 4. Quickstart | Its own page, curl only, tested with Doc Detective; against the local API; replaces the overview's "Try it locally" section | Built 2026-11-20 on the `quickstart` branch: the page, and its Doc Detective test in CI. Not merged yet; the post isn't written |
-| 5. How-to guides | "Find people and follow them" and "Show a feed with author names" | Not started |
+| 4. Quickstart | Its own page, curl only, tested with Doc Detective; against the local API; replaces the overview's "Try it locally" section | Merged 2026-11-21 (pull request #7). All checks passed on GitHub, including Quickstart test in 25 s, which the ruleset now requires. The post was drafted on 2026-11-21 |
+| 5. How-to guides | "Find people and follow them" and "Show a feed with author names", in JavaScript, tested with Doc Detective, under a Guides heading in the sidebar | Built 2026-11-22 on the `guides` branch: both guides, their tests in the renamed **Docs test** job, and the Guides heading. Split into steps 2026-11-23. Not merged yet; the post isn't written |
 | 6. Style guide and Vale | Prose linting on every pull request | Not started |
 | 7. Sandbox | Deploy the API (Render, MongoDB Atlas) with sample data; turn "Send API Request" back on; move the quickstart to the sandbox. First: password hashing, the `likes` fix (1.0.1), `NODE_ENV=production`, security updates to dependencies | Not started |
 | 8. Tutorial | For example, a command-line feed reader | Not started |
@@ -36,8 +36,8 @@ Since 2026-10-30, each step after the launch adds one thing to the published doc
 | 170 captured responses match the spec; 3 deliberately broken captures were rejected | `npm run test:validate`; entry of 2026-10-22 |
 | 58 of 58 documented responses and 221 of 221 documented fields appear in a capture (before the coverage cases: 39 of 55 responses; 42 fields missing) | `npm run test:coverage` |
 | 29 findings, 5 of them fixed: 3 in 0.2, 1 in 0.2.1, 1 on 2026-11-20 in an undocumented endpoint | `TESTING.md` |
-| 15 pages on the docs site: the overview, the quickstart, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
-| Quickstart test: 8 of 8 steps pass; it caught 2 deliberate breaks and missed 1, which led to the `${NAME}` rule | `npm run test:quickstart`; entry of 2026-11-20, "The quickstart page" |
+| 17 pages on the docs site: the overview, the quickstart, 2 guides, 3 tag pages, and 10 endpoint pages | `cd docs && npm run build` |
+| Docs test: 30 of 30 steps pass on 3 pages. The quickstart's steps caught 2 deliberate breaks and missed 1, which led to the `${NAME}` rule; the guides' caught 3 of 3 | `npm run test:docs` (called `test:quickstart` until 2026-11-22); entries of 2026-11-20, "The quickstart page", 2026-11-22, "The two how-to guides", and 2026-11-23, "The guides in steps" |
 | 0 of 170 real responses have a field the spec doesn't list | `npm run test:validate`, which checks this since 2026-11-01. Before that, a one-off scan in scratch; entry of 2026-10-30, "What `test:validate` and `test:coverage` each catch" |
 | Contract job, as narrowed, simulated in a fresh clone: an unchanged run passed, 4 of 4 contract breaks failed it, and the API not starting failed it (before narrowing: 4 of 4 unchanged runs passed, 4 of 4 changes to the API failed it) | Entries of 2026-11-03 and 2026-11-01 |
 | CI, simulated in a fresh clone: 5 of 5 bad commits failed and 3 of 3 good commits passed; Netlify's `ignore` command was right in 8 of 8 cases | Entry of 2026-10-30, "Spec linting in CI" |
@@ -1392,6 +1392,76 @@ Decisions made between 2026-11-05 and today, before building step 4.
 - **Me:** asked for the sidebar and the Endpoints heading, questioned four of the overview's sections, and made the decisions.
 - **Claude Code:** checked Stripe's Authentication and Errors sections, suggested the changes, made them, and ran the checks.
 
+### 2026-11-22: The how-to guides' plan
+
+weConect has no users, so there are no support tickets or analytics to show which guides readers need. Instead, I suggested reviewing what similar social apps document. Bluesky, Mastodon and X all document posting, following, timelines, looking up users and pagination.
+
+| Decision (mine) | My reason |
+|---|---|
+| Two guides, as planned on 2026-10-30: "Find people and follow them" and "Show a feed with author names" | "Because it's closest to what Bluesky documents": its tutorials include "Following and unfollowing" and "Viewing feeds". X documents follows and timelines too |
+| The guides' code is JavaScript: Node.js and its built-in `fetch`, one language for now. This changes "curl only for now" (2026-11-20), which was for the quickstart; the quickstart stays curl | "Because it's common among the social media app docs and I will prefer to use only one for now." It's also my personal preference. X's guides show curl, Python and JavaScript; Bluesky's show Python and TypeScript. I had questioned curl, since developers rarely use it in their own code |
+| Doc Detective tests the guides, as it does the quickstart | "To prevent drift." |
+| Each guide links to the quickstart's "Start the API" and "Save your API key" sections, instead of a separate setup page | "It's short and it's temporary": once the API is deployed, setup becomes creating a key in the app |
+| Titles follow Google's style: they start with a bare infinitive, such as "Create an instance". Diátaxis suggests "How to…" | "I will prefer to stick with Google style guide across all my personal documentation works." |
+| A "Guides" heading in the sidebar, styled like Endpoints | "I believe using Guides is more common than How-to Guides." Of six sites Claude Code checked, Google Cloud and Docusaurus use "Guides", Django "How-to guides", and GitHub Actions "How-tos" |
+| The guides don't use like, and there are only two | As Claude Code suggested: like is deprecated in 1.1.0, and each guide is another page to test and keep correct |
+
+**Who did what**
+- **Me:** asked how teams choose guides and languages, suggested reviewing other social apps' docs, questioned curl, and made the decisions.
+- **Claude Code:** read Bluesky's, Mastodon's and X's docs, the naming rules of Diátaxis and Google, and Doc Detective's schema for running JavaScript; suggested options; and recorded the decisions.
+
+### 2026-11-22, later: The two how-to guides and their tests
+
+**What changed**
+- `docs/content/guides/`: "Find people and follow them" and "Show a feed with author names". Each builds one Node.js script, explains the cases the API leaves to the reader, and shows the output from a passing run. A Guides heading sits above them in the sidebar.
+- `scripts/dev.mjs`: a third sample user, carol, with a post, whom alice doesn't follow. The quickstart's example output lists her, and the quickstart links to the guides.
+- `tests/docs/`: a second rule saves each `javascript` block to the file named in its title. Each page starts a fresh API in hidden steps, so every page starts from the same data a reader has. `test:quickstart` became `test:docs`, and the CI job **Quickstart test** became **Docs test**.
+
+**Result**
+
+| Check | Result |
+|---|---|
+| `npm run test:docs` | 3 pages, 23 of 23 steps, about 15 seconds, nothing left running |
+| Deliberate breaks, on copies of the pages | The follow script sending `{ id }` instead of `{ userId }`: caught, with the API's `400`. The feed script without its sort: caught at the output check |
+| `cd docs && npm run build` | 17 pages, with the link and anchor checks; screenshots at 1280 px in light and dark mode, and at 390 px |
+
+**Problems**
+- The first version used `before` and `after` in each guide's test comment to start and stop the API. They never ran: Doc Detective 5.3.1 applies them only to tests in YAML or JSON files. The guides passed anyway, because the quickstart's API was still running; the feed guide's output gave it away, with the quickstart's post and carol in it. Each page now starts its own API.
+- Doc Detective resolves paths relative to each page by default, so one rule couldn't serve pages in two folders. `relativePathBase: cwd` makes them relative to `tests/docs/`.
+- Code lines wider than about 72 characters scrolled sideways in the screenshots, so the scripts are wrapped.
+
+**Who did what**
+- **Me:** approved the outline and the third sample user.
+- **Claude Code:** read Doc Detective's code to design the test, wrote the guides and the test, ran the breaks and checks, and updated the docs.
+
+### 2026-11-23: The guides in steps
+
+I asked why each guide's code was one block. Claude Code had chosen one block for the test, not the reader: the test ran the block as written, and no line appeared twice on the page. Diátaxis says "the fundamental structure of a how-to guide is a sequence", and Google's style guide says "use one step for each action". Google's style guide sets no length for a code block, only "Wrap lines at 80 characters"; the guides wrap at 72.
+
+| Decision (mine) | My reason |
+|---|---|
+| Split each guide's code into steps, one part of the goal per step, instead of one script in one block. The steps' blocks add up to one file, which the test runs, so no line appears twice | "Is easier to read and follow than one big block of code." |
+| No setup step, request helper, or shared constants: each block calls `fetch` directly, with the full URL and the key, and can be copied on its own | "I don't see a need for an initial setup or helper in a how-to, unless it's something complex or needed." A reader "has their own code setup, is looking for a solution to a problem and will probably skim through the page", so each step should give "a direct answer instead of starting with an initial setup". The cost: the URL, the key header and the error check repeat in every block |
+| No file name on the code blocks. "Run the code" names the file once | Follows from the reason above. I'd preferred titles to naming the file in every step's text, as Claude Code first suggested. Claude Code agreed, and pointed out that a reader with their own code puts it in their own files, so the file name and the `.mjs` extension matter only to someone running the code as it is |
+| Keep "Run the code", with the output | As Claude Code suggested: Google's Technical Writing Two course says "Good documents explain how to run sample code" and suggests "describing the expected output or result". It's also where the reader sees the steps work |
+
+**What changed**
+- "Find people and follow them": Find a user's ID by their username, Follow a user, Get your username, Follow everyone on your list, and Run the code.
+- "Show a feed with author names": Get the timeline, Get each author once, Sort the posts and print them, and Run the code. The authors are fetched one after another instead of in parallel, so the "once" is one visible line: `if (usernames.has(post.userId)) continue;`.
+- `tests/docs/`: the JavaScript rule adds each block, in order, to the file that a hidden step names (`DOCS_FILE`), instead of the file in each block's title. The hidden step also deletes the files earlier pages made. A page with JavaScript blocks and no such step fails at its first block, with a message saying so.
+
+**Result**
+
+| Check | Result |
+|---|---|
+| `npm run test:docs` | 3 pages, 30 of 30 steps, about 8 seconds, nothing left running |
+| Deliberate breaks, on copies of the pages | `{ id }` instead of `{ userId }`: caught, with the API's `400`. The feed without its sort: caught at the output check. A guide without the step that names its file: caught at its first block |
+| `cd docs && npm run build` | Passes, with the link and anchor checks; the hidden steps don't render |
+
+**Who did what**
+- **Me:** asked why the code was one block, whether Google's style guide sets a length for code blocks, why `.mjs`, and whether a how-to needs file names and a run step; chose steps, direct `fetch` calls, and no setup.
+- **Claude Code:** explained that one block had been a choice for the test; checked Diátaxis, Google's style guide and its Technical Writing Two course, and how Node runs a `.js` file that uses `await` outside a function; rewrote both guides and the test rule; ran the breaks and checks; and updated the docs.
+
 ## Post and portfolio ideas
 
 - Testing my own API before documenting it turned up 23 problems, including search leaking every user's encrypted password.
@@ -1415,3 +1485,5 @@ Decisions made between 2026-11-05 and today, before building step 4.
 - My API could have started returning passwords and every contract test would still have passed. What that taught me about open schemas, and the check that closes the gap at test time only.
 - A fuzzer found an undocumented `500` that my 183 hand-written cases missed, in 15 seconds, and I still kept it out of CI: what each kind of test can and can't see.
 - My docs test passed while my quickstart was broken: Doc Detective fills in `$VARIABLES` itself, so a quoting mistake every reader would hit never reached the shell. One character pair, `${}`, fixed it.
+- No users, no support tickets: how I chose my first how-to guides by reviewing what Bluesky, Mastodon and X document, and why X's timeline needs no guide for author names when mine does.
+- My first how-to guide was one 60-line code block, because that was easiest to test. How I split it into steps a skimming reader can copy, without untested snippets.
